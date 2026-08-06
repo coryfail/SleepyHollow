@@ -31,7 +31,7 @@ test("AC-HOME-001 AC-HOME-005 AC-HOME-010 · home is a product page with no proc
   await expect(page.getByRole("heading", { name: /Observe expected red/i })).toHaveCount(0);
 });
 
-test("AC-SGAD-001 AC-SGAD-003 AC-SGAD-006 · SGAD is a complete independent methodology page", async ({ page }) => {
+test("AC-SGAD-001 AC-SGAD-003 AC-SGAD-006 AC-SGAD-012 · SGAD is a complete independent methodology page", async ({ page }) => {
   await page.goto("/sgad/");
   await expect(page.getByText(/without Sleepy Hollow/i)).toBeVisible();
   await expect(page.getByRole("heading", { name: "The SGAD lifecycle" })).toBeVisible();
@@ -46,6 +46,8 @@ test("AC-SGAD-001 AC-SGAD-003 AC-SGAD-006 · SGAD is a complete independent meth
   await expect(page.getByText("feature.test.ts", { exact: true })).toBeVisible();
   await expect(page.getByText("feature.ts", { exact: true })).toBeVisible();
   await expect(page.getByText("evidence/verification.md", { exact: true })).toBeVisible();
+  await expect(page.getByText("Install the standalone SGAD skill", { exact: true })).toBeVisible();
+  await expect(page.getByText("npx skills add coryfail/SleepyHollow --skill sgad-workflow", { exact: true })).toBeVisible();
 });
 
 test("AC-SGAD-001 · SGAD introduction follows the shared navigation without an excessive empty band", async ({ page }) => {

@@ -10,7 +10,9 @@ framework, and skill behavior they govern.
 SleepyHollow/
 ├── requirements/
 │   ├── README.md
-│   └── application.md
+│   ├── application.md
+│   └── approvals/
+│       └── SH-F017.yaml
 ├── cli/
 │   ├── requirements.md
 │   ├── create/
@@ -43,6 +45,9 @@ SleepyHollow/
 ├── skill/
 │   ├── requirements.md
 │   └── planning/
+│       └── requirements.md
+├── skills/
+│   └── sgad-workflow/
 │       └── requirements.md
 ├── models/
 │   ├── endpoint-requirement.md
@@ -105,6 +110,7 @@ must not be silently reused or weakened.
 | SH-F014 | `core/services/requirements.md` | Optional multi-service projects |
 | SH-F015 | `cli/dev/requirements.md` | Local development server |
 | SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
+| SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD methodology workflow skill |
 
 ## Shared models
 

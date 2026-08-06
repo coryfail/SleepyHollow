@@ -388,6 +388,35 @@ main,
   line-height: 1.55;
 }
 
+.methodology-install {
+  display: grid;
+  width: min(100%, 54rem);
+  gap: var(--space-sm);
+}
+
+.methodology-install > p {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.methodology-install pre {
+  max-width: 100%;
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  overflow-x: auto;
+  background: var(--color-paper-2);
+  border-block: var(--rule-hair) solid var(--color-rule);
+  border-inline-start: var(--rule-heavy) solid var(--color-accent);
+  color: var(--color-body);
+  scrollbar-width: thin;
+}
+
+.methodology-install code {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  white-space: pre;
+}
+
 .methodology-prose,
 .methodology-workflow,
 .methodology-adoption,

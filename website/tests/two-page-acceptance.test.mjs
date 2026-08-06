@@ -82,10 +82,10 @@ test("LICENSE · public license copy matches the repository license", () => {
   assert.doesNotMatch(footer(), /\bMIT\b/i);
 });
 
-test("AC-SITE-011 · traceability covers every approved two-page criterion", () => {
+test("AC-SITE-011 · traceability covers every declared two-page criterion", () => {
   const evidence = JSON.parse(read("evidence/traceability.json") || "{}");
   const ids = new Set((evidence.criteria || []).map(({ id }) => id));
-  for (const [prefix, count] of [["AC-SITE", 11], ["AC-HOME", 10], ["AC-SGAD", 11]]) {
+  for (const [prefix, count] of [["AC-SITE", 11], ["AC-HOME", 10], ["AC-SGAD", 12]]) {
     for (let number = 1; number <= count; number += 1) {
       assert.ok(ids.has(`${prefix}-${String(number).padStart(3, "0")}`));
     }
@@ -131,7 +131,7 @@ test("AC-SGAD-003 AC-SGAD-004 AC-SGAD-005 · SGAD explains every ordered respons
   assert.match(text, /producing agent[^.]*not the (?:verification )?verdict/i);
 });
 
-test("AC-SGAD-006 AC-SGAD-007 AC-SGAD-008 AC-SGAD-010 · SGAD provides an understandable adoption reference", () => {
+test("AC-SGAD-006 AC-SGAD-007 AC-SGAD-008 AC-SGAD-010 AC-SGAD-012 · SGAD provides an understandable adoption reference", () => {
   const text = sgad();
   for (const phrase of ["stable acceptance-criterion", "approval record", "bidirectional", "independent verification command", "my-application/", "requirements/application.md", "feature/", "requirements.md", "feature.test.ts", "feature.ts", "evidence/verification.md"]) {
     assert.match(text, new RegExp(phrase, "i"));
@@ -140,4 +140,8 @@ test("AC-SGAD-006 AC-SGAD-007 AC-SGAD-008 AC-SGAD-010 · SGAD provides an unders
   assert.match(text, /docs\/sgad/);
   assert.match(text, /sgadGuideUrl}\/templates/);
   assert.match(text, /content digest/i);
+  assert.match(text, /npx skills add/);
+  assert.match(text, /coryfail\/SleepyHollow --skill sgad-workflow/);
+  assert.doesNotMatch(text, /\$skill-installer/);
+  assert.doesNotMatch(text, /tree\/main\/skill\/sgad-workflow/);
 });
