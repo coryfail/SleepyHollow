@@ -111,6 +111,18 @@ See [workflow.md](workflow.md) for phase entry and exit conditions.
   profiles.
 - [Templates](templates/) provide portable starting artifacts.
 
+## Standalone SGAD skill
+
+The portable [SGAD workflow skill](../../skills/sgad-workflow/SKILL.md) helps
+developers apply this methodology in repositories that do not use SleepyHollow.
+It guides governance discovery, specifications, exact-content approval,
+criterion traceability, red-state evidence, bounded implementation, independent
+verification, and evidence-gated delivery using the adopting project's own
+language, framework, tests, CI, and deployment tools.
+
+This is a separate skill from the SleepyHollow application skill. It does not
+teach or require the SleepyHollow runtime or CLI.
+
 ## Relationship to SleepyHollow
 
 SleepyHollow is a reference implementation of SGAD for headless API development.

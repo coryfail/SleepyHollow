@@ -1,0 +1,4 @@
+interface:
+  display_name: "SGAD Workflow"
+  short_description: "Apply SGAD with governed, traceable evidence"
+  default_prompt: "Use $sgad-workflow to guide this change through the SGAD methodology."

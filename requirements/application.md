@@ -1,16 +1,21 @@
 # SleepyHollow Requirements and Architecture Specification
 
-**Version:** 0.3.0
+**Version:** 0.4.0
 
 **Status:** Product direction approved for initial implementation
 
-**Date:** August 5, 2026
+**Date:** August 6, 2026
 
 ## 1. Executive summary
 
 SleepyHollow is an agentic-first, simple headless framework for rapidly designing, prototyping, testing, and deploying APIs on Deno.
 
 Its defining feature is the official SleepyHollow AI skill. The skill guides a user from a plain-language application idea to a reviewed API design, creates requirements beside every proposed endpoint, develops each approved endpoint through test-driven development, verifies the result with deterministic framework tooling, and deploys the finished application.
+
+SleepyHollow also publishes a separate, framework-independent SGAD workflow
+skill. It helps developers adopt Specification-Governed Agentic Development in
+any repository without requiring the SleepyHollow runtime, CLI, or application
+skill.
 
 The framework is the small, reliable runtime beneath that experience. It provides file-based routing, schemas, validation, Deno KV integration, security defaults, tests, API contracts, generated clients, and fast deployment. It remains usable by a human without the skill, but it is intentionally designed so an agent can understand and operate it reliably.
 
@@ -327,6 +332,37 @@ CLAUDE.md
 ```
 
 These files provide a portable subset of the official skill's conventions. They do not replace the richer interactive workflow of the official skill.
+
+### 4.6 Standalone SGAD workflow skill
+
+The project shall publish a separate SGAD workflow skill for developers applying
+the methodology outside the SleepyHollow framework. The SGAD skill shall be
+framework-, language-, agent-host-, repository-, test-runner-, and deployment-
+target-independent.
+
+The skill shall guide a developer through establishing repository governance,
+discovering affected behavior, drafting or revising specifications, decomposing
+bounded components, obtaining approval bound to exact content, mapping tests to
+stable criteria, observing credible red-state evidence, implementing only
+approved scope, verifying through independent project controls, and delivering
+with evidence. It shall support honest brownfield adoption without fabricating
+historical approval or red-state evidence.
+
+The SGAD skill shall keep mandatory gates in its primary instructions and load
+detailed artifact, workflow, verification, adoption, and conformance guidance
+progressively. It shall provide portable templates for application requirements,
+component requirements, and verification reports. It shall not depend on
+SleepyHollow commands, treat an editable lifecycle field as approval, let the
+producing agent certify itself, or claim SGAD conformance without sufficient
+evidence.
+
+The distributable package shall live at `skills/sgad-workflow` so open
+agent-skill tooling can discover it from the repository shorthand. Public
+installation guidance shall use:
+
+```bash
+npx skills add coryfail/SleepyHollow --skill sgad-workflow
+```
 
 ## 5. Requirements format
 
@@ -762,6 +798,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 ### 15.1 Required
 
 - Official SleepyHollow agent skill
+- Standalone framework-independent SGAD workflow skill
 - Whole-application planning dialogue
 - Comprehensive `requirements/application.md`
 - Endpoint requirement decomposition
@@ -848,6 +885,12 @@ The first release is complete when all of the following are demonstrated:
 22. The skill can optionally scaffold two independent services with separate requirements and Deno KV stores.
 23. One service can call another through a generated client using the authentication approach approved in that project's requirements.
 24. No service reads another service's Deno KV data directly.
+25. A developer can use the standalone SGAD skill in a non-SleepyHollow
+    repository to establish governance, create reviewable requirements, preserve
+    approval and red-state gates, and produce an evidence-based verification
+    handoff without claiming unsupported conformance. The skill is discoverable
+    from `skills/sgad-workflow` through the documented `npx skills add`
+    repository command.
 
 ## 17. Delivery sequence
 
@@ -870,7 +913,9 @@ The first release is complete when all of the following are demonstrated:
 - `hollow check`
 - Contract consistency checks
 
-### Phase 3: Official skill
+### Phase 3: Agent skills
+
+#### Official SleepyHollow skill
 
 - Planning questions
 - Application design
@@ -879,6 +924,14 @@ The first release is complete when all of the following are demonstrated:
 - Approval workflow
 - TDD implementation loop
 - Bounded repair and reporting
+
+#### Standalone SGAD workflow skill
+
+- Repository governance and adoption assessment
+- Application and component specification guidance
+- Exact-content approval and criterion traceability
+- Red-state, implementation, and independent-verification gates
+- Portable artifact templates and evidence-based handoff
 
 ### Phase 4: Headless outputs
 
@@ -913,6 +966,7 @@ The first release is complete when all of the following are demonstrated:
 | Endpoint files duplicate shared rules inconsistently | Contracts drift | Keep shared model and policy requirements and validate dependencies |
 | Flexible authentication encourages unsafe custom code | Credential or authorization vulnerabilities | Prefer reviewed providers, define a neutral interface, require explicit security criteria, and flag custom crypto |
 | Agentic scope expands into an AI platform | Release is delayed | Keep model execution in the host agent and the workflow in the skill |
+| The standalone SGAD skill drifts from the methodology | Developers receive contradictory governance guidance | Keep methodology documents authoritative and validate the skill's gates, references, and templates against them |
 | Framework API becomes too broad for agents | Lower implementation reliability | Maintain a small canonical API and explicit escape hatches |
 | Microservices add premature complexity | Slow prototypes and operational burden | Default to one API and require planning justification for multiple services |
 | Deno KV limits future workloads | Rework for advanced data needs | Keep data access behind stable primitives and document the escape hatch |
@@ -957,7 +1011,7 @@ An endpoint is done when:
 
 ## 21. Final product statement
 
-SleepyHollow is an agentic-first platform for rapidly building and deploying headless applications. Its official AI skill plans the complete application, creates reviewable requirements beside every endpoint, develops approved behavior through TDD, and deploys the result on a simple Deno framework that independently verifies the work.
+SleepyHollow is an agentic-first platform for rapidly building and deploying headless applications. Its official AI skill plans the complete application, creates reviewable requirements beside every endpoint, develops approved behavior through TDD, and deploys the result on a simple Deno framework that independently verifies the work. Its separate SGAD workflow skill makes the underlying methodology usable by developers in any software repository.
 
 The shortest expression of the product is:
 

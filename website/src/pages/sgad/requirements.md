@@ -48,6 +48,8 @@ The page must remain useful to people who never use Sleepy Hollow.
 - Provide a practical adoption checklist and a compact example of colocated
   requirements, tests, implementation, and evidence.
 - Link to the canonical SGAD guide and reusable templates in the repository.
+- Provide one copy-pasteable terminal line using the open agent-skills CLI to
+  install the standalone SGAD skill directly from its repository path.
 
 ## Content boundaries
 
@@ -69,6 +71,9 @@ The page must remain useful to people who never use Sleepy Hollow.
 - Keep the human approval boundary visually prominent throughout the workflow.
 - Present the adoption checklist and file-layout example as practical reference
   material rather than product UI.
+- Present the install command as a compact technical affordance that stays on one
+  line when space permits and scrolls within its own bounded region on narrow
+  screens.
 - Shared navigation must identify this page as the SGAD destination and provide
   a clear route back to Sleepy Hollow.
 
@@ -107,9 +112,13 @@ The page must remain useful to people who never use Sleepy Hollow.
 - AC-SGAD-011: Given the methodology claims are reviewed against `docs/sgad/`,
   then the page does not present SGAD as an established standard, a guarantee,
   or a substitute for human judgment and domain-specific review.
+- AC-SGAD-012: Given an agent user wants to apply SGAD outside Sleepy Hollow,
+  then the page provides the visible, copy-pasteable terminal command
+  `npx skills add coryfail/SleepyHollow --skill sgad-workflow`
+  without implying that the Sleepy Hollow framework is installed.
 
 ## Approval boundary
 
-Approval authorizes only the SGAD page behavior and acceptance criteria
-AC-SGAD-001 through AC-SGAD-011. Site-wide delivery behavior and the Sleepy
-Hollow product narrative require their own approved requirements.
+The project owner approved this exact requirement revision, including the short
+standalone-skill install command in AC-SGAD-012. Site-wide delivery behavior and
+the Sleepy Hollow product narrative require their own approved requirements.

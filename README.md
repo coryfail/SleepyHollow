@@ -9,6 +9,11 @@ framework-independent methodology in which specifications authorize work,
 agents implement approved behavior, and independently checkable evidence governs
 completion.
 
+Developers can apply SGAD outside the SleepyHollow framework with the standalone
+[SGAD workflow skill](skills/sgad-workflow/SKILL.md). It is separate from the
+framework-specific SleepyHollow application skill and contains no SleepyHollow
+runtime or CLI workflow.
+
 ## Contributing
 
 Development follows a feature-branch workflow with `main` reserved for
