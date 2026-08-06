@@ -1,10 +1,10 @@
 {
   "schema": "sgad-traceability/v0.1",
-  "generated_at": "2026-08-06T17:21:00Z",
+  "generated_at": "2026-08-06T19:19:08Z",
   "requirements": [
     { "id": "sleepy-hollow-website", "path": "website/requirements.md", "digest": "sha256:57d0e449cae7d4bc2e5fc6397ac9641f9255fd16b3417368e68b043a3a34075e" },
     { "id": "website-sleepy-hollow-page", "path": "website/src/pages/sleepy-hollow/requirements.md", "digest": "sha256:20af56fff2d4b0786637895b333a94a75d38c98efd8b11c1d44ebb0ebbaa343e" },
-    { "id": "website-sgad-page", "path": "website/src/pages/sgad/requirements.md", "digest": "sha256:953d9a6f2e3b10e19cda2cb350df58620bdaf0760039b000bc1c08785a9c9bef" }
+    { "id": "website-sgad-page", "path": "website/src/pages/sgad/requirements.md", "digest": "sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170" }
   ],
   "criteria": [
     { "id": "AC-SITE-001", "tests": ["tests/two-page-acceptance.test.mjs", "npm run build"] },
@@ -38,7 +38,8 @@
     { "id": "AC-SGAD-008", "tests": ["tests/link-targets.test.mjs"] },
     { "id": "AC-SGAD-009", "tests": ["src/App.test.tsx", "tests/landing-page.spec.ts"] },
     { "id": "AC-SGAD-010", "tests": ["tests/two-page-acceptance.test.mjs"] },
-    { "id": "AC-SGAD-011", "tests": ["tests/two-page-acceptance.test.mjs"] }
+    { "id": "AC-SGAD-011", "tests": ["tests/two-page-acceptance.test.mjs"] },
+    { "id": "AC-SGAD-012", "tests": ["src/App.test.tsx", "tests/two-page-acceptance.test.mjs", "tests/link-targets.test.mjs", "tests/landing-page.spec.ts"], "expected_red": ["website/evidence/sgad-short-install-red-state.md"] }
   ],
   "expected_red": "website/evidence/two-page-red-state.md"
 }

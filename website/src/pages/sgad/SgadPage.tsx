@@ -1,12 +1,13 @@
 const repositoryUrl = "https://github.com/coryfail/SleepyHollow";
 const sgadGuideUrl = `${repositoryUrl}/tree/main/docs/sgad`;
 const sgadTemplatesUrl = `${sgadGuideUrl}/templates`;
+const sgadSkillInstallCommand = "npx skills add coryfail/SleepyHollow --skill sgad-workflow";
 
 const lifecycle = [
   ["1.0", "Specify", "Write the behavior people actually want. Keep assumptions and unresolved decisions visible instead of letting an agent fill the gaps."],
-  ["2.0", "Approve", "A human reviews the exact behavioral intent and grants bounded authority. Approval covers that content—not whatever seems plausible later."],
+  ["2.0", "Approve", "A human reviews the exact behavioral intent and grants bounded authority. Approval covers that content, not whatever seems plausible later."],
   ["3.0", "Write acceptance tests", "Turn every approved acceptance criterion into a check with a stable identity. Requirements point to their tests, and governed tests point back."],
-  ["4.0", "Observe expected red", "Run those checks before implementation. A meaningful expected-red result fails because behavior is missing—not because of syntax, configuration, dependency, or test environment failure."],
+  ["4.0", "Observe expected red", "Run those checks before implementation. A meaningful expected-red result fails because behavior is missing, not because of syntax, configuration, dependency, or test environment failure."],
   ["5.0", "Implement", "Let the agent create the smallest behavior the approved specification permits. New intent returns to human review instead of entering through a side door."],
   ["6.0", "Verify independently", "Use a deterministic verification command and reproducible tools to inspect the current revision. The producing agent’s confidence is not the verification verdict."],
   ["7.0", "Deliver with evidence", "Connect the approved requirement, red result, passing tests, implementation revision, and deployment. Completion is an evidence bundle, not a status message."],
@@ -15,10 +16,10 @@ const lifecycle = [
 const adoptionSteps = [
   "Store a requirements.md file beside each independently valuable feature.",
   "Give every stable acceptance-criterion ID a test mapping that survives refactoring.",
-  "Create an approval record bound to an exact requirement revision or content digest—a fingerprint of the approved file.",
+  "Create an approval record bound to an exact requirement revision or content digest, a fingerprint of the approved file.",
   "Keep bidirectional traceability: requirements point to tests and tests point back to requirements.",
   "Retain expected-red evidence showing the checks detected genuinely missing behavior.",
-  "Use an independent verification command—not the producing agent’s summary—to decide whether evidence passes.",
+  "Use an independent verification command, not the producing agent’s summary, to decide whether evidence passes.",
 ];
 
 export default function SgadPage() {
@@ -33,6 +34,13 @@ export default function SgadPage() {
             agent work, and independently checkable evidence. You can use it
             without Sleepy Hollow, a particular agent, or a new platform.
           </p>
+          <div className="methodology-install">
+            <p id="sgad-install-label">Install the standalone SGAD skill</p>
+            <pre
+              aria-labelledby="sgad-install-label"
+              tabIndex={0}
+            ><code>{sgadSkillInstallCommand}</code></pre>
+          </div>
         </header>
 
         <section className="methodology-prose" aria-labelledby="authority-title">

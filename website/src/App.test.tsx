@@ -29,6 +29,12 @@ describe("approved two-page behavior", () => {
     }
   });
 
+  test("AC-SGAD-012 · the SGAD page provides the standalone skill install line", () => {
+    render(<App page="sgad" />);
+    expect(screen.getByText("Install the standalone SGAD skill", { exact: true })).toBeVisible();
+    expect(screen.getByText("npx skills add coryfail/SleepyHollow --skill sgad-workflow", { exact: true })).toBeVisible();
+  });
+
   test("AC-SITE-002 · navigation identifies the current page", () => {
     render(<App page="sgad" />);
     const navigation = screen.getByRole("navigation", { name: /primary/i });

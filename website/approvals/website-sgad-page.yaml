@@ -1,7 +1,7 @@
 schema: sgad-approval/v0.1
 requirement_id: website-sgad-page
 requirement_path: website/src/pages/sgad/requirements.md
-requirement_digest: sha256:953d9a6f2e3b10e19cda2cb350df58620bdaf0760039b000bc1c08785a9c9bef
+requirement_digest: sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170
 scope:
   criteria:
     - AC-SGAD-001
@@ -15,8 +15,9 @@ scope:
     - AC-SGAD-009
     - AC-SGAD-010
     - AC-SGAD-011
+    - AC-SGAD-012
 approved_by: human-project-owner
-approved_at: 2026-08-06T16:27:58Z
+approved_at: 2026-08-06T19:19:08Z
 risk: standard
 source: codex-conversation
-decision: "Create a separate SGAD page that explains the methodology and how to use it"
+decision: "Publish the standalone SGAD skill with the short skills CLI install command"
