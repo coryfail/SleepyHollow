@@ -331,10 +331,18 @@ verification described above.
 ### Delivery
 
 - Verification scope initially excluded delivery.
-- Status: authorized after verification; pending execution.
+- Status: delivered.
 - Authorized at: 2026-08-06T23:18:39Z.
 - Authority: human-project-owner; direct instruction to push the verified change
   to `development` and `main`, then clean up the feature branch.
 - Intended delivery: commit the declared working tree, fast-forward and push
   `development` and `main`, confirm their remote tips, and remove the temporary
   feature branch.
+- Delivered at: 2026-08-06T23:20:21Z.
+- Implementation commit:
+  `bcf4ccf430bbf6c9b86838ffab22ab79ce4f1e57` (`refactor: simplify SGAD
+  governance`).
+- Result: `origin/development` and `origin/main` were independently confirmed at
+  the implementation commit after non-forced pushes. No remote feature branch
+  existed, and the merged local `feature/simplify-sgad-artifacts` branch was
+  deleted.
