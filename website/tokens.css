@@ -1,0 +1,52 @@
+:root {
+  --color-paper: oklch(13% 0.018 250);
+  --color-paper-2: oklch(17% 0.022 250);
+  --color-paper-3: oklch(22% 0.025 250);
+  --color-ink: oklch(95% 0.009 85);
+  --color-body: oklch(83% 0.012 85);
+  --color-muted: oklch(69% 0.016 85);
+  --color-rule: oklch(36% 0.028 250);
+  --color-rule-strong: oklch(52% 0.035 250);
+  --color-accent: oklch(76% 0.15 58);
+  --color-accent-soft: oklch(67% 0.09 58);
+  --color-focus: oklch(82% 0.16 72);
+  --color-mist: oklch(74% 0.035 220);
+  --color-pine: oklch(31% 0.045 168);
+
+  --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", serif;
+  --font-body: "Geist", "Avenir Next", "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "Cascadia Code", "Liberation Mono", monospace;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 9rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.953rem;
+  --text-2xl: 2.441rem;
+  --text-3xl: 3.052rem;
+  --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 110ms;
+  --dur-short: 200ms;
+  --dur-long: 400ms;
+
+  --rule-hair: 1px;
+  --rule-heavy: 3px;
+  --radius-sm: 0.25rem;
+  --radius-round: 999px;
+}
