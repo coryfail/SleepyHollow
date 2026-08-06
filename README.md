@@ -26,6 +26,7 @@ SleepyHollow develops itself using the same agentic-first process it provides to
 generated applications. The approved application specification lives at
 [requirements/application.md](requirements/application.md), and decomposed
 requirements are colocated with their future tests and implementation under the
-concrete [`cli/`](cli/), [`core/`](core/), and [`skill/`](skill/) components. See
+concrete [`cli/`](cli/), [`core/`](core/), and
+[`skills/sleepy-hollow/`](skills/sleepy-hollow/) components. See
 [requirements/README.md](requirements/README.md) for the lifecycle and complete
 structure.
