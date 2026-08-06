@@ -1,6 +1,14 @@
 # SleepyHollow
 Agent-native headless API framework for Deno that turns application ideas into reviewed, test-driven, production-ready APIs.
 
+## SGAD methodology
+
+SleepyHollow is a reference implementation of
+[Specification-Governed Agentic Development](docs/sgad/README.md): a
+framework-independent methodology in which specifications authorize work,
+agents implement approved behavior, and independently checkable evidence governs
+completion.
+
 ## Contributing
 
 Development follows a feature-branch workflow with `main` reserved for
