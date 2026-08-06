@@ -16,7 +16,7 @@
     { "id": "AC-SITE-007", "tests": ["tests/landing-page.spec.ts"] },
     { "id": "AC-SITE-008", "tests": ["tests/landing-page.spec.ts"] },
     { "id": "AC-SITE-009", "tests": ["src/App.test.tsx", "tests/two-page-acceptance.test.mjs"] },
-    { "id": "AC-SITE-010", "tests": ["tests/two-page-acceptance.test.mjs", ".github/workflows/website-pages.yml"] },
+    { "id": "AC-SITE-010", "tests": ["tests/two-page-acceptance.test.mjs", ".github/workflows/website-pages.yml", "evidence/pages-concurrency-red-state.md"] },
     { "id": "AC-SITE-011", "tests": ["tests/two-page-acceptance.test.mjs", "evidence/two-page-red-state.md"] },
     { "id": "AC-HOME-001", "tests": ["src/App.test.tsx", "tests/landing-page.spec.ts"] },
     { "id": "AC-HOME-002", "tests": ["src/App.test.tsx", "tests/two-page-acceptance.test.mjs"] },
