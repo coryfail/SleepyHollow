@@ -1,10 +1,11 @@
-# Contributing to SleepyHollow
+# Contributing to Sleepy Hollow
 
 ## Branches
 
 The repository uses the following long-lived branches:
 
-- `main` contains production-ready code. Releases are tagged from this branch.
+- `main` contains the current release-ready repository state. Releases are
+  tagged from this branch when the product reaches a releasable milestone.
 - `development` integrates completed work for the next release.
 
 Short-lived branches use these naming conventions:

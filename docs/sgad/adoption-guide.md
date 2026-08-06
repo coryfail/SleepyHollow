@@ -23,21 +23,33 @@ One possible minimal structure is:
 
 ```text
 project/
-├── requirements/
-│   └── application.md
-├── src/
-│   └── feature-name/
-│       ├── requirements.md
-│       ├── feature.test.ts
-│       └── feature.ts
-└── .sgad/
-    ├── policy.yml
-    ├── approvals/
-    └── evidence/
+├── requirements/application.md
+└── src/feature-name/
+    ├── requirements.md
+    ├── feature.test.ts
+    └── feature.ts
 ```
 
-The exact paths are not normative. Requirements, tests, implementation,
-approval, and evidence must be connected deterministically.
+Place requirements according to the behavior they own:
+
+- `requirements/application.md` owns application-wide intent, shared
+  architecture, cross-cutting behavior, and system criteria. It is the only item
+  in the top-level `requirements/` directory.
+- A component's `requirements.md` lives beside the feature, service, package,
+  website, skill, or documentation behavior it governs.
+- Root `requirements.md` is optional and reserved for durable behavior that
+  spans the repository and cannot be assigned honestly to the application or one
+  component.
+
+Use each governed `requirements.md` as the single home for its complete
+governance history: exact-content approval, stable criteria, bidirectional test
+mapping, red-state evidence, independent verification, and applicable delivery
+results. Append these records beneath `## Governance record` after the governed
+behavioral content.
+
+Git history, a protected review, CI, or an attestation may be linked as
+supporting provenance, but the canonical record remains in `requirements.md`.
+Do not accept an editable status as sole proof of approval or verification.
 
 ## 3. Write the system specification
 
@@ -74,9 +86,13 @@ Use [the component template](templates/component-requirements.md).
 
 ## 5. Record approval against exact content
 
-At minimum, review the specification in a protected pull request and retain the
-approved commit. Stronger implementations calculate the specification digest and
-store an explicit approval record.
+At minimum, review the specification through an authorized control, calculate
+the governed-content digest, and append the approval decision and its supporting
+source beneath `## Governance record` in the same `requirements.md`.
+
+Calculate the digest over the exact bytes before that heading after omitting the
+single top-level frontmatter `status:` line and its line ending. Apply no other
+normalization.
 
 Do not allow an agent to establish approval by changing `status: draft` to
 `status: approved` without independently verifiable authorization.
@@ -87,7 +103,7 @@ Choose one deterministic mapping mechanism:
 
 - Criterion IDs in test names.
 - Test annotations or metadata.
-- A checked manifest connecting criteria and tests.
+- A mapping table in the governed `requirements.md` connecting criteria and tests.
 - Generated mappings from a supported test framework.
 
 Add a CI check for unmapped criteria and unapproved acceptance tests.
@@ -112,7 +128,8 @@ Create one stable command or CI entry point that:
 - Validates red evidence when required.
 - Runs relevant tests and existing quality gates.
 - Detects changed or stale generated artifacts.
-- Produces human output and a versioned machine-readable report.
+- Appends a human-readable result and links any machine-readable runner output in
+  the governed `requirements.md`.
 - Returns nonzero when required evidence fails or is missing.
 
 The first verifier may be a small script around existing tools. Independence
@@ -122,8 +139,8 @@ platform.
 ## 9. Bind CI and delivery
 
 Protect governed branches or environments so delivery requires a valid verifier
-result for the exact revision. Retain the report as a CI artifact or repository
-attestation.
+result for the exact revision. Record the result in `requirements.md` and link
+the supporting CI run or repository attestation.
 
 Add post-delivery evidence only after pre-delivery verification is reliable.
 
@@ -170,7 +187,8 @@ A feature-branch workflow fits SGAD naturally:
 3. Review and approve exact intent.
 4. Add mapped tests and red evidence.
 5. Implement and verify.
-6. Open or update the implementation pull request with the verification report.
+6. Open or update the implementation pull request with the embedded verification
+   entry and its supporting runner links.
 7. Merge only while the report still matches the head revision.
 
 A project may use separate specification and implementation pull requests for

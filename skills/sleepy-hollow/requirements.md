@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F009
-title: Official SleepyHollow agent skill
+title: Official Sleepy Hollow agent skill
 status: draft
+risk: standard
 source_sections:
   - "3"
   - "4"
@@ -12,9 +14,11 @@ depends_on:
   - SH-F008
 open_decisions:
   - OPEN-010
+owners:
+  - Sleepy Hollow maintainers
 ---
 
-# Official SleepyHollow agent skill
+# Official Sleepy Hollow agent skill
 
 ## Purpose
 
@@ -92,3 +96,31 @@ conventions but shall not replace the official workflow.
 Codex, Claude, or another compatible host owns conversation, model selection, and
 file editing. OPEN-010 evaluates which portable guidance remains reliable across
 hosts.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

@@ -31,13 +31,13 @@ test("AC-HOME-001 AC-HOME-005 AC-HOME-010 · home is a product page with no proc
   await expect(page.getByRole("heading", { name: /Observe expected red/i })).toHaveCount(0);
 });
 
-test("AC-SGAD-001 AC-SGAD-003 AC-SGAD-006 AC-SGAD-012 · SGAD is a complete independent methodology page", async ({ page }) => {
+test("AC-WEB-SGAD-001 AC-WEB-SGAD-003 AC-WEB-SGAD-006 AC-WEB-SGAD-012 · SGAD is a complete independent methodology page", async ({ page }) => {
   await page.goto("/sgad/");
   await expect(page.getByText(/without Sleepy Hollow/i)).toBeVisible();
   await expect(page.getByRole("heading", { name: "The SGAD lifecycle" })).toBeVisible();
   await expect(page.locator(".lifecycle > li")).toHaveCount(7);
   await expect(page.getByText(/independent verification command/i)).toBeVisible();
-  await expect(page.locator(".file-map__files > li")).toHaveCount(3);
+  await expect(page.locator(".file-map__files > li")).toHaveCount(2);
   await expect(page.locator(".file-map__nested > li")).toHaveCount(3);
   await expect(page.getByText("my-application/", { exact: true })).toBeVisible();
   await expect(page.getByText("requirements/application.md", { exact: true })).toBeVisible();
@@ -45,12 +45,16 @@ test("AC-SGAD-001 AC-SGAD-003 AC-SGAD-006 AC-SGAD-012 · SGAD is a complete inde
   await expect(page.getByText("requirements.md", { exact: true })).toBeVisible();
   await expect(page.getByText("feature.test.ts", { exact: true })).toBeVisible();
   await expect(page.getByText("feature.ts", { exact: true })).toBeVisible();
-  await expect(page.getByText("evidence/verification.md", { exact: true })).toBeVisible();
+  await expect(page.getByText(/requirements\.md contains its complete governance history/i)).toBeVisible();
+  await expect(page.getByText(/criterion mapping/i)).toBeVisible();
+  await expect(page.getByText(/supporting provenance/i)).toBeVisible();
+  await expect(page.getByText(/application-wide intent belongs in requirements\/application\.md/i)).toBeVisible();
+  await expect(page.getByText(/root requirements\.md is reserved for repository-wide behavior/i)).toBeVisible();
   await expect(page.getByText("Install the standalone SGAD skill", { exact: true })).toBeVisible();
   await expect(page.getByText("npx skills add coryfail/SleepyHollow --skill sgad-workflow", { exact: true })).toBeVisible();
 });
 
-test("AC-SGAD-001 · SGAD introduction follows the shared navigation without an excessive empty band", async ({ page }) => {
+test("AC-WEB-SGAD-001 · SGAD introduction follows the shared navigation without an excessive empty band", async ({ page }) => {
   await page.setViewportSize({ width: 889, height: 936 });
   await page.goto("/sgad/");
 
@@ -86,6 +90,7 @@ for (const route of routes) {
 
   test(`AC-SITE-006 · ${route.name} exposes immediate keyboard focus`, async ({ page }) => {
     await page.goto(route.path);
+    await page.bringToFront();
     await page.keyboard.press("Tab");
     const focused = page.locator(":focus-visible");
     await expect(focused).toBeVisible();

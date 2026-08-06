@@ -1,8 +1,6 @@
-const repositoryUrl = "https://github.com/coryfail/SleepyHollow";
+import { repositoryUrl, sitePaths } from "../../site";
 
 export default function SleepyHollowPage() {
-  const sgadPageUrl = `${import.meta.env.BASE_URL}sgad/`;
-
   return (
     <main id="main-content" className="home-page">
       <section className="hero home-hero" aria-labelledby="home-title">
@@ -69,7 +67,7 @@ export default function SleepyHollowPage() {
             The method can be used with or without Sleepy Hollow.
           </p>
           <div className="hero__actions" aria-label="Continue learning">
-            <a className="text-action text-action--primary" href={sgadPageUrl}>
+            <a className="text-action text-action--primary" href={sitePaths.sgad}>
               Read how SGAD works <span aria-hidden="true">→</span>
             </a>
             <a className="text-action" href={repositoryUrl}>

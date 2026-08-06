@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F007
 title: Testing and acceptance-criterion traceability
 status: draft
+risk: standard
 source_sections:
   - "3.6"
   - "5.3"
@@ -15,6 +17,8 @@ depends_on:
 open_decisions:
   - OPEN-005
   - OPEN-006
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Testing and acceptance-criterion traceability
@@ -79,3 +83,31 @@ visibility and renewed approval when intended behavior changes.
 
 OPEN-005 selects transparent criterion metadata compatible with Deno's test
 runner. OPEN-006 must balance fast endpoint checks with shared regression safety.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

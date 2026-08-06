@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F017
 title: Standalone SGAD workflow skill
 status: approved
+risk: standard
 source_sections:
   - "4.6"
   - "15.1"
@@ -9,6 +11,8 @@ source_sections:
   - "17"
 depends_on: []
 open_decisions: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Standalone SGAD workflow skill
@@ -33,7 +37,7 @@ traceability, and independently checkable evidence.
 
 ## Requirements
 
-The SGAD workflow skill shall be independently usable without the SleepyHollow
+The SGAD workflow skill shall be independently usable without the Sleepy Hollow
 runtime, CLI, or application skill. It shall adapt to the repository's language,
 framework, agent host, source-control platform, test runner, verifier, and
 deployment target while preserving SGAD Core gates.
@@ -59,8 +63,10 @@ conformance when required evidence is missing.
 
 `SKILL.md` shall keep the non-negotiable gates concise and load detailed
 workflow, artifact, verification, adoption, and conformance guidance
-progressively. The skill shall include portable application-requirement,
-component-requirement, and verification-report templates.
+progressively. The skill shall include portable application- and
+component-requirement templates with complete embedded governance records.
+It shall place application, component, and repository-wide requirements
+according to the behavior they own.
 
 The complete package shall live at `skills/sgad-workflow` and retain the skill
 name `sgad-workflow`. The repository shall support the unambiguous installation
@@ -71,10 +77,12 @@ branch name or nested GitHub URL in the public instruction.
 
 - AC-F017-001: The skill metadata triggers for requests to adopt, operate,
   assess, or explain an SGAD development workflow without requiring
-  SleepyHollow.
+  Sleepy Hollow.
 - AC-F017-002: In an arbitrary repository, the skill discovers applicable
-  governance, risk, authority, canonical artifact locations, verification, and
-  delivery controls before governed implementation.
+  governance, risk, authority, canonical requirement locations, embedded
+  governance records, verification, and delivery controls before governed
+  implementation, then places requirements according to application,
+  component, or repository-wide ownership.
 - AC-F017-003: The skill records material unresolved decisions and does not
   silently convert assumptions into authorized behavior.
 - AC-F017-004: New governed behavior receives written system or component intent
@@ -115,7 +123,7 @@ branch name or nested GitHub URL in the public instruction.
   policy.
 - Granting approval, certifying the producer's own work, or claiming that passing
   evidence proves an incomplete specification is correct.
-- Requiring SleepyHollow or any particular agent, model, language, framework,
+- Requiring Sleepy Hollow or any particular agent, model, language, framework,
   repository host, test runner, or deployment target.
 
 ## Dependencies and assumptions
@@ -124,3 +132,49 @@ The canonical methodology lives in `docs/sgad/`. The skill packages a concise,
 portable operating workflow and templates derived from those documents. Adopting
 repositories remain responsible for defining authorized approvers and a verifier
 appropriate to their stack and risk.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-06T19:19:08Z.
+- Approved criteria: AC-F017-001 through AC-F017-013.
+- Historical requirement digest:
+  `sha256:f080aba49ed769339a504cd21be0bfed710b77f2a44071caae910dfb994ce64c`.
+- Decision source: Codex conversation; publish the standalone SGAD workflow
+  skill for framework-independent use.
+
+### Criterion mapping
+
+- AC-F017-001 through AC-F017-012 -> standalone skill source review,
+  canonical/package template comparison, and skill-creator validation.
+- AC-F017-013 -> website structural, React, link-target, browser, and local
+  agent-skills package-discovery checks.
+
+### Red-state evidence
+
+- Status: failed-as-expected for the short-install correction.
+- Base revision: `05e2aab`.
+- The focused structural and rendered checks failed before the short
+  `npx skills add coryfail/SleepyHollow --skill sgad-workflow` command and local
+  package target existed; the runner and unrelated website checks were healthy.
+
+### Verification
+
+- Status: passed at 2026-08-06T19:22:50Z for the historical approved revision.
+- Verifier: structural source checks, React tests, local skill-target validation,
+  and Chromium desktop/mobile behavior.
+- Result: the short install command, package discovery, page presentation, and
+  approved AC-WEB-SGAD-012 integration all passed.
+- Current repository-wide verification is recorded in root `requirements.md`.
+
+### Delivery
+
+- Status: no independent delivery record was retained for SH-F017.

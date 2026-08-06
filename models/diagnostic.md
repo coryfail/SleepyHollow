@@ -1,10 +1,15 @@
 ---
+schema: sleepy-hollow-model/v0.1
 id: SH-MODEL-DIAGNOSTIC
+title: Diagnostic model
 status: draft
 source_sections:
   - "8"
   - "11.2"
   - "12"
+depends_on: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Diagnostic model

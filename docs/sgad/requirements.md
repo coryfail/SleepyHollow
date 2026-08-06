@@ -1,12 +1,12 @@
 ---
-schema: sgad-component/v0.1
+schema: sgad-component/v0.2
 id: sgad-methodology
 title: Specification-Governed Agentic Development methodology
 status: draft
 risk: standard
 depends_on: []
 owners:
-  - SleepyHollow maintainers
+  - Sleepy Hollow maintainers
 ---
 
 # SGAD methodology requirements
@@ -21,10 +21,12 @@ governed software lifecycle transitions.
 
 - Define the SGAD purpose, terminology, principles, workflow, artifacts,
   lifecycle, verification model, adoption path, and conformance rules.
-- Provide portable templates for application requirements, component
-  requirements, and verification reports.
+- Provide portable templates for application and component requirements with
+  embedded approval, mapping, red-state, verification, and delivery records.
+- Place application, component, and repository-wide requirements according to
+  the behavior they own.
 - Define how SGAD extends to nondeterministic AI systems.
-- Describe SleepyHollow as a reference implementation without making it a
+- Describe Sleepy Hollow as a reference implementation without making it a
   dependency of SGAD.
 
 ## Out of scope
@@ -63,7 +65,7 @@ governed software lifecycle transitions.
   tests, incomplete traceability, stale artifacts, dependency impact, and
   production revision drift.
 - AC-SGAD-011: The methodology defines a portable SGAD Core conformance claim and
-  stronger optional capability profiles without requiring SleepyHollow.
+  stronger optional capability profiles without requiring Sleepy Hollow.
 - AC-SGAD-012: The adoption guide provides a staged path usable in greenfield and
   brownfield repositories with existing tools.
 - AC-SGAD-013: The AI-system extension represents nondeterministic results with
@@ -80,6 +82,10 @@ governed software lifecycle transitions.
 - AC-SGAD-017: SGAD applies its own rules to methodology changes and identifies
   the current documentation as a draft until approval and verification evidence
   exist.
+- AC-SGAD-018: Requirement placement follows behavioral ownership:
+  `requirements/application.md` owns application-wide intent, component
+  requirements are colocated, and optional root `requirements.md` is reserved
+  for irreducible repository-wide behavior.
 
 ## Dependencies and assumptions
 
@@ -101,3 +107,31 @@ compatibility assessment.
 Approval should cover the methodology purpose, all AC-SGAD criteria, SGAD Core
 normative requirements, optional capability profiles, and the version 0.1
 templates. Partial approval must list excluded criteria explicitly.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed checks.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable while the methodology remains a public draft.

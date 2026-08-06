@@ -15,7 +15,8 @@ Define:
 
 - Authorized approvers and content-binding mechanism.
 - Risk classes and evidence required for each.
-- Canonical specification, approval, evidence, and policy locations.
+- The governed `requirements.md` files that will contain complete governance
+  histories.
 - Criterion-mapping convention.
 - One stable verifier command or CI entry point.
 - Evidence retention, invalidation, and delivery rules.
@@ -45,18 +46,26 @@ approval and red evidence for new governed behavior.
 ```text
 project/
 ├── requirements/application.md
-├── src/feature-name/
-│   ├── requirements.md
-│   ├── feature.test.ts
-│   └── feature.ts
-└── .sgad/
-    ├── policy.yml
-    ├── approvals/
-    └── evidence/
+└── src/feature-name/
+    ├── requirements.md
+    ├── feature.test.ts
+    └── feature.ts
 ```
 
-Paths are not normative. Require deterministic connections among intent,
-approval, tests, implementation, verification, and delivery.
+Place requirements according to behavioral ownership:
+
+- `requirements/application.md` owns application-wide intent and is the only
+  item in the top-level `requirements/` directory.
+- A component's `requirements.md` lives beside the feature, service, package,
+  website, skill, or documentation behavior it governs.
+- Root `requirements.md` is optional and reserved for durable repository-wide
+  behavior that cannot be assigned honestly elsewhere.
+
+Use the feature's `requirements.md` as the single home for its complete
+governance history: approval, criterion mapping, red-state evidence,
+verification, and applicable delivery. Append those records beneath
+`## Governance record`. Git, review, CI, and attestations may be linked as
+supporting provenance from that record.
 
 ## Avoid common failures
 

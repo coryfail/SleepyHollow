@@ -1,28 +1,32 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
 status: draft
+risk: standard
 source_sections:
   - "3.1"
   - "12"
   - "15.1"
 depends_on: []
 open_decisions: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Project creation
 
 ## Purpose
 
-Give humans and agents one safe command that creates a valid SleepyHollow
+Give humans and agents one safe command that creates a valid Sleepy Hollow
 application before any application-specific endpoint exists.
 
 ## In scope
 
 - `hollow create <project-name>`.
-- A minimal Deno project and typed SleepyHollow configuration.
+- A minimal Deno project and typed Sleepy Hollow configuration.
 - Empty API, requirements, and generated-output locations.
-- Instructions for using the official SleepyHollow skill.
+- Instructions for using the official Sleepy Hollow skill.
 - Human-readable and machine-readable creation results.
 
 ## Requirements
@@ -70,3 +74,31 @@ or installing the official skill in supported agent environments.
 
 The CLI distribution and installation mechanism will be selected during initial
 implementation. That choice must not change the observable scaffold contract.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

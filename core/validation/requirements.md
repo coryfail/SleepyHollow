@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F003
 title: Schemas, validation, and errors
 status: draft
+risk: standard
 source_sections:
   - "6.2"
   - "6.5"
@@ -10,6 +12,8 @@ depends_on:
   - SH-F002
 open_decisions:
   - OPEN-002
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Schemas, validation, and errors
@@ -67,3 +71,31 @@ contract tooling rather than being reauthored separately.
 
 OPEN-002 will select a schema approach based on TypeScript inference, runtime
 correctness, error quality, and OpenAPI compatibility.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

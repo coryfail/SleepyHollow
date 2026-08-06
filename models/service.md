@@ -1,13 +1,18 @@
 ---
+schema: sleepy-hollow-model/v0.1
 id: SH-MODEL-SERVICE
+title: Service model
 status: draft
 source_sections:
   - "9"
+depends_on: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Service model
 
-A service is an independently describable and deployable SleepyHollow
+A service is an independently describable and deployable Sleepy Hollow
 application with its own application requirement, runtime configuration, API
 routes, tests, generated contract, deployment, and Deno KV database.
 

@@ -1,43 +1,52 @@
-# SleepyHollow Requirements and Architecture Specification
+---
+schema: sgad-application/v0.2
+id: sleepy-hollow-application
+title: Sleepy Hollow requirements and architecture specification
+status: draft
+risk: standard
+depends_on: []
+owners:
+  - Sleepy Hollow maintainers
+---
+
+# Sleepy Hollow Requirements and Architecture Specification
 
 **Version:** 0.4.0
-
-**Status:** Product direction approved for initial implementation
 
 **Date:** August 6, 2026
 
 ## 1. Executive summary
 
-SleepyHollow is an agentic-first, simple headless framework for rapidly designing, prototyping, testing, and deploying APIs on Deno.
+Sleepy Hollow is an agentic-first, simple headless framework for rapidly designing, prototyping, testing, and deploying APIs on Deno.
 
-Its defining feature is the official SleepyHollow AI skill. The skill guides a user from a plain-language application idea to a reviewed API design, creates requirements beside every proposed endpoint, develops each approved endpoint through test-driven development, verifies the result with deterministic framework tooling, and deploys the finished application.
+Its defining feature is the official Sleepy Hollow AI skill. The skill guides a user from a plain-language application idea to a reviewed API design, creates requirements beside every proposed endpoint, develops each approved endpoint through test-driven development, verifies the result with deterministic framework tooling, and deploys the finished application.
 
-SleepyHollow also publishes a separate, framework-independent SGAD workflow
+Sleepy Hollow also publishes a separate, framework-independent SGAD workflow
 skill. It helps developers adopt Specification-Governed Agentic Development in
-any repository without requiring the SleepyHollow runtime, CLI, or application
+any repository without requiring the Sleepy Hollow runtime, CLI, or application
 skill.
 
 The framework is the small, reliable runtime beneath that experience. It provides file-based routing, schemas, validation, Deno KV integration, security defaults, tests, API contracts, generated clients, and fast deployment. It remains usable by a human without the skill, but it is intentionally designed so an agent can understand and operate it reliably.
 
 The primary product promise is:
 
-> Describe the application. Review the design endpoint by endpoint. SleepyHollow builds, tests, and deploys it.
+> Describe the application. Review the design endpoint by endpoint. Sleepy Hollow builds, tests, and deploys it.
 
 The operating trust boundary is:
 
 > The skill plans and implements. The framework independently verifies and runs the result.
 
-Authentication is not a built-in product requirement. Each application defines its authentication and authorization needs during AI-assisted planning. SleepyHollow provides neutral request-principal, authorization, secret-handling, and verification interfaces so projects can use no authentication, project-specific authentication, an external provider, API keys, or service credentials without forcing one model on every application.
+Authentication is not a built-in product requirement. Each application defines its authentication and authorization needs during AI-assisted planning. Sleepy Hollow provides neutral request-principal, authorization, secret-handling, and verification interfaces so projects can use no authentication, project-specific authentication, an external provider, API keys, or service credentials without forcing one model on every application.
 
-Microservices are optional. A project may be one deployable API, several independently deployable services, or one API designed for later extraction. SleepyHollow does not require distributed architecture and does not attempt to become a full microservice orchestration platform in the first release.
+Microservices are optional. A project may be one deployable API, several independently deployable services, or one API designed for later extraction. Sleepy Hollow does not require distributed architecture and does not attempt to become a full microservice orchestration platform in the first release.
 
 ## 2. Product definition
 
 ### 2.1 Product category
 
-SleepyHollow is an agentic-first headless application framework and development workflow. The AI skill is the primary development experience. The Deno framework and CLI provide the deterministic application runtime, checks, contracts, and deployment path that make the agentic workflow trustworthy.
+Sleepy Hollow is an agentic-first headless application framework and development workflow. The AI skill is the primary development experience. The Deno framework and CLI provide the deterministic application runtime, checks, contracts, and deployment path that make the agentic workflow trustworthy.
 
-SleepyHollow is not primarily:
+Sleepy Hollow is not primarily:
 
 - A general-purpose web framework
 - A backend-as-a-service
@@ -59,7 +68,7 @@ The first release serves:
 
 ### 2.3 Core value proposition
 
-SleepyHollow reduces the distance between an application idea and a deployed, consumable API while retaining deliberate design and test evidence.
+Sleepy Hollow reduces the distance between an application idea and a deployed, consumable API while retaining deliberate design and test evidence.
 
 The user should receive:
 
@@ -97,10 +106,10 @@ The user should receive:
 
 The intended onboarding flow is:
 
-1. Install the SleepyHollow framework and CLI.
+1. Install the Sleepy Hollow framework and CLI.
 2. Open Codex, Claude, or another supported agent environment.
-3. Install or activate the official SleepyHollow skill when the environment supports skills.
-4. Create a new project that depends on the installed SleepyHollow framework.
+3. Install or activate the official Sleepy Hollow skill when the environment supports skills.
+4. Create a new project that depends on the installed Sleepy Hollow framework.
 5. Invoke the skill and describe the desired application.
 
 The first-release CLI shall support a direct project creation command such as:
@@ -211,11 +220,18 @@ The user may:
 - Reject an endpoint
 - Return to the application-level design when a change affects shared behavior
 
-Approval shall be recorded in the endpoint frontmatter. The initial lifecycle is intentionally small:
+Approval shall resolve through an independently verifiable approval record bound
+to the exact requirement content and approved scope. The initial human-readable
+lifecycle is intentionally small:
 
 ```text
 draft -> approved -> verified
 ```
+
+An endpoint frontmatter `status` is a lifecycle projection used for routing and
+readability. An editable status value is not approval authority or verification
+evidence by itself. Independent approval and evidence records determine the
+actual governed state.
 
 If approved behavior changes, the requirement returns to `draft`, affected tests are regenerated or revised transparently, and the user approves the changed behavior again.
 
@@ -234,7 +250,9 @@ For each approved endpoint, the skill shall:
 9. Run relevant integration tests.
 10. Run `hollow check`.
 11. Repair bounded implementation failures without changing approved behavior.
-12. Mark the endpoint `verified` only after all required checks pass.
+12. Expose the endpoint as `verified` only after an independent verifier resolves
+    valid exact-content approval, mapped tests, credible red-state evidence, and
+    passing results. The projected status is not itself completion evidence.
 13. Report changed files, criterion coverage, verification results, and remaining risks.
 
 The process repeats until all approved endpoints are implemented or the user chooses to stop.
@@ -254,11 +272,11 @@ When the selected endpoint set is verified, the skill shall:
 9. Run a smoke test.
 10. Return the live API URL, contract locations, and verification summary.
 
-## 4. Official SleepyHollow skill
+## 4. Official Sleepy Hollow skill
 
 ### 4.1 Role
 
-The official skill is the defining agentic integration. It teaches a compatible coding agent how to plan, structure, review, test, build, verify, and deploy a SleepyHollow application.
+The official skill is the defining agentic integration. It teaches a compatible coding agent how to plan, structure, review, test, build, verify, and deploy a Sleepy Hollow application.
 
 The framework shall not embed a managed model runtime in the first release. Model selection, conversation, and file editing remain responsibilities of Codex, Claude, or another host agent.
 
@@ -336,7 +354,7 @@ These files provide a portable subset of the official skill's conventions. They 
 ### 4.6 Standalone SGAD workflow skill
 
 The project shall publish a separate SGAD workflow skill for developers applying
-the methodology outside the SleepyHollow framework. The SGAD skill shall be
+the methodology outside the Sleepy Hollow framework. The SGAD skill shall be
 framework-, language-, agent-host-, repository-, test-runner-, and deployment-
 target-independent.
 
@@ -350,9 +368,9 @@ historical approval or red-state evidence.
 
 The SGAD skill shall keep mandatory gates in its primary instructions and load
 detailed artifact, workflow, verification, adoption, and conformance guidance
-progressively. It shall provide portable templates for application requirements,
-component requirements, and verification reports. It shall not depend on
-SleepyHollow commands, treat an editable lifecycle field as approval, let the
+progressively. It shall provide portable templates for application and component
+requirements. It shall not depend on
+Sleepy Hollow commands, treat an editable lifecycle field as approval, let the
 producing agent certify itself, or claim SGAD conformance without sufficient
 evidence.
 
@@ -365,6 +383,19 @@ npx skills add coryfail/SleepyHollow --skill sgad-workflow
 ```
 
 ## 5. Requirements format
+
+Requirement placement follows behavioral ownership:
+
+- `requirements/application.md` owns product-wide intent, shared architecture,
+  cross-cutting behavior, and system-level acceptance criteria.
+- A component's `requirements.md` lives beside and owns the behavior of that
+  endpoint, CLI surface, runtime module, skill, website, or documentation set.
+- Root `requirements.md` is reserved for durable governed behavior that spans an
+  entire repository and cannot be assigned honestly to the application or one
+  component.
+
+The top-level `requirements/` directory contains only `application.md`; it is not
+a collection point for miscellaneous specifications.
 
 ### 5.1 Endpoint requirement frontmatter
 
@@ -382,6 +413,11 @@ depends_on:
 service: application
 ---
 ```
+
+The `status` field is workflow-routing metadata and a lifecycle projection. Its
+editable value cannot serve as sole approval authority or verification evidence.
+The requirement must instead resolve independently verifiable records bound to
+its exact content and governed scope.
 
 ### 5.2 Required sections
 
@@ -451,7 +487,20 @@ Return one bookmark by its primary identifier.
 - AC-003: A malformed ID returns an RFC 9457 `400` response.
 ```
 
-### 5.3 Acceptance-criterion traceability
+### 5.3 Embedded governance format
+
+Each application and endpoint `requirements.md` shall contain its complete
+`Governance record` after the behavioral specification. It embeds exact-content
+approval, bidirectional criterion mapping, credible red-state evidence,
+independent verification, and applicable delivery results. Calculate the
+governed-content digest from the exact bytes before the `## Governance record`
+heading after omitting the one top-level frontmatter `status:` line and its line
+ending. No other normalization is permitted. This keeps the human-readable
+lifecycle projection outside the approval digest while binding every behavioral
+section. Supporting Git, review, CI, or attestation provenance may be linked
+from the embedded record.
+
+### 5.4 Acceptance-criterion traceability
 
 Every approved acceptance criterion shall map to at least one test. Tests may cover multiple criteria when the mapping remains explicit. Verification shall report:
 
@@ -466,7 +515,7 @@ The initial release does not require cryptographic test locking. The skill shall
 
 ### 6.1 File-based routes
 
-SleepyHollow shall use predictable file-based API routes. Directory segments map to URL segments, and dynamic folders such as `[id]` map to path parameters.
+Sleepy Hollow shall use predictable file-based API routes. Directory segments map to URL segments, and dynamic folders such as `[id]` map to path parameters.
 
 Each implemented route shall declare:
 
@@ -528,7 +577,7 @@ Custom routes and handlers are first-class. Applications shall not be forced int
 
 ### 7.1 Product boundary
 
-SleepyHollow v0.1 shall not ship a mandatory built-in authentication system or prescribe email/password, passwordless, OIDC, sessions, JWTs, API keys, or service credentials for all applications.
+Sleepy Hollow v0.1 shall not ship a mandatory built-in authentication system or prescribe email/password, passwordless, OIDC, sessions, JWTs, API keys, or service credentials for all applications.
 
 Authentication shall be selected during application planning and documented in:
 
@@ -692,7 +741,7 @@ Contract generation shall derive from the same normalized route and schema defin
 
 ### 11.1 Test utilities
 
-SleepyHollow shall provide utilities for:
+Sleepy Hollow shall provide utilities for:
 
 - Starting an application in test mode
 - Isolated Deno KV databases
@@ -797,7 +846,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 
 ### 15.1 Required
 
-- Official SleepyHollow agent skill
+- Official Sleepy Hollow agent skill
 - Standalone framework-independent SGAD workflow skill
 - Whole-application planning dialogue
 - Comprehensive `requirements/application.md`
@@ -857,11 +906,33 @@ Standalone executables and additional cloud adapters are deferred until the init
 - Requiring microservices for simple applications
 - Hiding application behavior in implicit package scanning or magic activation
 
+### 15.4 Colocated requirement inventory
+
+| ID | Location | Responsibility |
+|---|---|---|
+| SH-F001 | `cli/create/requirements.md` | Installation and safe project creation |
+| SH-F002 | `core/routing/requirements.md` | File-based HTTP routing runtime |
+| SH-F003 | `core/validation/requirements.md` | Schemas, validation, and Problem Details |
+| SH-F004 | `core/kv/requirements.md` | Typed, bounded Deno KV access |
+| SH-F005 | `core/security/requirements.md` | Security, authentication, and authorization boundaries |
+| SH-F006 | `skills/sleepy-hollow/planning/requirements.md` | Application planning, decomposition, and approval |
+| SH-F007 | `core/testing/requirements.md` | Test utilities and criterion traceability |
+| SH-F008 | `cli/check/requirements.md` | Independent `hollow check` verification |
+| SH-F009 | `skills/sleepy-hollow/requirements.md` | Official agent skill and end-to-end workflow |
+| SH-F010 | `cli/generate/requirements.md` | OpenAPI and typed-client generation |
+| SH-F011 | `cli/requirements.md` | Shared CLI behavior and diagnostics |
+| SH-F012 | `core/config/requirements.md` | Configuration and observability |
+| SH-F013 | `cli/deploy/requirements.md` | Verified Deno Deploy delivery |
+| SH-F014 | `core/services/requirements.md` | Optional multi-service projects |
+| SH-F015 | `cli/dev/requirements.md` | Local development server |
+| SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
+| SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD workflow skill |
+
 ## 16. MVP acceptance criteria
 
 The first release is complete when all of the following are demonstrated:
 
-1. A user can install SleepyHollow and create a valid project.
+1. A user can install Sleepy Hollow and create a valid project.
 2. The official skill can turn a plain-language idea into a comprehensive application requirements document.
 3. The user can review and approve the application design before implementation.
 4. The skill can decompose the design into endpoint requirements and create the API folder structure without generating endpoint code.
@@ -885,7 +956,7 @@ The first release is complete when all of the following are demonstrated:
 22. The skill can optionally scaffold two independent services with separate requirements and Deno KV stores.
 23. One service can call another through a generated client using the authentication approach approved in that project's requirements.
 24. No service reads another service's Deno KV data directly.
-25. A developer can use the standalone SGAD skill in a non-SleepyHollow
+25. A developer can use the standalone SGAD skill in a non-Sleepy Hollow
     repository to establish governance, create reviewable requirements, preserve
     approval and red-state gates, and produce an evidence-based verification
     handoff without claiming unsupported conformance. The skill is discoverable
@@ -915,7 +986,7 @@ The first release is complete when all of the following are demonstrated:
 
 ### Phase 3: Agent skills
 
-#### Official SleepyHollow skill
+#### Official Sleepy Hollow skill
 
 - Planning questions
 - Application design
@@ -994,7 +1065,8 @@ The following decisions require prototypes or focused evaluation before their ex
 
 An endpoint is done when:
 
-- Its `requirements.md` is approved.
+- A valid approval record resolves to the exact content of its `requirements.md`
+  and bounded criteria.
 - Its dependencies are approved or explicitly available.
 - Every acceptance criterion maps to at least one test.
 - The pre-implementation tests failed for the expected missing behavior.
@@ -1006,13 +1078,42 @@ An endpoint is done when:
 - Data access is bounded and index-compatible.
 - OpenAPI and generated client output are current.
 - `hollow check` passes.
-- The requirement status is `verified`.
+- A content-bound verification result establishes the verified state; any
+  editable status field is only a lifecycle projection.
 - The completion report identifies changes, evidence, and remaining risks.
 
 ## 21. Final product statement
 
-SleepyHollow is an agentic-first platform for rapidly building and deploying headless applications. Its official AI skill plans the complete application, creates reviewable requirements beside every endpoint, develops approved behavior through TDD, and deploys the result on a simple Deno framework that independently verifies the work. Its separate SGAD workflow skill makes the underlying methodology usable by developers in any software repository.
+Sleepy Hollow is an agentic-first platform for rapidly building and deploying headless applications. Its official AI skill plans the complete application, creates reviewable requirements beside every endpoint, develops approved behavior through TDD, and deploys the result on a simple Deno framework that independently verifies the work. Its separate SGAD workflow skill makes the underlying methodology usable by developers in any software repository.
 
 The shortest expression of the product is:
 
-> Describe it. Review it. SleepyHollow builds and deploys it.
+> Describe it. Review it. Sleepy Hollow builds and deploys it.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content product approval.
+- Approver, time, approved criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending exact-content product approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved product test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent product verification.
+
+### Delivery
+
+- Status: not applicable while the application specification remains draft.

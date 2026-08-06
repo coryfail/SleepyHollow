@@ -1,9 +1,14 @@
 ---
+schema: sleepy-hollow-model/v0.1
 id: SH-MODEL-ROUTE
+title: Route model
 status: draft
 source_sections:
   - "6.1"
   - "10"
+depends_on: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Route model

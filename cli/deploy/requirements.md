@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F013
 title: Deno Deploy delivery
 status: draft
+risk: standard
 source_sections:
   - "3.7"
   - "14"
@@ -12,13 +14,15 @@ depends_on:
   - SH-F012
 open_decisions:
   - OPEN-011
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Deno Deploy delivery
 
 ## Purpose
 
-Provide one excellent, deterministic path from a verified SleepyHollow
+Provide one excellent, deterministic path from a verified Sleepy Hollow
 application to a live Deno Deploy service with post-deployment evidence.
 
 ## In scope
@@ -78,3 +82,31 @@ results. A deployment is not successful until required smoke tests pass.
 
 OPEN-011 must validate Deno Deploy setup, safe credentials, upload behavior, URL
 discovery, and reliable smoke tests against the current platform API.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

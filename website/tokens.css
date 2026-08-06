@@ -13,8 +13,8 @@
   --color-mist: oklch(74% 0.035 220);
   --color-pine: oklch(31% 0.045 168);
 
-  --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", serif;
-  --font-body: "Geist", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "SFMono-Regular", "Cascadia Code", "Liberation Mono", monospace;
 
   --space-3xs: 0.125rem;

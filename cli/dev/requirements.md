@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F015
 title: Local development command
 status: draft
+risk: standard
 source_sections:
   - "12"
   - "14"
@@ -10,13 +12,15 @@ depends_on:
   - SH-F002
   - SH-F012
 open_decisions: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Local development command
 
 ## Purpose
 
-Run a SleepyHollow application locally with fast, deterministic feedback while
+Run a Sleepy Hollow application locally with fast, deterministic feedback while
 routes, schemas, and configuration change.
 
 ## In scope
@@ -63,3 +67,31 @@ change succeeded.
 The reload implementation may be selected during development, but its observable
 behavior must satisfy the same route inventory and startup validation as a fresh
 process.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

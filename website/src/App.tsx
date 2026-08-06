@@ -12,7 +12,7 @@ function currentDocumentPage(): PageId {
 export default function App({ page = currentDocumentPage() }: { page?: PageId }) {
   return (
     <div className="site-shell" id="top">
-      <a className="skip-link" href="#main-content">Skip to content</a>
+      <a className="skip-link" href="#main-content" tabIndex={0}>Skip to content</a>
       <SiteHeader currentPage={page} />
       {page === "sgad" ? <SgadPage /> : <SleepyHollowPage />}
       <SiteFooter />

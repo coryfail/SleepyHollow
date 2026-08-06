@@ -1,6 +1,6 @@
 ---
 name: sgad-workflow
-description: Apply Specification-Governed Agentic Development (SGAD) in any software repository by establishing governance, writing reviewable specifications, binding approval to exact intent, mapping acceptance criteria to tests, recording credible red-state evidence, implementing within approved scope, and handing off to independent verification and evidence-gated delivery. Use when a developer asks to adopt, follow, explain, audit, or assess SGAD; create SGAD requirements or evidence artifacts; govern agent-generated changes; or run a greenfield or brownfield change through the SGAD methodology. This skill is framework-independent and does not require SleepyHollow.
+description: Apply Specification-Governed Agentic Development (SGAD) in any software repository by establishing governance, writing reviewable specifications, binding approval to exact intent, mapping acceptance criteria to tests, recording credible red-state evidence, implementing within approved scope, and handing off to independent verification and evidence-gated delivery. Use when a developer asks to adopt, follow, explain, audit, or assess SGAD; create SGAD requirements or embedded governance records; govern agent-generated changes; or run a greenfield or brownfield change through the SGAD methodology. This skill is framework-independent and does not require Sleepy Hollow.
 ---
 
 # SGAD workflow
@@ -15,7 +15,7 @@ Choose the smallest route that satisfies the request:
 - **Explain:** Describe SGAD concepts without changing repository state.
 - **Assess:** Compare current artifacts and controls with SGAD Core; report gaps
   without asserting conformance.
-- **Adopt:** Establish a governed boundary, artifact locations, authority, and a
+- **Adopt:** Establish a governed boundary, requirement locations, authority, and a
   staged rollout. Read [adoption.md](references/adoption.md).
 - **Execute:** Run a concrete change through the full workflow below. Read
   [workflow.md](references/workflow.md).
@@ -55,11 +55,16 @@ release controls, and evidence. Determine:
 - Which behavior is governed and which policy applies.
 - The risk classification and required checks.
 - Who or what may approve exact intent.
-- Canonical locations for specifications, approval, and evidence.
+- The governed `requirements.md` that will contain the complete approval and
+  evidence history.
 - The independent verifier entry point and delivery gate.
 
 If these controls do not exist, propose the smallest explicit policy before
 continuing. Do not silently appoint the producing agent as approver or verifier.
+Use the governed `requirements.md` as the single governance record. It must embed
+approval, criterion mapping, red-state evidence, verification, and applicable
+delivery history. Git, review, CI, and attestations may be linked only as
+supporting provenance from that record.
 
 ### 2. Discover and specify
 
@@ -69,7 +74,15 @@ assumptions, risks, and open decisions.
 
 Create or revise the application specification when system boundaries or shared
 behavior change. Decompose work into independently reviewable component
-requirements. Start from:
+requirements. Place requirements according to behavioral ownership:
+
+- `requirements/application.md` owns application-wide intent and is the only
+  item in the top-level `requirements/` directory.
+- A component's `requirements.md` lives beside the behavior it owns.
+- Root `requirements.md` is optional and reserved for durable repository-wide
+  behavior that cannot be assigned to the application or one component.
+
+Start from:
 
 - [application-requirements.md](assets/templates/application-requirements.md)
 - [component-requirements.md](assets/templates/component-requirements.md)
@@ -80,8 +93,11 @@ remains draft.
 ### 3. Obtain exact-content approval
 
 Present the requirement, stable criteria, risk, dependencies, assumptions, and
-open decisions. Require approval evidence from the authority defined by policy
-and bind it to the exact content digest or immutable revision and approved scope.
+open decisions. Calculate the digest over the exact bytes before
+`## Governance record` after omitting the single top-level frontmatter `status:`
+line and its line ending. Apply no other normalization. Append approval from the
+authority defined by policy beneath that heading, bound to the digest and
+approved scope.
 
 If approval is absent, stop at a review-ready specification. If intent changes,
 return the affected requirement to draft and invalidate downstream evidence.
@@ -95,9 +111,9 @@ risk-appropriate adversarial cases.
 
 Run the tests against the pre-implementation baseline. Record identities,
 revision, results, and why each expected failure demonstrates missing approved
-behavior. Treat compilation errors, malformed assertions, unavailable
-dependencies, or unrelated regression failures as broken baseline, not red-state
-evidence.
+behavior in the same `requirements.md`. Treat compilation errors, malformed
+assertions, unavailable dependencies, or unrelated regression failures as a
+broken baseline, not red-state evidence.
 
 For behavior that predates SGAD adoption, record characterization evidence and
 the absence of historical red evidence honestly.
@@ -116,10 +132,10 @@ Require it to check applicable structure, authority, traceability, red evidence,
 tests, security and policy, contracts, generated artifacts, non-functional
 requirements, and delivery readiness.
 
-Use [verification-report.md](assets/templates/verification-report.md) for the
-evidence handoff. Report missing, stale, ambiguous, or failing required evidence
-as failure. Do not mark the result verified solely from checks selected or
-interpreted by the producer.
+Append the verification result beneath the requirement's `Governance record` and
+link machine-readable runner output when useful. Report missing, stale,
+ambiguous, or failing required evidence as failure. Do not mark the result
+verified solely from checks selected or interpreted by the producer.
 
 ### 7. Deliver and revalidate
 
@@ -130,8 +146,8 @@ revision to the verified revision and retain smoke, health, migration, or other
 required operational evidence.
 
 After any material change, perform impact analysis, invalidate affected approval
-and verification, preserve historical records, and repeat the smallest safe
-portion of the workflow.
+and verification, preserve historical entries in `requirements.md`, and repeat
+the smallest safe portion of the workflow.
 
 ## Report the outcome
 
@@ -141,7 +157,7 @@ State:
 - Approval source and exact bounded scope, or the missing approval blocker.
 - Criterion-to-test mappings and pre-implementation evidence.
 - Implementation revision and changed governed artifacts.
-- Independent checks, results, and evidence locations.
+- Independent checks, results, and embedded governance entries.
 - Delivery result when authorized.
 - Exceptions, missing evidence, invalidated dependents, and residual risks.
 

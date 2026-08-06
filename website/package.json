@@ -13,9 +13,10 @@
     "test": "vitest run",
     "test:browser": "playwright test",
     "test:links": "node --test tests/link-targets.test.mjs",
+    "test:repository": "node --test tests/repository-consistency.test.mjs",
     "test:structure": "node --test tests/two-page-acceptance.test.mjs",
     "typecheck": "tsc -b",
-    "verify": "npm run test:structure && npm run test:links && npm run test && npm run typecheck && npm run build && npm run test:browser"
+    "verify": "npm run test:structure && npm run test:links && npm run test:repository && npm run test && npm run typecheck && npm run test:browser"
   },
   "dependencies": {
     "react": "19.2.8",

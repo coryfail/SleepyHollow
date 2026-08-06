@@ -14,7 +14,8 @@ const source = (path) => read(`src/${path}`);
 const home = () => source("pages/sleepy-hollow/SleepyHollowPage.tsx");
 const sgad = () => source("pages/sgad/SgadPage.tsx");
 const footer = () => source("components/SiteFooter.tsx");
-const shared = () => `${source("App.tsx")}\n${source("components/SiteHeader.tsx")}\n${read("src/styles.css")}`;
+const site = () => source("site.ts");
+const shared = () => `${source("App.tsx")}\n${source("components/SiteHeader.tsx")}\n${site()}\n${read("src/styles.css")}`;
 
 test("AC-SITE-001 AC-SITE-003 · build defines independent root and SGAD entries", () => {
   assert.ok(existsSync(resolve(website, "sgad/index.html")), "missing sgad/index.html");
@@ -27,7 +28,7 @@ test("AC-SITE-003 · production artifact declares the approved custom domain", (
   assert.equal(read("public/CNAME").trim(), "sleepyhollow.io");
 });
 
-test("AC-SITE-002 AC-HOME-005 AC-SGAD-009 · shared navigation connects and identifies both pages", () => {
+test("AC-SITE-002 AC-HOME-005 AC-WEB-SGAD-009 · shared navigation connects and identifies both pages", () => {
   const text = shared();
   assert.match(text, /aria-current/);
   assert.match(text, /Sleepy Hollow/);
@@ -83,14 +84,15 @@ test("LICENSE · public license copy matches the repository license", () => {
 });
 
 test("AC-SITE-011 · traceability covers every declared two-page criterion", () => {
-  const evidence = JSON.parse(read("evidence/traceability.json") || "{}");
-  const ids = new Set((evidence.criteria || []).map(({ id }) => id));
-  for (const [prefix, count] of [["AC-SITE", 11], ["AC-HOME", 10], ["AC-SGAD", 12]]) {
+  const requirement = read("requirements.md");
+  const mapping = requirement.split("### Criterion mapping")[1]?.split("### Red-state evidence")[0] ?? "";
+  const ids = new Set(Array.from(mapping.matchAll(/\| (AC-(?:SITE|HOME|WEB-SGAD)-\d{3}) \|/g), (match) => match[1]));
+  for (const [prefix, count] of [["AC-SITE", 11], ["AC-HOME", 10], ["AC-WEB-SGAD", 12]]) {
     for (let number = 1; number <= count; number += 1) {
       assert.ok(ids.has(`${prefix}-${String(number).padStart(3, "0")}`));
     }
   }
-  assert.match(read("evidence/two-page-red-state.md"), /result:\s*failed/i);
+  assert.match(requirement, /Two-page split[\s\S]*3 passed, 11 failed/i);
 });
 
 test("AC-HOME-001 AC-HOME-003 · home opens with an honest, plain-language product definition", () => {
@@ -104,7 +106,7 @@ test("AC-HOME-002 AC-HOME-004 AC-HOME-009 · home explains the planned system an
   for (const phrase of ["reviewed requirements", "test-driven development", "deterministic", "deployable API", "Specification-Governed Agentic Development"]) {
     assert.match(text, new RegExp(phrase, "i"));
   }
-  assert.match(text, /github\.com\/coryfail\/SleepyHollow/);
+  assert.match(site(), /github\.com\/coryfail\/SleepyHollow/);
 });
 
 test("AC-HOME-006 AC-HOME-007 AC-HOME-010 · home excludes methodology detail and unsupported product claims", () => {
@@ -113,7 +115,7 @@ test("AC-HOME-006 AC-HOME-007 AC-HOME-010 · home excludes methodology detail an
   assert.doesNotMatch(text, /install now|production[- ]ready|customers|% faster/i);
 });
 
-test("AC-SGAD-001 AC-SGAD-002 AC-SGAD-011 · SGAD is independent, bounded, and honestly described", () => {
+test("AC-WEB-SGAD-001 AC-WEB-SGAD-002 AC-WEB-SGAD-011 · SGAD is independent, bounded, and honestly described", () => {
   const text = sgad();
   assert.match(text, /Specification-Governed Agentic Development/);
   assert.match(text, /without Sleepy Hollow/i);
@@ -122,7 +124,7 @@ test("AC-SGAD-001 AC-SGAD-002 AC-SGAD-011 · SGAD is independent, bounded, and h
   assert.match(text, /not (?:a guarantee|an established industry standard)/i);
 });
 
-test("AC-SGAD-003 AC-SGAD-004 AC-SGAD-005 · SGAD explains every ordered responsibility and verification boundary", () => {
+test("AC-WEB-SGAD-003 AC-WEB-SGAD-004 AC-WEB-SGAD-005 · SGAD explains every ordered responsibility and verification boundary", () => {
   const text = sgad();
   for (const phrase of ["Specify", "Approve", "acceptance tests", "expected red", "Implement", "Verify independently", "Deliver with evidence"]) {
     assert.match(text, new RegExp(phrase, "i"));
@@ -131,17 +133,17 @@ test("AC-SGAD-003 AC-SGAD-004 AC-SGAD-005 · SGAD explains every ordered respons
   assert.match(text, /producing agent[^.]*not the (?:verification )?verdict/i);
 });
 
-test("AC-SGAD-006 AC-SGAD-007 AC-SGAD-008 AC-SGAD-010 AC-SGAD-012 · SGAD provides an understandable adoption reference", () => {
+test("AC-WEB-SGAD-006 AC-WEB-SGAD-007 AC-WEB-SGAD-008 AC-WEB-SGAD-010 AC-WEB-SGAD-012 · SGAD provides an understandable adoption reference", () => {
   const text = sgad();
-  for (const phrase of ["stable acceptance-criterion", "approval record", "bidirectional", "independent verification command", "my-application/", "requirements/application.md", "feature/", "requirements.md", "feature.test.ts", "feature.ts", "evidence/verification.md"]) {
+  for (const phrase of ["stable acceptance-criterion", "Record approval inside", "bidirectional", "independent verification command", "my-application/", "requirements/application.md", "feature/", "requirements.md", "feature.test.ts", "feature.ts", "complete governance history", "criterion mapping", "supporting provenance"]) {
     assert.match(text, new RegExp(phrase, "i"));
   }
   assert.match(text, /file-map__nested/);
-  assert.match(text, /docs\/sgad/);
-  assert.match(text, /sgadGuideUrl}\/templates/);
+  assert.match(site(), /docs\/sgad/);
+  assert.match(site(), /sgadGuideUrl}\/templates/);
   assert.match(text, /content digest/i);
-  assert.match(text, /npx skills add/);
-  assert.match(text, /coryfail\/SleepyHollow --skill sgad-workflow/);
+  assert.match(site(), /npx skills add/);
+  assert.match(site(), /coryfail\/SleepyHollow --skill sgad-workflow/);
   assert.doesNotMatch(text, /\$skill-installer/);
   assert.doesNotMatch(text, /tree\/main\/skill\/sgad-workflow/);
 });

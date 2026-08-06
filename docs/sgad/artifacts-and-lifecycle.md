@@ -1,8 +1,8 @@
 # SGAD artifacts and lifecycle
 
-SGAD uses repository-visible artifacts to connect intent, authority, execution,
-and evidence. This document defines their responsibilities without requiring one
-storage format or tool.
+SGAD uses an embedded governance record in each governed `requirements.md` to
+connect intent, authority, execution, and evidence. This document defines the
+record's responsibilities without requiring a particular repository or CI tool.
 
 ## Artifact graph
 
@@ -13,16 +13,38 @@ Application specification
           -> Acceptance-test mapping
               -> Red-state evidence
                   -> Implementation revision
-                      -> Verification report
+                      -> Embedded verification entry
                           -> Delivery record
 ```
 
 Every edge must be recoverable through stable identifiers, content digests,
 repository revisions, or deterministic references.
 
+## Embedded record
+
+Approval and evidence are required functions, and their canonical record lives
+inside the governed `requirements.md`. Append a `Governance record` after the
+behavioral specification with approval, criterion mapping, red-state evidence,
+verification, and applicable delivery subsections.
+
+Calculate the governed-content digest over the exact UTF-8 bytes before the
+`## Governance record` heading after omitting the single top-level frontmatter
+`status:` line and its line ending. Apply no other normalization. This prevents a
+circular self-hash, keeps the derived lifecycle projection from invalidating its
+own authority, and binds approval to every behavioral byte. Append later evidence
+beneath that heading. Git history, protected reviews, CI runs, and attestations
+may be linked as supporting provenance, but the embedded record remains the
+canonical governance history.
+
+Colocation does not collapse trust boundaries. An editable status is not sole
+proof of approval or verification, and producer-authored prose is not independent
+evidence. The verifier checks embedded authority, exact content binding, scope,
+results, and linked provenance.
+
 ## Application specification
 
-The application specification is the authoritative system-level intent. It
+The application specification lives at `requirements/application.md` and is the
+authoritative system-level intent. It
 defines:
 
 - Purpose, actors, consumers, goals, and non-goals.
@@ -34,16 +56,21 @@ defines:
 
 Component specifications refine it and may not silently contradict it.
 
+The top-level `requirements/` directory contains only `application.md`.
+Repository-wide behavior that cannot be owned by the application or one
+component may use root `requirements.md`.
+
 ## Component specification
 
 A component specification is the smallest independently approvable unit of
-behavior. It contains machine-readable metadata and human-readable intent.
+behavior. Its `requirements.md` is colocated with the component it owns and
+contains machine-readable metadata and human-readable intent.
 
 Recommended metadata:
 
 ```yaml
 ---
-schema: sgad-component/v0.1
+schema: sgad-component/v0.2
 id: component-stable-id
 title: Human-readable title
 status: draft
@@ -59,8 +86,9 @@ The body defines purpose, scope, non-scope, inputs, outputs, errors, state,
 security, side effects, non-functional expectations, assumptions, dependencies,
 risks, and stable acceptance criteria.
 
-The `status` value is convenient for humans and workflow routing. It is not proof
-of authority or verification by itself.
+The `status` value is convenient for humans and workflow routing. It is omitted
+from the governed-content digest and is not proof of authority or verification
+by itself.
 
 ## Acceptance criteria
 
@@ -87,31 +115,27 @@ approval. Reusing the same ID for unrelated behavior is prohibited.
 Approval is a record bound to exact content, not a mutable word inside the
 specification.
 
-Recommended approval fields:
+Recommended embedded approval fields:
 
 ```yaml
-schema: sgad-approval/v0.1
-requirement_id: component-stable-id
-requirement_digest: sha256:...
-scope:
-  criteria:
-    - AC-COMPONENT-001
-    - AC-COMPONENT-002
-approved_by: authorized-identity
-approved_at: 2026-08-06T14:00:00Z
-risk: standard
-source: pull-request-review
+- Status: approved.
+- Approver: authorized-identity.
+- Approved at: 2026-08-06T14:00:00Z.
+- Approved criteria: AC-COMPONENT-001 and AC-COMPONENT-002.
+- Governed-content digest: sha256:...
+- Decision source: protected review reference.
 ```
 
-An approval mechanism may use a protected pull-request review, signed record,
-ticket decision, repository policy, or another auditable authority. The verifier
-must be able to determine that the approver was authorized and that the digest
-matches current content.
+An approval decision may come from a protected pull-request review, signed
+decision, ticket, repository policy, or another auditable authority. Record that
+source in `requirements.md`; the verifier must determine that the approver was
+authorized and the digest matches current governed content.
 
 ## Acceptance-test mapping
 
-The mapping connects criteria to tests and tests back to criteria. It may live in
-test names, test metadata, a manifest, or generated analysis.
+The embedded mapping connects criteria to tests and tests back to criteria. Test
+names, test metadata, or generated analysis may supply deterministic inputs, but
+the resolved mapping remains in the governed `requirements.md`.
 
 The mapping reports:
 
@@ -149,10 +173,10 @@ acceptable.
 
 Uncommitted or external state must be captured explicitly if it affects results.
 
-## Verification report
+## Verification entry
 
-The verification report binds current execution evidence to approved intent. It
-includes:
+The verification entry in `requirements.md` binds current execution evidence to
+approved intent. It includes:
 
 - Requirement and approval digests.
 - Implementation revision.
@@ -180,7 +204,7 @@ outcome.
 |---|---|---|
 | `draft` | Intent is not authorized for implementation. | A specification exists; unresolved decisions remain visible. |
 | `approved` | Exact bounded intent is authorized. | Valid approval record matching the current requirement digest. |
-| `verified` | Current implementation satisfies required checks for approved intent. | Valid approval, criterion mapping, red evidence, passing checks, and a verification report bound to the implementation revision. |
+| `verified` | Current implementation satisfies required checks for approved intent. | Valid approval, criterion mapping, red evidence, passing checks, and an embedded verification entry bound to the implementation revision. |
 
 The lifecycle intentionally omits `implementing` and `completed`. Those may be
 useful task states, but they do not describe the authority or evidence state of a
@@ -215,6 +239,6 @@ component/
 └── component.ts
 ```
 
-Central storage is also valid when tools maintain deterministic bidirectional
-links. A directory convention alone is not traceability; the verifier must be
-able to resolve the relationship.
+The requirement contains the canonical approval and evidence record and may link
+supporting review and CI provenance. The verifier must resolve every relationship
+deterministically from this one local governance history.

@@ -6,7 +6,7 @@ Use this guide when executing a concrete governed change.
 
 | Phase | Entry focus | Required exit evidence |
 |---|---|---|
-| Establish governance | Policy, risk, authority, artifact locations, verifier, delivery gate | The repository can classify and govern the proposed change. |
+| Establish governance | Policy, risk, authority, governed requirements, verifier, delivery gate | The repository can classify and govern the proposed change. |
 | Discover | Existing behavior, actors, boundaries, dependencies, constraints, unknowns | Material uncertainty is resolved or recorded with approval impact. |
 | Specify the system | System boundary and cross-cutting intent | System intent is coherent enough to decompose. |
 | Decompose behavior | Small, independently reviewable components | Every proposed behavior and dependency is identifiable. |

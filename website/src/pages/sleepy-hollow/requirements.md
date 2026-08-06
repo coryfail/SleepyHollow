@@ -1,5 +1,5 @@
 ---
-schema: sgad-component/v0.1
+schema: sgad-component/v0.2
 id: website-sleepy-hollow-page
 title: Sleepy Hollow framework landing page
 status: approved
@@ -8,7 +8,7 @@ depends_on:
   - sleepy-hollow-website
   - sleepy-hollow-application
 owners:
-  - SleepyHollow maintainers
+  - Sleepy Hollow maintainers
 ---
 
 # Sleepy Hollow framework page requirements
@@ -104,3 +104,45 @@ become.
 Approval authorizes only the Sleepy Hollow page behavior and acceptance criteria
 AC-HOME-001 through AC-HOME-010. Site-wide delivery behavior and SGAD methodology
 content require their own approved requirements.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-06T16:27:58Z.
+- Approved criteria: AC-HOME-001 through AC-HOME-010.
+- Historical exact-content digest:
+  `sha256:20af56fff2d4b0786637895b333a94a75d38c98efd8b11c1d44ebb0ebbaa343e`.
+- Decision: keep the page product-focused and move the full methodology to its
+  own page.
+
+### Criterion mapping
+
+- AC-HOME-001 through AC-HOME-010 map to the exact per-criterion entries in
+  `website/requirements.md` and the named React, structural, link, browser, and
+  visual checks.
+
+### Red-state evidence
+
+- Status: failed-as-expected at 2026-08-06T16:29:00Z as part of the two-page
+  split: 3 of 14 structural checks passed and 11 failed for the absent page
+  structure and navigation while the runner remained healthy.
+
+### Verification
+
+- Status: passed historically at 2026-08-06T17:24:12Z under
+  `website/package.json#verify` for implementation manifest
+  `working-tree:sha256:257f6b894e1e2d1badfffb7dfa4e974ad018dc6111cc8d83f0d4c3401a999706`.
+- Current verification is recorded by the parent website requirement.
+
+### Delivery
+
+- Status: governed by the parent website requirement; no independent page-only
+  delivery record exists.

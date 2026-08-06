@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F006
 title: Requirements planning and approval workflow
 status: draft
+risk: standard
 source_sections:
   - "3.2"
   - "3.3"
@@ -12,6 +14,8 @@ depends_on:
   - SH-F001
 open_decisions:
   - OPEN-004
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Requirements planning and approval workflow
@@ -19,7 +23,7 @@ open_decisions:
 ## Purpose
 
 Define the reviewable, machine-readable requirements artifacts that must exist
-before SleepyHollow generates tests or application behavior.
+before Sleepy Hollow generates tests or application behavior.
 
 ## In scope
 
@@ -27,6 +31,7 @@ before SleepyHollow generates tests or application behavior.
 - Endpoint-level decomposition and shared model or policy requirements.
 - Structure-first API scaffolding.
 - Stable frontmatter, acceptance identifiers, dependencies, and lifecycle state.
+- Storage-neutral governance references and lifecycle-status projections.
 - Endpoint-by-endpoint approval, revision, deferral, and rejection.
 
 ## Requirements
@@ -44,9 +49,17 @@ include purpose, methods, inputs, success and error responses, security, data
 access, side effects, abuse considerations, dependencies, assumptions, and
 acceptance criteria.
 
+Every generated application and endpoint `requirements.md` shall contain its
+complete governance history: approval bound to exact content and bounded
+criteria, bidirectional criterion-to-test mappings, credible red-state evidence,
+independent verification, and applicable delivery results. Supporting Git,
+review, CI, or attestation provenance may be linked, but no separate SGAD
+governance artifact tree is created.
+
 The initial lifecycle is `draft -> approved -> verified`. A behavioral revision
 returns the affected requirement to `draft`; it shall not silently retain prior
-approval.
+approval. Frontmatter `status` remains workflow-routing metadata and a readable
+lifecycle projection; it is not sole approval authority or verification evidence.
 
 ## Acceptance criteria
 
@@ -81,3 +94,31 @@ approval.
 
 OPEN-004 shall validate Markdown plus YAML frontmatter as a portable authoring
 format without introducing proprietary syntax.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

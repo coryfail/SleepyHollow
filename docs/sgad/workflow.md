@@ -12,7 +12,8 @@ Before governed work begins, the project defines:
 - Which changes require SGAD.
 - Who or what may approve intent.
 - Risk classifications and required evidence.
-- Canonical locations or references for specifications and evidence.
+- Ownership-based locations for application, component, and repository
+  requirements and their embedded governance records.
 - The verifier entry point and structured result format.
 - Which changes invalidate prior approval or verification.
 - Deployment and external-mutation policies.
@@ -154,7 +155,7 @@ and residual risks.
 
 ### Exit condition
 
-Every required check passes and a reproducible verification report binds the
+Every required check passes and a reproducible verification entry binds the
 approved intent to the current implementation.
 
 ## Phase 9: Deliver with evidence

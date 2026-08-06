@@ -1,5 +1,5 @@
 ---
-schema: sgad-component/v0.1
+schema: sgad-component/v0.2
 id: website-sgad-page
 title: SGAD methodology page
 status: approved
@@ -8,7 +8,7 @@ depends_on:
   - sleepy-hollow-website
   - sgad-methodology
 owners:
-  - SleepyHollow maintainers
+  - Sleepy Hollow maintainers
 ---
 
 # SGAD methodology page requirements
@@ -47,6 +47,9 @@ The page must remain useful to people who never use Sleepy Hollow.
   verification decision.
 - Provide a practical adoption checklist and a compact example of colocated
   requirements, tests, implementation, and evidence.
+- Explain that application-wide intent belongs in
+  `requirements/application.md`, component requirements stay beside their
+  behavior, and root `requirements.md` is reserved for repository-wide behavior.
 - Link to the canonical SGAD guide and reusable templates in the repository.
 - Provide one copy-pasteable terminal line using the open agent-skills CLI to
   install the standalone SGAD skill directly from its repository path.
@@ -79,40 +82,41 @@ The page must remain useful to people who never use Sleepy Hollow.
 
 ## Acceptance criteria
 
-- AC-SGAD-001: Given a visitor opens `/sgad/`, then the first screen expands
+- AC-WEB-SGAD-001: Given a visitor opens `/sgad/`, then the first screen expands
   Specification-Governed Agentic Development, defines it in plain language, and
   states that it can be used without Sleepy Hollow.
-- AC-SGAD-002: Given a visitor reads the authority explanation, then the page
+- AC-WEB-SGAD-002: Given a visitor reads the authority explanation, then the page
   clearly distinguishes human behavioral-intent approval, specification-bounded
   agent work, and evidence-based completion.
-- AC-SGAD-003: Given a visitor reads the workflow, then specification, approval,
+- AC-WEB-SGAD-003: Given a visitor reads the workflow, then specification, approval,
   acceptance tests, expected red, implementation, independent verification, and
   evidence-backed delivery appear as distinct ordered responsibilities.
-- AC-SGAD-004: Given expected red is explained, then the page distinguishes a
+- AC-WEB-SGAD-004: Given expected red is explained, then the page distinguishes a
   meaningful missing-behavior failure from syntax, configuration, dependency,
   or test-environment failure.
-- AC-SGAD-005: Given independent verification is explained, then the page states
+- AC-WEB-SGAD-005: Given independent verification is explained, then the page states
   that the producing agent's confidence or summary is not the verification
   verdict.
-- AC-SGAD-006: Given a reader wants to adopt SGAD, then the page provides concrete
+- AC-WEB-SGAD-006: Given a reader wants to adopt SGAD, then the page provides concrete
   steps covering colocated requirements, stable acceptance-criterion IDs,
   approval records, bidirectional test mapping, expected-red evidence, and an
   independent verification command.
-- AC-SGAD-007: Given the practical file example is read without styling, then its
+- AC-WEB-SGAD-007: Given the practical file example is read without styling, then its
   relationship among requirements, tests, implementation, and evidence remains
-  understandable in semantic text.
-- AC-SGAD-008: Given a visitor wants more detail, then descriptive links open the
+  understandable in semantic text and the surrounding explanation assigns
+  application, component, and repository-wide requirements to their owners.
+- AC-WEB-SGAD-008: Given a visitor wants more detail, then descriptive links open the
   canonical SGAD guide and reusable templates without placeholder destinations.
-- AC-SGAD-009: Given a visitor wants product context, then a secondary internal
+- AC-WEB-SGAD-009: Given a visitor wants product context, then a secondary internal
   route returns to the Sleepy Hollow framework page without implying that the
   methodology depends on it.
-- AC-SGAD-010: Given a nontechnical reader encounters TDD, deterministic
+- AC-WEB-SGAD-010: Given a nontechnical reader encounters TDD, deterministic
   verification, traceability, or content digests, then each essential term is
   explained near its first use or omitted when it is not necessary.
-- AC-SGAD-011: Given the methodology claims are reviewed against `docs/sgad/`,
+- AC-WEB-SGAD-011: Given the methodology claims are reviewed against `docs/sgad/`,
   then the page does not present SGAD as an established standard, a guarantee,
   or a substitute for human judgment and domain-specific review.
-- AC-SGAD-012: Given an agent user wants to apply SGAD outside Sleepy Hollow,
+- AC-WEB-SGAD-012: Given an agent user wants to apply SGAD outside Sleepy Hollow,
   then the page provides the visible, copy-pasteable terminal command
   `npx skills add coryfail/SleepyHollow --skill sgad-workflow`
   without implying that the Sleepy Hollow framework is installed.
@@ -120,5 +124,50 @@ The page must remain useful to people who never use Sleepy Hollow.
 ## Approval boundary
 
 The project owner approved this exact requirement revision, including the short
-standalone-skill install command in AC-SGAD-012. Site-wide delivery behavior and
+standalone-skill install command in AC-WEB-SGAD-012. Site-wide delivery behavior and
 the Sleepy Hollow product narrative require their own approved requirements.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-06T19:19:08Z.
+- Approved criteria: AC-WEB-SGAD-001 through AC-WEB-SGAD-012.
+- Historical exact-content digest:
+  `sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170`.
+- Decision: publish the standalone SGAD skill with the short agent-skills CLI
+  installation command.
+
+### Criterion mapping
+
+- AC-WEB-SGAD-001 through AC-WEB-SGAD-012 map to the exact per-criterion entries in
+  `website/requirements.md` and the named React, structural, link, browser,
+  no-JavaScript, and skill-discovery checks.
+
+### Red-state evidence
+
+- Two-page split: 3 of 14 structural checks passed and 11 failed at
+  2026-08-06T16:29:00Z for the absent SGAD route and content.
+- Short-install correction: structural checks passed 15/16 and link checks 0/1
+  at 2026-08-06T19:07:00Z because the short command and canonical package were
+  absent at base revision `05e2aab`.
+- Both results were failed-as-expected with healthy unrelated checks.
+
+### Verification
+
+- Status: passed at 2026-08-06T19:22:50Z for the historical approved digest.
+- Structural, React, link-target, local skill-discovery, and Chromium
+  desktop/mobile checks passed.
+- Current verification is recorded by the parent website requirement.
+
+### Delivery
+
+- Status: governed by the parent website requirement; no independent page-only
+  delivery record exists.

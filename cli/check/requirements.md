@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F008
 title: Independent verification
 status: draft
+risk: standard
 source_sections:
   - "3.6"
   - "8"
@@ -17,6 +19,8 @@ depends_on:
   - SH-F007
 open_decisions:
   - OPEN-006
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Independent verification
@@ -84,3 +88,31 @@ data decisions, and unreviewed breaking contract changes. An endpoint may become
 
 Each underlying feature must expose normalized metadata rather than requiring the
 verifier to guess behavior from arbitrary implementation code.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

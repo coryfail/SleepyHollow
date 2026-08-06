@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F005
 title: Security and authorization boundaries
 status: draft
+risk: standard
 source_sections:
   - "7"
   - "8"
@@ -11,6 +13,8 @@ depends_on:
 open_decisions:
   - OPEN-007
   - OPEN-008
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Security and authorization boundaries
@@ -18,7 +22,7 @@ open_decisions:
 ## Purpose
 
 Provide broadly safe HTTP defaults and neutral integration points without
-turning SleepyHollow into an identity product or imposing authentication on
+turning Sleepy Hollow into an identity product or imposing authentication on
 public applications.
 
 ## In scope
@@ -76,3 +80,31 @@ authorization material.
 
 Authentication designs remain application requirements. OPEN-007 and OPEN-008
 must validate the principal boundary and credible rate limiting on Deno Deploy.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

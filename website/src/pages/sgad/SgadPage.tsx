@@ -1,7 +1,9 @@
-const repositoryUrl = "https://github.com/coryfail/SleepyHollow";
-const sgadGuideUrl = `${repositoryUrl}/tree/main/docs/sgad`;
-const sgadTemplatesUrl = `${sgadGuideUrl}/templates`;
-const sgadSkillInstallCommand = "npx skills add coryfail/SleepyHollow --skill sgad-workflow";
+import {
+  sgadGuideUrl,
+  sgadSkillInstallCommand,
+  sgadTemplatesUrl,
+  sitePaths,
+} from "../../site";
 
 const lifecycle = [
   ["1.0", "Specify", "Write the behavior people actually want. Keep assumptions and unresolved decisions visible instead of letting an agent fill the gaps."],
@@ -16,9 +18,9 @@ const lifecycle = [
 const adoptionSteps = [
   "Store a requirements.md file beside each independently valuable feature.",
   "Give every stable acceptance-criterion ID a test mapping that survives refactoring.",
-  "Create an approval record bound to an exact requirement revision or content digest, a fingerprint of the approved file.",
+  "Record approval inside requirements.md, bound to the exact governed-content digest—a fingerprint of the approved intent.",
   "Keep bidirectional traceability: requirements point to tests and tests point back to requirements.",
-  "Retain expected-red evidence showing the checks detected genuinely missing behavior.",
+  "Append expected-red, verification, and applicable delivery results to the same requirements.md governance record.",
   "Use an independent verification command, not the producing agent’s summary, to decide whether evidence passes.",
 ];
 
@@ -89,7 +91,7 @@ export default function SgadPage() {
           <figure className="file-map" aria-labelledby="feature-record-title">
             <figcaption>
               <strong id="feature-record-title">An application record, kept connected.</strong>
-              <span>Application intent, feature behavior, and delivery evidence remain easy to trace.</span>
+              <span>Keep the working files small and the complete governance history beside the behavior it governs.</span>
             </figcaption>
 
             <div className="file-map__tree">
@@ -107,7 +109,7 @@ export default function SgadPage() {
                   <ul className="file-map__nested" aria-label="Files inside the feature folder">
                     <li>
                       <code>requirements.md</code>
-                      <span className="file-map__role">approved intent</span>
+                      <span className="file-map__role">intent + governance</span>
                     </li>
                     <li>
                       <code>feature.test.ts</code>
@@ -119,16 +121,17 @@ export default function SgadPage() {
                     </li>
                   </ul>
                 </li>
-                <li className="file-map__entry">
-                  <code>evidence/verification.md</code>
-                  <span className="file-map__role">delivery evidence</span>
-                </li>
               </ul>
             </div>
 
             <p className="file-map__evidence">
-              The verification report closes the loop by binding the approved
-              requirements, expected-red result, tests, and passing revision.
+              Each feature&apos;s requirements.md contains its complete governance
+              history: exact-content approval, criterion mapping, red-state
+              evidence, independent verification, and applicable delivery results.
+              Git reviews and CI runs can be linked as supporting provenance.
+              Application-wide intent belongs in requirements/application.md;
+              component requirements stay beside their behavior; and optional
+              root requirements.md is reserved for repository-wide behavior.
             </p>
           </figure>
         </section>
@@ -147,7 +150,7 @@ export default function SgadPage() {
           Continue with the <a href={sgadGuideUrl}>complete SGAD guide</a> or
           begin from the <a href={sgadTemplatesUrl}>reusable SGAD templates</a>.
           To see the framework intended to embody the method, return to the
-          <a href={import.meta.env.BASE_URL}> Sleepy Hollow framework page</a>.
+          <a href={sitePaths.home}> Sleepy Hollow framework page</a>.
         </p>
       </article>
     </main>

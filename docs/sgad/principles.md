@@ -42,8 +42,10 @@ Component specifications, tests, and implementation should be colocated or
 connected through deterministic references. This improves discovery, reduces
 context reconstruction, and makes drift visible during ordinary repository work.
 
-Colocation is a means, not the invariant. A different layout is conforming when
-the relationships remain deterministic, bidirectional, and tool-checkable.
+The component's `requirements.md` is the single home for its complete governance
+history. It embeds approval, criterion mapping, red-state evidence, verification,
+and applicable delivery records beside behavior. Supporting Git, review, CI, or
+attestation provenance may be linked from that record.
 
 ## 6. Give every criterion a stable identity
 

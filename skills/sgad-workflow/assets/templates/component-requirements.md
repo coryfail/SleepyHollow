@@ -1,5 +1,5 @@
 ---
-schema: sgad-component/v0.1
+schema: sgad-component/v0.2
 id: component-stable-id
 title: Component title
 status: draft
@@ -11,6 +11,10 @@ owners:
 ---
 
 # Component requirements
+
+Colocate this `requirements.md` with the component it governs. Use this template
+at repository root only when the governed behavior spans the repository and has
+no honest application or component owner.
 
 ## Purpose
 
@@ -78,3 +82,46 @@ that must be reevaluated if this requirement changes.
 
 State the criteria being submitted for approval and any criteria explicitly
 deferred or rejected.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted. Append history; do not rewrite old
+entries to make stale evidence appear current.
+
+### Approval
+
+- Status: pending.
+- Approver: pending.
+- Approved at: pending.
+- Approved criteria: pending.
+- Governed-content digest: pending.
+- Decision source: pending.
+
+### Criterion mapping
+
+| Criterion | Governed tests or checks |
+|---|---|
+| AC-COMPONENT-001 | pending |
+| AC-COMPONENT-002 | pending |
+
+### Red-state evidence
+
+- Status: pending.
+- Baseline revision: pending.
+- Command, runner, and test digest: pending.
+- Observed result and expected reason: pending.
+
+### Verification
+
+- Status: pending.
+- Verifier and command: pending.
+- Governed revision or manifest: pending.
+- Result, time, and residual risks: pending.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.
+- Verified source, target, result, and time: pending when applicable.

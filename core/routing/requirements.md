@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F002
 title: File-based routing runtime
 status: draft
+risk: standard
 source_sections:
   - "6.1"
   - "6.6"
@@ -10,6 +12,8 @@ depends_on:
   - SH-F001
 open_decisions:
   - OPEN-001
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # File-based routing runtime
@@ -68,3 +72,31 @@ depend on implicit package scanning or hidden activation.
 
 The exact route-module API remains OPEN-001. Its prototype must optimize for
 explicitness, TypeScript inference, and reliable agent use.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

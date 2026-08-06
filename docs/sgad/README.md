@@ -31,13 +31,19 @@ runtime.
 | Plane | Governing question | Primary artifacts |
 |---|---|---|
 | Intent | What behavior is actually wanted? | Application and component specifications |
-| Authority | What exact work has been approved, by whom, and at what risk? | Approval records and policy |
+| Authority | What exact work has been approved, by whom, and at what risk? | Embedded approval entries and declared authority |
 | Execution | What was produced under that authority? | Tests, implementation, configuration, and generated artifacts |
-| Evidence | What independently checkable facts support completion? | Test results, verification reports, attestations, and delivery records |
+| Evidence | What independently checkable facts support completion? | Embedded test, verification, attestation, and delivery results |
 
 Keeping these planes distinct prevents a coding agent from silently turning an
 assumption into intent, intent into authority, or its own completion statement
 into evidence.
+
+These are trust boundaries, not file boundaries. Each governed `requirements.md`
+is the single home for its complete governance history: approval, criterion
+mapping, red-state evidence, verification, and applicable delivery results. Git,
+protected review, CI, and attestations may be linked as supporting provenance
+from that record.
 
 ## Core invariants
 
@@ -71,9 +77,11 @@ draft -> approved -> verified
 - `verified` means the approved revision is satisfied by current, independently
   checkable evidence.
 
-The status text is a human-readable projection. A verifier must derive authority
-and verification from valid records, digests, repository state, and evidence; it
-must not trust an editable `status` field by itself.
+The status text is a human-readable projection. It is omitted from the
+governed-content digest so advancing an honestly derived projection does not
+invalidate its own authority. A verifier must derive authority and verification
+from valid embedded records, digests, repository state, and evidence; it must not
+trust an editable `status` field by itself.
 
 > No governed lifecycle transition occurs without independently checkable
 > evidence.
@@ -97,7 +105,7 @@ See [workflow.md](workflow.md) for phase entry and exit conditions.
 
 ## Documents
 
-- [Methodology requirements](requirements.md) defines the approved scope and
+- [Methodology requirements](requirements.md) defines the draft scope and
   acceptance criteria SGAD will use to govern itself.
 - [Principles](principles.md) defines the values and design constraints.
 - [Workflow](workflow.md) defines the end-to-end operating process.
@@ -114,23 +122,23 @@ See [workflow.md](workflow.md) for phase entry and exit conditions.
 ## Standalone SGAD skill
 
 The portable [SGAD workflow skill](../../skills/sgad-workflow/SKILL.md) helps
-developers apply this methodology in repositories that do not use SleepyHollow.
+developers apply this methodology in repositories that do not use Sleepy Hollow.
 It guides governance discovery, specifications, exact-content approval,
 criterion traceability, red-state evidence, bounded implementation, independent
 verification, and evidence-gated delivery using the adopting project's own
 language, framework, tests, CI, and deployment tools.
 
-This is a separate skill from the SleepyHollow application skill. It does not
-teach or require the SleepyHollow runtime or CLI.
+This is a separate skill from the Sleepy Hollow application skill. It does not
+teach or require the Sleepy Hollow runtime or CLI.
 
-## Relationship to SleepyHollow
+## Relationship to Sleepy Hollow
 
-SleepyHollow is a reference implementation of SGAD for headless API development.
+Sleepy Hollow is a reference implementation of SGAD for headless API development.
 It extends the general method with endpoint-local requirements, runtime schemas,
 data-access checks, authorization guards, API contract generation, typed clients,
 and deployment verification.
 
-SGAD does not require SleepyHollow. A project can conform using Markdown, its
+SGAD does not require Sleepy Hollow. A project can conform using Markdown, its
 existing test runner, source control, CI, and a verifier appropriate to its own
 stack.
 

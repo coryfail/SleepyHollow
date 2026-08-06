@@ -1,5 +1,5 @@
 ---
-schema: sgad-application/v0.1
+schema: sgad-application/v0.2
 id: application-id
 title: Application name
 status: draft
@@ -10,6 +10,9 @@ depends_on: []
 ---
 
 # Application requirements
+
+Place this file at `requirements/application.md` as the sole item inside the
+top-level `requirements/` directory.
 
 ## Purpose
 
@@ -96,3 +99,46 @@ policy, smoke tests, rollback expectations, and required delivery evidence.
 
 State which sections and criteria require approval, who may approve them, and
 which unresolved decisions prevent approval.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted. Append history; do not rewrite old
+entries to make stale evidence appear current.
+
+### Approval
+
+- Status: pending.
+- Approver: pending.
+- Approved at: pending.
+- Approved criteria: pending.
+- Governed-content digest: pending.
+- Decision source: pending.
+
+### Criterion mapping
+
+| Criterion | Governed tests or checks |
+|---|---|
+| AC-APP-001 | pending |
+| AC-APP-002 | pending |
+
+### Red-state evidence
+
+- Status: pending.
+- Baseline revision: pending.
+- Command, runner, and test digest: pending.
+- Observed result and expected reason: pending.
+
+### Verification
+
+- Status: pending.
+- Verifier and command: pending.
+- Governed revision or manifest: pending.
+- Result, time, and residual risks: pending.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.
+- Verified source, target, result, and time: pending when applicable.

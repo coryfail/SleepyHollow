@@ -1,16 +1,13 @@
 import type { PageId } from "../App";
-
-const repositoryUrl = "https://github.com/coryfail/SleepyHollow";
+import { repositoryUrl, sitePaths } from "../site";
 
 export default function SiteHeader({ currentPage }: { currentPage: PageId }) {
-  const basePath = import.meta.env.BASE_URL;
-
   return (
     <header className="site-header">
       <nav className="nav-pill" aria-label="Primary navigation">
         <a
           className="wordmark"
-          href={basePath}
+          href={sitePaths.home}
           aria-current={currentPage === "sleepy-hollow" ? "page" : undefined}
         >
           Sleepy Hollow
@@ -18,7 +15,7 @@ export default function SiteHeader({ currentPage }: { currentPage: PageId }) {
         <ul className="nav-pill__links">
           <li>
             <a
-              href={`${basePath}sgad/`}
+              href={sitePaths.sgad}
               aria-current={currentPage === "sgad" ? "page" : undefined}
             >
               SGAD

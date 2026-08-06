@@ -20,7 +20,7 @@ describe("approved two-page behavior", () => {
     expect(screen.getByText(/Sleepy Hollow is built through SGAD/i)).toBeVisible();
   });
 
-  test("AC-SGAD-001 AC-SGAD-003 · the SGAD page defines and orders the method", () => {
+  test("AC-WEB-SGAD-001 AC-WEB-SGAD-003 · the SGAD page defines and orders the method", () => {
     render(<App page="sgad" />);
     expect(screen.getByRole("heading", { level: 1, name: /Specification-Governed/i })).toBeVisible();
     expect(screen.getByText(/without Sleepy Hollow/i)).toBeVisible();
@@ -29,7 +29,7 @@ describe("approved two-page behavior", () => {
     }
   });
 
-  test("AC-SGAD-012 · the SGAD page provides the standalone skill install line", () => {
+  test("AC-WEB-SGAD-012 · the SGAD page provides the standalone skill install line", () => {
     render(<App page="sgad" />);
     expect(screen.getByText("Install the standalone SGAD skill", { exact: true })).toBeVisible();
     expect(screen.getByText("npx skills add coryfail/SleepyHollow --skill sgad-workflow", { exact: true })).toBeVisible();

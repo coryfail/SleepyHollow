@@ -1,8 +1,13 @@
 ---
+schema: sleepy-hollow-model/v0.1
 id: SH-MODEL-PRINCIPAL
+title: Principal model
 status: draft
 source_sections:
   - "7.2"
+depends_on: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Principal model

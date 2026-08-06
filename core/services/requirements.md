@@ -1,7 +1,9 @@
 ---
+schema: sgad-component/v0.2
 id: SH-F014
 title: Optional multi-service projects
 status: draft
+risk: standard
 source_sections:
   - "9"
   - "15.1"
@@ -11,6 +13,8 @@ depends_on:
   - SH-F010
   - SH-F012
 open_decisions: []
+owners:
+  - Sleepy Hollow maintainers
 ---
 
 # Optional multi-service projects
@@ -18,7 +22,7 @@ open_decisions: []
 ## Purpose
 
 Allow justified applications to use independently deployable services without
-making microservices the default or turning SleepyHollow into an orchestration
+making microservices the default or turning Sleepy Hollow into an orchestration
 platform.
 
 ## In scope
@@ -76,3 +80,31 @@ calling feature's requirements.
 
 The initial release supports service-shaped projects and generated clients. It
 does not promise a complete microservice platform.
+
+## Governance record
+
+The governed-content digest covers the exact UTF-8 bytes before this heading after
+omitting the single top-level frontmatter `status:` line and its line ending. The
+status field is a lifecycle projection for routing and human readability; no
+other digest normalization is permitted.
+
+### Approval
+
+- Status: pending exact-content approval.
+- Approver, time, bounded criteria, digest, and decision source: pending.
+
+### Criterion mapping
+
+- Status: pending approval and governed tests.
+
+### Red-state evidence
+
+- Status: pending approved test execution against a healthy baseline.
+
+### Verification
+
+- Status: pending implementation and independent verification.
+
+### Delivery
+
+- Status: not applicable until delivery is authorized and attempted.

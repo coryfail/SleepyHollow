@@ -182,12 +182,12 @@ be sufficient. SGAD still applies, but evidence can include:
 - Human evaluation for criteria that cannot be automated reliably.
 - Production monitoring, drift detection, and incident feedback.
 
-An AI-system verification report states the evaluated distribution and limits. It
+An AI-system verification entry states the evaluated distribution and limits. It
 must not convert a probabilistic result into an absolute guarantee.
 
 ## Residual risk
 
-Verification reports disclose what was not established, including untested
+Verification entries disclose what was not established, including untested
 assumptions, unavailable environments, accepted warnings, nondeterministic
 results, and policy exceptions.
 
