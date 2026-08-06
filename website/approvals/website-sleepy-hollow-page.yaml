@@ -1,0 +1,21 @@
+schema: sgad-approval/v0.1
+requirement_id: website-sleepy-hollow-page
+requirement_path: website/src/pages/sleepy-hollow/requirements.md
+requirement_digest: sha256:20af56fff2d4b0786637895b333a94a75d38c98efd8b11c1d44ebb0ebbaa343e
+scope:
+  criteria:
+    - AC-HOME-001
+    - AC-HOME-002
+    - AC-HOME-003
+    - AC-HOME-004
+    - AC-HOME-005
+    - AC-HOME-006
+    - AC-HOME-007
+    - AC-HOME-008
+    - AC-HOME-009
+    - AC-HOME-010
+approved_by: human-project-owner
+approved_at: 2026-08-06T16:27:58Z
+risk: standard
+source: codex-conversation
+decision: "Keep the Sleepy Hollow landing page product-focused and move the full methodology to its own page"

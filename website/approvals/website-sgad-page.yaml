@@ -1,0 +1,22 @@
+schema: sgad-approval/v0.1
+requirement_id: website-sgad-page
+requirement_path: website/src/pages/sgad/requirements.md
+requirement_digest: sha256:953d9a6f2e3b10e19cda2cb350df58620bdaf0760039b000bc1c08785a9c9bef
+scope:
+  criteria:
+    - AC-SGAD-001
+    - AC-SGAD-002
+    - AC-SGAD-003
+    - AC-SGAD-004
+    - AC-SGAD-005
+    - AC-SGAD-006
+    - AC-SGAD-007
+    - AC-SGAD-008
+    - AC-SGAD-009
+    - AC-SGAD-010
+    - AC-SGAD-011
+approved_by: human-project-owner
+approved_at: 2026-08-06T16:27:58Z
+risk: standard
+source: codex-conversation
+decision: "Create a separate SGAD page that explains the methodology and how to use it"
