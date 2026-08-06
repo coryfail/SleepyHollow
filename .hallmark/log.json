@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-08-06",
+    "macrostructure": "Long Document",
+    "theme": "Midnight",
+    "enrichment": "none — typography only",
+    "nav": "N5 Floating pill",
+    "footer": "Ft2 Inline rule",
+    "brief": "SGAD framework-independent methodology page",
+    "critique": "P5 H5 E5 S5 R5 V5",
+    "slop_test": "pass (58/58)",
+    "verification": "22/22 browser checks passed across both routes"
+  },
+  {
+    "date": "2026-08-06",
+    "macrostructure": "Marquee Hero",
+    "theme": "Midnight",
+    "enrichment": "none — typography only",
+    "nav": "N5 Floating pill",
+    "footer": "Ft2 Inline rule",
+    "brief": "Sleepy Hollow product landing page with dedicated SGAD transition",
+    "critique": "P5 H5 E5 S5 R5 V5",
+    "slop_test": "pass (58/58)",
+    "verification": "22/22 browser checks passed across both routes"
+  }
+]

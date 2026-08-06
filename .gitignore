@@ -1,0 +1,8 @@
+# macOS Finder metadata
+.DS_Store
+website/node_modules/
+website/dist/
+website/coverage/
+website/playwright-report/
+website/test-results/
+website/*.tsbuildinfo

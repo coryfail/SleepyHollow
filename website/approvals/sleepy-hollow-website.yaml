@@ -1,0 +1,22 @@
+schema: sgad-approval/v0.1
+requirement_id: sleepy-hollow-website
+requirement_path: website/requirements.md
+requirement_digest: sha256:57d0e449cae7d4bc2e5fc6397ac9641f9255fd16b3417368e68b043a3a34075e
+scope:
+  criteria:
+    - AC-SITE-001
+    - AC-SITE-002
+    - AC-SITE-003
+    - AC-SITE-004
+    - AC-SITE-005
+    - AC-SITE-006
+    - AC-SITE-007
+    - AC-SITE-008
+    - AC-SITE-009
+    - AC-SITE-010
+    - AC-SITE-011
+approved_by: human-project-owner
+approved_at: 2026-08-06T17:20:18Z
+risk: standard
+source: codex-conversation
+decision: "Commit, push, and publish the verified website at https://sleepyhollow.io"
