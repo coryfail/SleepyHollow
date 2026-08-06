@@ -69,6 +69,10 @@ test("AC-SITE-010 · Pages workflow verifies branches and only deploys main", ()
   assert.match(workflow, /pull_request:/);
   assert.match(workflow, /branches:\s*\[main\]/);
   assert.match(workflow, /github\.event_name\s*==\s*'push'/);
+  assert.match(
+    workflow,
+    /group:\s*pages-\$\{\{\s*github\.event_name\s*\}\}-\$\{\{\s*github\.ref\s*\}\}/,
+  );
 });
 
 test("LICENSE · public license copy matches the repository license", () => {
