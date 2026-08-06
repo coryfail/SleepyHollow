@@ -11,8 +11,12 @@ SleepyHollow/
 ├── requirements/
 │   ├── README.md
 │   ├── application.md
-│   └── approvals/
-│       └── SH-F017.yaml
+│   ├── repository-organization.md
+│   ├── approvals/
+│   │   ├── SH-F017.yaml
+│   │   └── SH-R001.yaml
+│   └── evidence/
+│       └── SH-R001-red-state.md
 ├── cli/
 │   ├── requirements.md
 │   ├── create/
@@ -42,13 +46,13 @@ SleepyHollow/
 │   │   └── requirements.md
 │   └── services/
 │       └── requirements.md
-├── skill/
-│   ├── requirements.md
-│   └── planning/
-│       └── requirements.md
 ├── skills/
-│   └── sgad-workflow/
-│       └── requirements.md
+│   ├── sgad-workflow/
+│   │   └── requirements.md
+│   └── sleepy-hollow/
+│       ├── requirements.md
+│       └── planning/
+│           └── requirements.md
 ├── models/
 │   ├── endpoint-requirement.md
 │   ├── route.md
@@ -99,10 +103,10 @@ must not be silently reused or weakened.
 | SH-F003 | `core/validation/requirements.md` | Schemas, validation, and Problem Details |
 | SH-F004 | `core/kv/requirements.md` | Typed, bounded Deno KV access |
 | SH-F005 | `core/security/requirements.md` | Security, authentication, and authorization boundaries |
-| SH-F006 | `skill/planning/requirements.md` | Application planning, decomposition, and approval |
+| SH-F006 | `skills/sleepy-hollow/planning/requirements.md` | Application planning, decomposition, and approval |
 | SH-F007 | `core/testing/requirements.md` | Test utilities and criterion traceability |
 | SH-F008 | `cli/check/requirements.md` | Independent `hollow check` verification |
-| SH-F009 | `skill/requirements.md` | Official agent skill and end-to-end workflow |
+| SH-F009 | `skills/sleepy-hollow/requirements.md` | Official agent skill and end-to-end workflow |
 | SH-F010 | `cli/generate/requirements.md` | OpenAPI and typed-client generation |
 | SH-F011 | `cli/requirements.md` | Shared CLI behavior and diagnostics |
 | SH-F012 | `core/config/requirements.md` | Configuration and observability |
@@ -111,6 +115,7 @@ must not be silently reused or weakened.
 | SH-F015 | `cli/dev/requirements.md` | Local development server |
 | SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
 | SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD methodology workflow skill |
+| SH-R001 | `requirements/repository-organization.md` | Project-boundary organization and canonical repository paths |
 
 ## Shared models
 

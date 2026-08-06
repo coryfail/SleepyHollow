@@ -1,0 +1,15 @@
+schema: sgad-approval/v0.1
+requirement_id: SH-R001
+requirement_path: requirements/repository-organization.md
+requirement_digest: sha256:9ced44762c2fdcfc2e1e35f6e5414d55e76a43d8e13fe0cff71cd5f0c6210691
+scope:
+  criteria:
+    - AC-R001-001
+    - AC-R001-002
+    - AC-R001-003
+    - AC-R001-004
+approved_by: human-project-owner
+approved_at: 2026-08-06T20:30:07Z
+risk: low
+source: codex-conversation
+decision: "Move Hallmark metadata into website, consolidate the Sleepy Hollow skill under skills, and promote the verified feature through development to main"
