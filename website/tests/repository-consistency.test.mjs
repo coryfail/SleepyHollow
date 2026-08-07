@@ -217,24 +217,36 @@ test("AC-REPO-008 AC-REPO-009 · browser and Pages verification use the canonica
   }
 
   const workflow = read(".github/workflows/website-pages.yml");
-  for (const path of ["website/**", "docs/sgad/**", "skills/sgad-workflow/**", "requirements.md", "requirements/**", "models/**", "cli/**", "core/**"]) {
+  for (const path of ["website/**", "docs/sgad/**", "skills/sgad-workflow/**", "requirements.md", "requirements/**", "models/**", "cli/**", "core/**", "deno.json", "deno.lock"]) {
     assert.match(workflow, new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+  assert.match(workflow, /deno task verify:framework/);
   assert.match(workflow, /run:\s*npm run verify/);
   assert.match(workflow, /if:\s*github\.event_name == 'push'/);
 });
 
-test("AC-REPO-010 · draft product behavior remains unchanged", () => {
+test("AC-REPO-010 · product activation remains governed after cleanup", () => {
   const componentPaths = requirementPaths().filter((path) => /^(?:cli|core|skills\/sleepy-hollow)\//.test(path));
   for (const path of componentPaths) {
     const prior = execFileSync("git", ["show", `HEAD:${path}`], { cwd: repository, encoding: "utf8" });
     const current = read(path);
-    assert.equal(section(current, "Acceptance criteria"), section(prior, "Acceptance criteria"), `${path} criteria changed`);
     const previousMetadata = frontmatter(prior, path);
     const currentMetadata = frontmatter(current, path);
-    assert.deepEqual(currentMetadata.depends_on, previousMetadata.depends_on, `${path} dependencies changed`);
-    assert.deepEqual(currentMetadata.open_decisions ?? [], previousMetadata.open_decisions ?? [], `${path} decisions changed`);
-    assert.equal(currentMetadata.status, "draft", `${path} gained implementation authority`);
+
+    if (currentMetadata.status === "draft") {
+      assert.equal(section(current, "Acceptance criteria"), section(prior, "Acceptance criteria"), `${path} draft criteria changed`);
+      assert.deepEqual(currentMetadata.depends_on, previousMetadata.depends_on, `${path} draft dependencies changed`);
+      assert.deepEqual(currentMetadata.open_decisions ?? [], previousMetadata.open_decisions ?? [], `${path} draft decisions changed`);
+      continue;
+    }
+
+    const { normalized, record } = governedContent(current, path);
+    assert.match(record, /^### Approval\n\n- Status: approved\./m, `${path} lacks approved authority`);
+    assert.match(
+      record,
+      new RegExp(`Governed-content digest:[\\s\\S]{0,80}sha256:${sha256(normalized)}`),
+      `${path} approval does not bind current governed content`,
+    );
   }
 });
 

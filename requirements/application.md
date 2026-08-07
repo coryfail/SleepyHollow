@@ -967,13 +967,13 @@ The first release is complete when all of the following are demonstrated:
 
 ### Phase 1: Minimal framework kernel
 
-- Project creation
 - File-based routing
 - Schemas and validation
 - Deno KV primitives
 - Errors and basic security
 - Test utilities
 - Human-readable and JSON diagnostics
+- Project creation
 
 ### Phase 2: Requirements and verification
 
@@ -1049,15 +1049,15 @@ The following decisions require prototypes or focused evaluation before their ex
 
 | ID | Decision | Evaluation goal |
 |---|---|---|
-| OPEN-001 | Route module API | Smallest explicit API an agent uses reliably |
-| OPEN-002 | Schema library | Strong TypeScript inference, runtime validation, and OpenAPI generation |
-| OPEN-003 | Deno KV index encoding | Correct uniqueness, pagination, and atomic behavior |
-| OPEN-004 | Requirement parser | Stable Markdown and frontmatter without creating a proprietary authoring format |
-| OPEN-005 | Criterion-to-test metadata | Transparent mapping that works with Deno's test runner |
-| OPEN-006 | Endpoint-local verification | Fast targeted checks without missing shared regressions |
-| OPEN-007 | Auth-provider interface | Flexible enough for projects without becoming an auth framework |
-| OPEN-008 | Rate limiting | Useful local behavior and credible Deno Deploy behavior |
-| OPEN-009 | Generated client shape | Minimal dependencies and easy frontend or service consumption |
+| OPEN-001 | Route module API | Proposed resolution in SH-F002: one default `defineRoute` method-map export per endpoint directory, with the filesystem as the sole path source |
+| OPEN-002 | Schema library | Proposed resolution in SH-F003: pinned Zod 4 schemas with fail-closed JSON Schema/OpenAPI normalization from the same runtime definitions |
+| OPEN-003 | Deno KV index encoding | Proposed resolution in SH-F004: native tuple keys, pointer indexes, versionstamp checks, and native opaque cursors behind bounded declared-index queries |
+| OPEN-004 | Requirement parser | Proposed resolution in SH-F006: strict YAML 1.2 core frontmatter plus ordinary Markdown headings and stable acceptance-criterion list items, with deterministic source diagnostics and no proprietary authoring syntax |
+| OPEN-005 | Criterion-to-test metadata | Proposed resolution in SH-F007: a transparent `criterionTest` wrapper registers native Deno tests with stable test, requirement, and criterion IDs while exposing the same frozen metadata for manifests and reports |
+| OPEN-006 | Endpoint-local verification | Proposed resolution in SH-F007: targeted checks close transitively over both requirement dependencies and dependents, then escalate to the full relevant suite whenever ownership or graph safety is uncertain |
+| OPEN-007 | Auth-provider interface | Proposed resolution in SH-F005: named project providers return a validated neutral principal, while routes explicitly declare none or required authentication and optional guards |
+| OPEN-008 | Rate limiting | Proposed resolution in SH-F005: bounded process-local fixed windows for test/development and a pluggable shared-scope adapter requirement for protected production routes |
+| OPEN-009 | Generated client shape | Proposed resolution in SH-F010: one dependency-free Web Standards TypeScript module with required base URL, injectable fetch and neutral authentication hook, optional fail-closed response validation, and no persistence or framework-runtime access |
 | OPEN-010 | Skill portability | Rich Codex skill plus useful Claude and generic-agent guidance |
 | OPEN-011 | Deno Deploy integration | Fast setup with safe credential handling and reliable smoke tests |
 

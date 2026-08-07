@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
-status: draft
+status: verified
 risk: standard
 source_sections:
   - "3.1"
@@ -84,20 +84,90 @@ other digest normalization is permitted.
 
 ### Approval
 
-- Status: pending exact-content approval.
-- Approver, time, bounded criteria, digest, and decision source: pending.
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-07T12:47:53Z.
+- Approved criteria: AC-F001-001 through AC-F001-009.
+- Governed-content digest:
+  `sha256:5d0236364f999f012df2182a85f1d5c3c1c55b6cccbe4e19f21bc8a675e67068`.
+- Decision source: Codex conversation; direct response `Approved` after review
+  of the requirement path, bounded criteria, and exact governed-content digest.
 
 ### Criterion mapping
 
-- Status: pending approval and governed tests.
+- AC-F001-001 -> `create_test.ts` successful atomic creation test.
+- AC-F001-002 -> `create_test.ts` generated-project verification-command test.
+- AC-F001-003 -> `create_test.ts` typed configuration and canonical-location
+  test.
+- AC-F001-004 -> `create_test.ts` official-skill planning guidance test.
+- AC-F001-005 -> `create_test.ts` invalid-name and unsafe-destination test.
+- AC-F001-006 -> `create_test.ts` existing-file overwrite-refusal test.
+- AC-F001-007 -> `create_test.ts` stable JSON result and diagnostic test.
+- AC-F001-008 -> `create_test.ts` repeat-attempt preservation test.
+- AC-F001-009 -> `create_test.ts` compiled standalone CLI version test.
 
 ### Red-state evidence
 
-- Status: pending approved test execution against a healthy baseline.
+- Status: failed as expected.
+- Observed at: 2026-08-07T15:14:26Z, with the standalone runtime prerequisite
+  revalidated outside the network sandbox immediately afterward.
+- Base revision: `71b3e4debe8e924b6c9d61d5cc663a5690de98be` plus the approved
+  SH-F001 requirement, mapped creation tests, typed nonfunctional seams, pinned
+  dependency lock, and the verified framework working tree.
+- Commands: `deno task check:create` and `deno task test:create` using Deno
+  `2.9.5` on macOS arm64. The valid red rerun allowed Deno's first-time download
+  of its matching compile runtime.
+- Runtime-test digest:
+  `sha256:c07b575faafaf8013f01a18832194e5fdc2cdefcf8ef39094dba7b1c8d3706d5`.
+- Dependency-lock digest:
+  `sha256:8405839670a88a985b955e1bacd52b08588cf437a854094deddd2612b42355e7`.
+- Result: creation type checking passed and creation passed 0/9. On the valid
+  rerun, standalone compilation completed and its binary failed only because
+  `--version` reached the deliberate CLI seam.
+- Expected failure: every creation criterion reached the healthy runner and
+  failed through `SH_CREATE_NOT_IMPLEMENTED`; no dependency, assertion-runner,
+  permission, or unrelated regression failure obscured the missing approved
+  behavior. The earlier sandboxed compile download failure is explicitly
+  excluded from red evidence.
 
 ### Verification
 
-- Status: pending implementation and independent verification.
+- Status: passed.
+- Verified at: 2026-08-07T15:17:48Z.
+- Base revision: `71b3e4debe8e924b6c9d61d5cc663a5690de98be` plus the declared
+  working tree.
+- Approved requirement digest:
+  `sha256:5d0236364f999f012df2182a85f1d5c3c1c55b6cccbe4e19f21bc8a675e67068`.
+- Product implementation manifest:
+  `working-tree:sha256:de690a4fe42299b5a1ea5d1c6c52a539b5909340d0b3e90a20ee3c07597d6c20`
+  across 57 sorted framework and project-creation source, fixture, test,
+  configuration, dependency-lock, repository-control, and CI files. Each
+  record is `<relative-path>\0<file-sha256>\n` before hashing the sorted stream.
+- Current runtime-test digest:
+  `sha256:c07b575faafaf8013f01a18832194e5fdc2cdefcf8ef39094dba7b1c8d3706d5`.
+- Dependency-lock digest:
+  `sha256:8405839670a88a985b955e1bacd52b08588cf437a854094deddd2612b42355e7`.
+- Commands: `deno task verify:create`, `deno task verify:framework`,
+  `git diff --check`, and the canonical `npm run verify` from `website/`.
+- Results: creation passed 9/9; the generated scaffold independently passed
+  its documented format, lint, type, test, and structure verifier; and the
+  compiled standalone binary reported `hollow 0.1.0`. Framework formatting,
+  linting, type checking, and all 48 component tests with thirteen nested steps
+  passed.
+- Independent repository results: structural 16/16, links 1/1, repository
+  consistency 9/9, React 8/8, TypeScript/build, and Playwright/Axe 66/66 across
+  Chromium, Firefox, and WebKit passed. The repository-consistency test digest
+  remained
+  `sha256:a909a928e37ea21a2f7af88604948f97fc9afbf162d4eef24c73929fa96215d6`.
+- Verified behavior includes atomic staging and rename, strict safe-name and
+  existing-destination refusal, deterministic files, a typed empty
+  configuration, canonical planning locations, official-skill guidance,
+  stable JSON success/failure surfaces, repeat preservation, and a self-
+  contained compiled CLI artifact. No example endpoint is generated.
+- Residual boundary: no package registry publication or end-user installer was
+  delivered; the verified distribution artifact is the Deno-compiled standalone
+  executable. No commit, push, publication, deployment, or other delivery was
+  performed.
 
 ### Delivery
 
