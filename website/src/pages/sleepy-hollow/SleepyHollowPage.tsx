@@ -5,10 +5,7 @@ export default function SleepyHollowPage() {
     <main id="main-content" className="home-page">
       <section className="hero home-hero" aria-labelledby="home-title">
         <div className="hero__copy">
-          <p className="status-line">
-            <span className="status-line__mark" aria-hidden="true" />
-            Sleepy Hollow · In development
-          </p>
+          <p className="status-line">Sleepy Hollow · In development</p>
           <h1 id="home-title">The agent can build it. You decide what holds.</h1>
           <p className="hero__lede">
             Sleepy Hollow is an agentic-first headless API framework for Deno,

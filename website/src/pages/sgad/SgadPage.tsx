@@ -146,12 +146,17 @@ export default function SgadPage() {
           </p>
         </aside>
 
-        <p className="methodology-close">
-          Continue with the <a href={sgadGuideUrl}>complete SGAD guide</a> or
-          begin from the <a href={sgadTemplatesUrl}>reusable SGAD templates</a>.
-          To see the framework intended to embody the method, return to the
-          <a href={sitePaths.home}> Sleepy Hollow framework page</a>.
-        </p>
+        <nav className="methodology-close" aria-label="Continue with SGAD">
+          <a className="text-action text-action--primary" href={sgadGuideUrl}>
+            Read the SGAD guide <span aria-hidden="true">↗</span>
+          </a>
+          <a className="text-action" href={sgadTemplatesUrl}>
+            Browse reusable templates <span aria-hidden="true">↗</span>
+          </a>
+          <a className="text-action" href={sitePaths.home}>
+            Back to Sleepy Hollow <span aria-hidden="true">→</span>
+          </a>
+        </nav>
       </article>
     </main>
   );

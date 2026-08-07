@@ -278,6 +278,106 @@ otherwise healthy runner.
 - Short-install correction: passed independently at 2026-08-06T19:22:50Z for
   website SGAD digest
   `sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170`.
+- Redesign implementation pass, 2026-08-06: a bounded visual/structural
+  improvement for marketing effectiveness (Hallmark-governed) — filled primary
+  CTA button, numbered principle card grid, a static Tier-A CSS atmospheric
+  hero panel on the framework page only, and a restructured SGAD closing
+  action row. `website/design.md` was added to lock the shared token system.
+  No requirement text, acceptance criterion, or narrative claim changed;
+  approved criteria AC-SITE-001 through AC-SITE-011, AC-HOME-001 through
+  AC-HOME-010, and AC-WEB-SGAD-001 through AC-WEB-SGAD-012 remain governed by
+  the approvals above. Passed independently at 2026-08-06T19:57:00Z.
+  Implementation manifest:
+  `working-tree:sha256:251ef84f8b34a77c0d2eee65468103e16940f0eeaa69fc94c6dff2cf7bb1f205`
+  (diff of `website/` against base revision `fc6316cc9fe829450e3ac79c1582b6c959016fdf`).
+  Verifier: `website/package.json#verify`. Results: structural 16/16, links
+  1/1, repository-consistency 9/9, React/Vitest 8/8, TypeScript build, Vite
+  production build, Playwright/Axe 66/66 across Chromium, Firefox, and WebKit
+  (WCAG 2.2 AA, all four required responsive widths on both routes, reduced
+  motion, keyboard focus, no-JavaScript fallback, 1280×800 hero fit).
+- User-requested correction, 2026-08-06: the shared floating-pill nav (N5)
+  was replaced with an edge-aligned bar (N9) — sticky to the top, wordmark
+  hard-left, "Home" / "SGAD Methodology" / "GitHub" hard-right — because the
+  bare acronym link and the floating chip were not to the project owner's
+  taste. Also fixed a pre-existing width defect: the file-map figcaption
+  heading carried a stale 24ch max-width from an old two-column layout,
+  wrapping into two cramped lines inside a much wider box. No requirement
+  text or acceptance criterion changed; `.nav-pill` selectors were renamed to
+  `.nav-bar` and the exact-text assertion `"SGAD"` was updated to `"SGAD
+  Methodology"` in `src/App.test.tsx` and `tests/landing-page.spec.ts` to
+  match the intentional, more descriptive link rename — same checks, same
+  rigor, correct selector. Passed independently at 2026-08-06T20:48:00Z.
+  Implementation manifest:
+  `working-tree:sha256:1ce750f0d6acc474137c749db0d6140cb5e85ee191c6a37430297538877fec1b`
+  (diff of `website/` against base revision `fc6316cc9fe829450e3ac79c1582b6c959016fdf`).
+  Verifier: `website/package.json#verify`. Results: structural 16/16, links
+  1/1, repository-consistency 9/9, React/Vitest 8/8, TypeScript build, Vite
+  production build, Playwright/Axe 66/66 across Chromium, Firefox, and WebKit.
+- User-requested removal, 2026-08-06: the hero atmospheric CSS panel
+  (`hero__glow`) added during the redesign pass was removed at the project
+  owner's request — the framework page hero is typography-only again
+  (`.home-hero` reverted to a single-column layout). No requirement text or
+  acceptance criterion changed. Passed independently at 2026-08-06T20:55:00Z.
+  Implementation manifest:
+  `working-tree:sha256:485c76de492818f2d96f826ea5396bdee8bcfe050d7d02c5ee133989c288bde2`
+  (diff of `website/` against base revision `fc6316cc9fe829450e3ac79c1582b6c959016fdf`).
+  Verifier: `website/package.json#verify`. Results: structural 16/16, links
+  1/1, repository-consistency 9/9, React/Vitest 8/8, TypeScript build, Vite
+  production build, Playwright/Axe 66/66 across Chromium, Firefox, and WebKit.
+- User-requested hero alignment, 2026-08-06: the project owner asked for the
+  two page heroes to "look similar." Brought the framework-page hero's
+  typography, vertical anchor, and border weight into line with the SGAD
+  hero's — same heading clamp/max-width, same lede size, bottom-anchored
+  alignment, same heavy border-bottom rule — without collapsing the two page
+  structures, which AC-SITE-005 and the child page requirements (`page
+  structure and visual direction`) require to stay recognizably different.
+  The SGAD page keeps its install-command block and long-form document body;
+  the home page keeps its concise product sections below the fold. No
+  requirement text or acceptance criterion changed. Passed independently at
+  2026-08-06T21:00:00Z. Implementation manifest:
+  `working-tree:sha256:a5e2dc562449d6401c046605bf2be954ad030a60222ad9ec6eca138af5c8f972`
+  (diff of `website/` against base revision `fc6316cc9fe829450e3ac79c1582b6c959016fdf`).
+  Verifier: `website/package.json#verify`. Results: structural 16/16, links
+  1/1, repository-consistency 9/9, React/Vitest 8/8, TypeScript build, Vite
+  production build, Playwright/Axe 66/66 across Chromium, Firefox, and WebKit.
+- User-requested margin and layout correction, 2026-08-06: the SGAD page's
+  `.methodology-document` carried its own inner 68rem width cap while the
+  home page's sections stretched to the shared 96rem `main` container,
+  producing visibly different side margins between the two pages. Removed the
+  inner cap so both pages share the exact same outer width and gutter. That
+  exposed a second defect: the file-map figure and the "Apply SGAD with tools
+  you already trust." section, once full width, left their prose in a narrow
+  left-hugging column with a large dead gap on the right. Gave both a
+  two-column margin-note layout (caption/intro left, content right) at
+  ≥60rem, matching the pattern already used by `.methodology-prose` and
+  `.methodology-caution` on the same page; the file-map figure spans full
+  width beneath the adoption intro/steps row. No requirement text or
+  acceptance criterion changed. Passed independently at 2026-08-06T21:05:00Z.
+  Implementation manifest:
+  `working-tree:sha256:a9c64964af8dd9f954f223dfb177eab7d64d87f2a24b6f10f7cf9c979984cd06`
+  (diff of `website/` against base revision `fc6316cc9fe829450e3ac79c1582b6c959016fdf`).
+  Verifier: `website/package.json#verify`. Results: structural 16/16, links
+  1/1, repository-consistency 9/9, React/Vitest 8/8, TypeScript build, Vite
+  production build, Playwright/Axe 66/66 across Chromium, Firefox, and WebKit.
+- User-requested type-scale correction, 2026-08-06: several body-copy
+  elements were still sitting at the 1rem/0.875rem tier left over from the
+  original single-page layout — nav bar links, file-map role labels and
+  evidence paragraph, the framework principle-card descriptions, the SGAD
+  lifecycle stage descriptions, and the adoption steps list. Raised them to
+  match the size already used by comparable paragraph text elsewhere on the
+  same pages (mostly `--text-md`/`--text-base`). This initially regressed
+  AC-SITE-007 at 320px on both routes — nav bar links no longer fit on one
+  row at the larger size — caught by the automated Playwright suite;
+  corrected by keeping the larger nav-link size everywhere at ≥30rem and
+  reverting to `--text-sm` only below that breakpoint, where the nav bar
+  already sits on its own row. No requirement text or acceptance criterion
+  changed. Passed independently at 2026-08-06T21:12:00Z. Implementation
+  manifest:
+  `working-tree:sha256:ea14906beb979d475cdbbc68c907ef3a02d0cf47ae15f4ccf508095197d8bfee`
+  (diff of `website/` against base revision `fc6316cc9fe829450e3ac79c1582b6c959016fdf`).
+  Verifier: `website/package.json#verify`. Results: structural 16/16, links
+  1/1, repository-consistency 9/9, React/Vitest 8/8, TypeScript build, Vite
+  production build, Playwright/Axe 66/66 across Chromium, Firefox, and WebKit.
 - Current repository-wide verification is recorded in root `requirements.md`.
 
 ### Delivery

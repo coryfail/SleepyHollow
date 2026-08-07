@@ -38,7 +38,7 @@ describe("approved two-page behavior", () => {
   test("AC-SITE-002 · navigation identifies the current page", () => {
     render(<App page="sgad" />);
     const navigation = screen.getByRole("navigation", { name: /primary/i });
-    expect(within(navigation).getByRole("link", { name: "SGAD" })).toHaveAttribute("aria-current", "page");
+    expect(within(navigation).getByRole("link", { name: "SGAD Methodology" })).toHaveAttribute("aria-current", "page");
     expect(within(navigation).getByRole("link", { name: "Sleepy Hollow" })).not.toHaveAttribute("aria-current");
   });
 

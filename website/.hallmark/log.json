@@ -1,6 +1,33 @@
 [
   {
     "date": "2026-08-06",
+    "scope": "app",
+    "correction": true,
+    "macrostructure": "Marquee Hero (marketing) / Long Document (content)",
+    "theme": "Midnight (unchanged)",
+    "enrichment": "E7 abstract-background variant on the marketing hero (hero__glow, Tier-A CSS, no svg, static) — content page stays typography-only",
+    "nav": "N9 edge-aligned minimal (was N5 floating pill) — sticky top bar, wordmark hard-left, Home / SGAD Methodology / GitHub hard-right",
+    "footer": "Ft2 Inline rule",
+    "brief": "User-requested correction after the first redesign pass: (1) file-map figcaption heading had a stale 24ch max-width from an old two-column layout, wrapping into two cramped lines inside a much wider box — widened to 40ch, now one line; (2) floating pill nav replaced with an edge-aligned bar per user preference; (3) bare 'SGAD' nav link renamed to 'SGAD Methodology' for descriptive link text; (4) added an explicit 'Home' link beside it so the wordmark isn't the only way back. No requirement text or acceptance criterion changed; two test selectors (.nav-pill to .nav-bar) and two exact-text assertions ('SGAD' to 'SGAD Methodology') were updated to match the intentional rename.",
+    "critique": "P5 H4 E5 S5 R5 V4",
+    "slop_test": "pass — no svg on marketing route, no illustration/diagram, tokens locked, reduced-motion covers all new elements, WCAG 2.2 AA automated checks pass",
+    "verification": "66/66 Playwright checks (chromium/firefox/webkit) + 16/16 structural + 8/8 React + 9/9 repository-consistency + 1/1 links + typecheck + build, all pass"
+  },
+  {
+    "date": "2026-08-06",
+    "scope": "app",
+    "macrostructure": "Marquee Hero (marketing) / Long Document (content)",
+    "theme": "Midnight (unchanged)",
+    "enrichment": "E7 abstract-background variant on the marketing hero (hero__glow, Tier-A CSS, no svg, static) — content page stays typography-only",
+    "nav": "N5 Floating pill",
+    "footer": "Ft2 Inline rule",
+    "brief": "Redesign pass: bounded visual/structural improvement for marketing effectiveness — filled primary CTA button, numbered principle card grid, hero atmospheric panel, SGAD closing action row. design.md added at website root. No copy claims changed, no acceptance criteria changed.",
+    "critique": "P5 H4 E5 S5 R5 V4",
+    "slop_test": "pass — no svg on marketing route, no illustration/diagram, tokens locked, reduced-motion covers all new elements, WCAG 2.2 AA automated checks pass",
+    "verification": "66/66 Playwright checks (chromium/firefox/webkit) + 16/16 structural + 8/8 React + 9/9 repository-consistency + 1/1 links + typecheck + build, all pass"
+  },
+  {
+    "date": "2026-08-06",
     "macrostructure": "Long Document",
     "theme": "Midnight",
     "enrichment": "none — typography only",

@@ -16,10 +16,10 @@ const requiredViewports = [
 test("AC-SITE-002 · the two destinations are separate and mutually navigable", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Sleepy Hollow", exact: true })).toHaveAttribute("aria-current", "page");
-  await page.getByRole("link", { name: "SGAD", exact: true }).click();
+  await page.getByRole("link", { name: "SGAD Methodology", exact: true }).click();
   await expect(page).toHaveURL(/\/sgad\/$/);
   await expect(page.getByRole("heading", { level: 1, name: /Specification-Governed/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: "SGAD", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("link", { name: "SGAD Methodology", exact: true })).toHaveAttribute("aria-current", "page");
 });
 
 test("AC-HOME-001 AC-HOME-005 AC-HOME-010 · home is a product page with no process illustration", async ({ page }) => {
@@ -58,7 +58,7 @@ test("AC-WEB-SGAD-001 · SGAD introduction follows the shared navigation without
   await page.setViewportSize({ width: 889, height: 936 });
   await page.goto("/sgad/");
 
-  const navigation = await page.locator(".nav-pill").boundingBox();
+  const navigation = await page.locator(".nav-bar").boundingBox();
   const introduction = await page.getByText("An open methodology · Public draft", { exact: true }).boundingBox();
 
   expect(navigation).not.toBeNull();
@@ -116,7 +116,7 @@ for (const route of routes) {
         viewport: document.documentElement.clientWidth,
       }));
       expect(dimensions.body).toBeLessThanOrEqual(dimensions.viewport);
-      for (const action of await page.locator(".nav-pill a, .text-action").all()) {
+      for (const action of await page.locator(".nav-bar__links a, .wordmark, .text-action").all()) {
         expect(await action.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe("nowrap");
       }
     });

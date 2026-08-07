@@ -9,6 +9,7 @@
   --color-rule-strong: oklch(52% 0.035 250);
   --color-accent: oklch(76% 0.15 58);
   --color-accent-soft: oklch(67% 0.09 58);
+  --color-on-accent: var(--color-paper);
   --color-focus: oklch(82% 0.16 72);
   --color-mist: oklch(74% 0.035 220);
   --color-pine: oklch(31% 0.045 168);
