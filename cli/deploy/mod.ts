@@ -1,5 +1,4 @@
 import { deploy } from "./deployment.ts";
-export { DeployError } from "./deploy_error.ts";
 import { plan } from "./plan.ts";
 import { human, json } from "./render.ts";
 import type {
