@@ -19,10 +19,10 @@ const walk = (directory) => readdirSync(directory, { withFileTypes: true }).flat
 });
 
 const repositoryFiles = () => execFileSync(
-  "rg",
-  ["--files", "-g", "!website/node_modules/**", "-g", "!website/dist/**", "-g", "!website/test-results/**"],
+  "git",
+  ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
   { cwd: repository, encoding: "utf8" },
-).trim().split("\n").filter(Boolean);
+).split("\0").filter(Boolean);
 
 const requirementPaths = () => repositoryFiles().filter((path) => (
   path === "requirements.md"

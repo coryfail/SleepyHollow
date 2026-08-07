@@ -327,6 +327,17 @@ verification described above.
   of every Safari release; system-font metrics may vary slightly by platform;
   Git history was not rewritten; and no commit, push, publication, deployment,
   or other external delivery was performed.
+- CI portability correction verified at 2026-08-07T01:47:59Z. GitHub Actions
+  run `31137472441` failed before browser execution because the Ubuntu runner
+  could not spawn the undeclared `rg` executable. The repository inventory now
+  uses `git ls-files --cached --others --exclude-standard -z`, which is provided
+  by the checked-out Git environment and preserves tracked plus unignored file
+  coverage without filtering generated paths before AC-REPO-012 inspects them.
+- Corrected consistency-test digest:
+  `sha256:f2018f92c1cfe044883df865713a4080478eb16dbce2d056013e92e2d11aae83`.
+- Reverification: repository consistency 9/9 and the complete canonical verifier
+  passed with the same structural, link, React, type, build, and 66/66
+  cross-browser results recorded above.
 
 ### Delivery
 
