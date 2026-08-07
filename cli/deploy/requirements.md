@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F013
 title: Deno Deploy delivery
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "3.7"
@@ -92,8 +92,15 @@ other digest normalization is permitted.
 
 ### Approval
 
-- Status: pending exact-content approval.
-- Approver, time, bounded criteria, digest, and decision source: pending.
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-07T22:36:53Z.
+- Approved criteria: AC-F013-001 through AC-F013-009.
+- Governed-content digest:
+  `sha256:fc354689a9b796f3be3563516920e8f443069a57a8f4a9bd5bd7d774d13996f2`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the requirement scope, bounded criteria, dependencies, open decisions, and
+  exact governed-content digest.
 
 ### Criterion mapping
 

@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F009
 title: Official Sleepy Hollow agent skill
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "3"
@@ -106,20 +106,72 @@ other digest normalization is permitted.
 
 ### Approval
 
-- Status: pending exact-content approval.
-- Approver, time, bounded criteria, digest, and decision source: pending.
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-07T22:36:53Z.
+- Approved criteria: AC-F009-001 through AC-F009-012.
+- Governed-content digest:
+  `sha256:b0da46ef216f78fd63026af4930064b13a5bdcde5e6374398e20c8359b11ca57`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the requirement scope, bounded criteria, dependencies, open decisions, and
+  exact governed-content digest.
 
 ### Criterion mapping
 
-- Status: pending approval and governed tests.
+- AC-F009-001 -> `skill_test.ts` unresolved material discovery question test.
+- AC-F009-002 -> `skill_test.ts` application-review artifact gate test.
+- AC-F009-003 -> `skill_test.ts` decomposition premature-code test.
+- AC-F009-004 -> `skill_test.ts` per-endpoint approval isolation test.
+- AC-F009-005 -> `skill_test.ts` approval and expected-red implementation test.
+- AC-F009-006 -> `skill_test.ts` broken-baseline discrimination test.
+- AC-F009-007 -> `skill_test.ts` bounded-repair behavior and test-weakening
+  test.
+- AC-F009-008 -> `skill_test.ts` independent check-evidence verification test.
+- AC-F009-009 -> `skill_test.ts` mandatory authentication-element test.
+- AC-F009-010 -> `skill_test.ts` first and risky deployment confirmation test.
+- AC-F009-011 -> `skill_test.ts` completion-report coverage and evidence test.
+- AC-F009-012 -> `skill_test.ts` mandatory-constraint placement test against the
+  shipped `SKILL.md` and seven references.
 
 ### Red-state evidence
 
-- Status: pending approved test execution against a healthy baseline.
+- Status: failed as expected.
+- Observed at: 2026-08-07T22:46:04Z.
+- Base revision: `96670b3e056838fd1a57db7bdbf133860a007534` plus the approved
+  SH-F009 requirement, mapped skill tests, and typed nonfunctional seams.
+- Commands: `deno task check:skill` and `deno task test:skill` using Deno
+  `2.9.5` on macOS arm64.
+- Result: `deno task check:skill` passed, establishing a healthy typed baseline.
+  `deno task test:skill` reported `0 passed | 12 failed`. Every failure was an
+  assertion failure identifying approved behavior absent from the seams, not a
+  compilation error, unresolved import, or unavailable dependency.
+- Baseline health: `deno task verify:planning` and `deno task verify:check`
+  passed at the same revision, so no unrelated regression contaminated the run.
 
 ### Verification
 
-- Status: pending implementation and independent verification.
+- Status: passed for the governed orchestration boundary.
+- Verified at: 2026-08-07T22:50:14Z.
+- Command: `deno task verify:skill`, comprising `deno fmt --check`, `deno lint`,
+  `deno task check:skill`, and `deno task test:skill`.
+- Result: `12 passed | 0 failed`.
+- Regression scope: `verify:framework`, `verify:create`, `verify:planning`,
+  `verify:check`, `verify:cli`, `verify:test-command`, and `verify:dev` all
+  passed at the same revision.
+- Repair record: two mapped tests captured a thrown error through
+  `assert.throws`, which returns `undefined` under `node:assert/strict`. The
+  capture mechanism was corrected to a `caught` helper that returns the thrown
+  error. No assertion was relaxed, no criterion narrowed, and no approved
+  behavior changed.
+- Residual risk: AC-F009-005 and AC-F009-008 are verified at the orchestration
+  boundary using injected red-state and `CheckResult` evidence. End-to-end
+  evidence against a real project additionally requires the SH-F008 repository
+  evidence loader, which remains an unimplemented host boundary. Those two
+  criteria are not yet closed by a live `hollow check` run.
+- Residual risk: the mapped tests govern the documented workflow and the
+  constraints carried in `SKILL.md`. They do not establish that a live agent
+  host follows those constraints during a conversation. No automated control in
+  this repository closes that gap.
 
 ### Delivery
 
