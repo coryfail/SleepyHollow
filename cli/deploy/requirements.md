@@ -104,16 +104,55 @@ other digest normalization is permitted.
 
 ### Criterion mapping
 
-- Status: pending approval and governed tests.
+- AC-F013-001 -> `deploy_test.ts` failed-verification upload-refusal test.
+- AC-F013-002 -> `deploy_test.ts` plan target and value-free env-key test.
+- AC-F013-003 -> `deploy_test.ts` first-deployment confirmation pause test.
+- AC-F013-004 -> `deploy_test.ts` credential non-disclosure test across result,
+  human output, and JSON output.
+- AC-F013-005 -> `deploy_test.ts` upload, health, and smoke ordering test.
+- AC-F013-006 -> `deploy_test.ts` failed required smoke-test evidence test.
+- AC-F013-007 -> `deploy_test.ts` complete success-result location and time
+  test.
+- AC-F013-008 -> `deploy_test.ts` unchanged-revision idempotence test.
+- AC-F013-009 -> `deploy_test.ts` sole-supported-target test.
 
 ### Red-state evidence
 
-- Status: pending approved test execution against a healthy baseline.
+- Status: failed as expected.
+- Observed at: 2026-08-07T22:58:41Z.
+- Base revision: `836cbc2` plus the approved SH-F013 requirement, mapped
+  deployment tests, and typed nonfunctional seams.
+- Commands: `deno task check:deploy` and `deno task test:deploy` using Deno
+  `2.9.5` on macOS arm64.
+- Result: `deno task check:deploy` passed, establishing a healthy typed
+  baseline. `deno task test:deploy` reported `0 passed | 9 failed`. Every
+  failure was an assertion failure identifying approved behavior absent from the
+  seams, not a compilation error or unresolved import.
 
 ### Verification
 
-- Status: pending implementation and independent verification.
+- Status: passed for the governed command boundary.
+- Verified at: 2026-08-07T23:03:43Z.
+- Command: `deno task verify:deploy`, comprising `deno fmt --check`,
+  `deno lint`, `deno task check:deploy`, and `deno task test:deploy`.
+- Result: `9 passed | 0 failed`.
+- Regression scope: `verify:framework`, `verify:create`, `verify:planning`,
+  `verify:check`, `verify:cli`, `verify:test-command`, `verify:dev`, and
+  `verify:skill` all passed at the same revision.
+- Reuse: credential redaction reuses `redactSecurityData` from SH-F005 rather
+  than introducing a second redaction implementation.
+- Residual risk: OPEN-011 is unresolved. The command owns plan construction,
+  the verification gate, the confirmation gate, smoke-result interpretation,
+  idempotence, and result shaping, all verified against an injected
+  `DeployAdapter`. No Deno Deploy adapter implementation exists, and no
+  credentialed upload, live URL discovery, or live smoke test has been executed
+  against the real platform. AC-F013-005, AC-F013-006, and AC-F013-007 are
+  therefore closed only at the command boundary.
+- Residual risk: `hollow deploy` has no host-supplied `DeployInventoryLoader`,
+  matching the unimplemented SH-F008 evidence-loader boundary. The command
+  cannot yet assemble a real project's deployment inventory.
 
 ### Delivery
 
-- Status: not applicable until delivery is authorized and attempted.
+- Status: not applicable. No deployment has been authorized or attempted, and
+  no Deno Deploy adapter exists to attempt one.
