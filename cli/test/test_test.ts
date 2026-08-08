@@ -467,3 +467,103 @@ Deno.test("AC-F016-007 · passing tests cannot mutate verification state", async
     await Deno.remove(directory, { recursive: true });
   }
 });
+
+async function captureHarness(options: {
+  readonly writeArtifact: boolean;
+}): Promise<{
+  readonly root: string;
+  readonly stdout: string[];
+  readonly stderr: string[];
+  readonly code: number;
+  readonly capturePath: string | undefined;
+}> {
+  const root = await Deno.makeTempDir({ prefix: "sh-test-capture-" });
+  await Deno.mkdir(join(root, "generated"), { recursive: true });
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  let capturePath: string | undefined;
+  const code = await runTestCommand(
+    ["--json"],
+    {
+      cwd: root,
+      stdout: (value) => stdout.push(value),
+      stderr: (value) => stderr.push(value),
+    },
+    () => inventory(),
+    (_plan, source) => {
+      capturePath = source.captureArtifactPath;
+      if (options.writeArtifact && capturePath) {
+        Deno.writeTextFileSync(
+          capturePath,
+          JSON.stringify({
+            schema: "sleepy-hollow-capture/v1",
+            runner: "deno test",
+            revision: "r1",
+            requests: [],
+            dataOperations: [],
+            uncapturedRoutes: [],
+          }),
+        );
+      }
+      return {
+        status: "passed" as const,
+        durationMs: 1,
+        events: [],
+        evidence: "runner evidence",
+      };
+    },
+  );
+  return { root, stdout, stderr, code, capturePath };
+}
+
+Deno.test("AC-F016-008 · a run that executes tests persists a capture artifact", async () => {
+  const harness = await captureHarness({ writeArtifact: true });
+  assert.ok(harness.capturePath);
+  assert.ok(harness.capturePath.endsWith("generated/capture.json"));
+  const written = await Deno.readTextFile(harness.capturePath);
+  assert.equal(JSON.parse(written).schema, "sleepy-hollow-capture/v1");
+  await Deno.remove(harness.root, { recursive: true });
+});
+
+Deno.test("AC-F016-009 · enabling capture changes neither execution nor results", async () => {
+  const persisted = await captureHarness({ writeArtifact: true });
+  const absent = await captureHarness({ writeArtifact: false });
+
+  const read = (h: typeof persisted) =>
+    JSON.parse((h.code === 0 ? h.stdout[0] : h.stderr[0]) ?? "{}");
+  const withArtifact = read(persisted);
+  const withoutArtifact = read(absent);
+
+  assert.equal(persisted.code, absent.code);
+  assert.equal(withArtifact.ok, withoutArtifact.ok);
+  assert.deepEqual(withArtifact.selectedTests, withoutArtifact.selectedTests);
+  assert.deepEqual(withArtifact.criteria, withoutArtifact.criteria);
+  assert.deepEqual(withArtifact.summary, withoutArtifact.summary);
+
+  const extra = (withoutArtifact.diagnostics ?? []).filter((item: {
+    code: string;
+  }) =>
+    !(withArtifact.diagnostics ?? []).some((k: { code: string }) =>
+      k.code === item.code
+    )
+  );
+  assert.deepEqual(extra.map((item: { code: string }) => item.code), [
+    "SH_TEST_CAPTURE_NOT_PERSISTED",
+  ]);
+
+  await Deno.remove(persisted.root, { recursive: true });
+  await Deno.remove(absent.root, { recursive: true });
+});
+
+Deno.test("AC-F016-010 · a missing capture artifact is reported as a diagnostic", async () => {
+  const harness = await captureHarness({ writeArtifact: false });
+  const result = JSON.parse(
+    (harness.code === 0 ? harness.stdout[0] : harness.stderr[0]) ?? "{}",
+  );
+  const diagnostics = (result.diagnostics ?? []) as { code: string }[];
+  assert.ok(
+    diagnostics.some((item) => item.code === "SH_TEST_CAPTURE_NOT_PERSISTED"),
+    `expected capture diagnostic, saw ${JSON.stringify(diagnostics)}`,
+  );
+  await Deno.remove(harness.root, { recursive: true });
+});

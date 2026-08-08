@@ -165,6 +165,8 @@ export async function execute(
   } catch {
     return emit(loadFailure(parsed.scope), parsed.json, io);
   }
+  const capturePath = `${io.cwd}/generated/capture.json`;
+  inventory = { ...inventory, captureArtifactPath: capturePath };
   const testPlan = plan(inventory, parsed.scope);
   if (testPlan.diagnostics.some((item) => item.severity === "error")) {
     return emit(failedWithoutRunner(testPlan, inventory), parsed.json, io);
@@ -186,8 +188,28 @@ export async function execute(
       evidence: "Native test runner failed before producing bounded evidence",
     };
   }
+  const normalized = normalizeRunnerResult(testPlan, inventory, runnerResult);
+  let persisted = true;
+  try {
+    await Deno.stat(capturePath);
+  } catch {
+    persisted = false;
+  }
   return emit(
-    normalizeRunnerResult(testPlan, inventory, runnerResult),
+    persisted ? normalized : {
+      ...normalized,
+      diagnostics: [
+        ...normalized.diagnostics,
+        {
+          code: "SH_TEST_CAPTURE_NOT_PERSISTED",
+          severity: "warning" as const,
+          summary:
+            "The test run completed but no capture artifact was persisted.",
+          correction:
+            "Enable Sleepy Hollow capture in the project test setup so verification has observed evidence.",
+        },
+      ],
+    },
     parsed.json,
     io,
   );

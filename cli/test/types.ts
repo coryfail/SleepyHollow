@@ -30,6 +30,7 @@ export interface TestRunnerPermissions {
 }
 
 export interface TestCommandInventory {
+  readonly captureArtifactPath?: string;
   readonly projectRootDisplay: string;
   readonly requirements: readonly RequirementEvidence[];
   readonly dependencyGraph: readonly RequirementDependency[];

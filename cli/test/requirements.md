@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F016
 title: Test command
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "11"
@@ -284,6 +284,33 @@ other digest normalization is permitted.
   only at the explicit `SH_TEST_COMMAND_NOT_IMPLEMENTED` boundary in
   `cli/test/mod.ts`, with no fixture, compilation, dependency, permission, or
   unrelated infrastructure failure.
+
+### Verification, capture amendment
+
+- Status: passed for all ten approved criteria.
+- Verified at: 2026-08-08T17:42:16Z.
+- Command: `deno task verify:test-command`.
+- Result: `10 passed | 0 failed`.
+- Criterion mapping: AC-F016-008 -> capture-path persistence test;
+  AC-F016-009 -> capture-invariance comparison test; AC-F016-010 -> missing
+  artifact diagnostic test.
+- Red state: `0 passed | 3 failed` for the three new criteria against a healthy
+  typed baseline before implementation.
+- Test correction: AC-F016-009 first asserted a specific exit code, which
+  assumed a fixture outcome rather than testing the approved invariant. It was
+  rewritten to compare a run whose artifact was persisted against one whose was
+  not, asserting identical exit code, result, selection, criteria, and summary,
+  and that the only difference is the capture diagnostic. The corrected test is
+  strictly stronger.
+- Interpretation recorded: `hollow test` runs tests in a subprocess, so the
+  command cannot hold capture records itself. It resolves the artifact path,
+  supplies it to the runner, and confirms persistence afterward, reporting a
+  diagnostic when no artifact was written. Project test setup performs the
+  write. This satisfies the approved intent that a run leaves observed evidence
+  without abandoning subprocess isolation.
+- Residual risk: a generated project does not yet scaffold capture-aware test
+  setup, so a fresh `hollow create` project produces no artifact until SH-F001
+  is amended to scaffold it.
 
 ### Verification, superseded
 
