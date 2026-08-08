@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F019
 title: Runtime evidence capture
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "8"
@@ -213,6 +213,23 @@ readability; no other digest normalization is permitted.
   `core/kv`, `core/security`, or `core/testing` was modified. Capture wraps
   their public surfaces through a delegating proxy, so their governed content
   and verified status are untouched.
+### Verification, withdrawn
+
+- Status: the verified claim above is withdrawn. SH-F019 returns to `approved`.
+- Withdrawn at: 2026-08-08T14:58:00Z.
+- Reason: the approved Artifact requirement states that capture shall write one
+  deterministic artifact to the project's declared generated location. No
+  approved criterion covers persistence, and the implementation has no write
+  path. The twelve mapped criteria therefore passed while the component did not
+  satisfy its own approved requirements text.
+- Assessment: this is a criterion-coverage defect, not an implementation defect.
+  The mapped criteria under-covered an approved requirement sentence, so the
+  component gate could not detect the omission. Closing it requires a new
+  criterion, which is a governed change and invalidates the current approval.
+- Downstream impact: SH-F018 consumes the artifact from the generated location
+  and its twelve passing criteria are unaffected, because they read a fixture
+  artifact rather than one capture wrote.
+
 - Residual risk: capture observes only what tests exercise. Behavior no test
   reaches is reported as uncaptured and carries no evidence. Whether uncaptured
   behavior fails verification is an SH-F008 decision that remains open.
