@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import type { CheckResult } from "../check/mod.ts";
 import {
   buildDeployPlan,
+  createDenoDeployAdapter,
   DEPLOY_TARGET_KINDS,
   exitCodeForDeploy,
   renderHumanDeployResult,
   renderJsonDeployResult,
+  resolveDeployToken,
   runDeployment,
 } from "./mod.ts";
 import type {
@@ -306,4 +308,123 @@ Deno.test("AC-F013-009 · Deno Deploy is the only supported production target", 
       item.code === "SH_DEPLOY_TARGET_UNSUPPORTED"
     ),
   );
+});
+
+const TOKEN_VAR = "DENO_DEPLOY_TOKEN";
+
+function transportRecorder(
+  responder: (request: Request) => Response | Promise<Response>,
+): { readonly calls: Request[]; readonly fetch: typeof globalThis.fetch } {
+  const calls: Request[] = [];
+  return {
+    calls,
+    fetch: ((input: Request | URL | string, init?: RequestInit) => {
+      const request = input instanceof Request
+        ? input
+        : new Request(String(input), init);
+      calls.push(request);
+      return Promise.resolve(responder(request));
+    }) as typeof globalThis.fetch,
+  };
+}
+
+Deno.test("AC-F013-010 · a missing or malformed token fails closed before any request", () => {
+  const recorder = transportRecorder(() => new Response(null, { status: 200 }));
+  for (const value of [undefined, "", "   "]) {
+    const error = (() => {
+      try {
+        resolveDeployToken({
+          get: () => value,
+        });
+        return undefined;
+      } catch (thrown) {
+        return thrown;
+      }
+    })();
+    assert.ok(error, `token ${JSON.stringify(value)} must be refused`);
+    assert.match(String((error as Error).message), new RegExp(TOKEN_VAR));
+  }
+  assert.deepEqual(recorder.calls, []);
+});
+
+Deno.test("AC-F013-011 · the token is sent only as authorization to the configured origin", async () => {
+  const recorder = transportRecorder(() =>
+    new Response(JSON.stringify({ url: "https://x.deno.dev", id: "r1" }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    })
+  );
+  const adapter = createDenoDeployAdapter({
+    apiOrigin: "https://api.deno.com",
+    transport: recorder.fetch,
+  });
+  await adapter.upload({
+    target: { kind: "deno-deploy", project: "bookmarks" },
+    revision: "96670b3",
+    token: TOKEN,
+  });
+  assert.equal(recorder.calls.length, 1);
+  const sent = recorder.calls[0];
+  assert.equal(new URL(sent.url).origin, "https://api.deno.com");
+  assert.equal(sent.headers.get("authorization"), `Bearer ${TOKEN}`);
+  for (const [name, value] of sent.headers) {
+    if (name === "authorization") continue;
+    assert.ok(!value.includes(TOKEN), `${name} leaked the token`);
+  }
+  assert.ok(!sent.url.includes(TOKEN));
+});
+
+Deno.test("AC-F013-012 · the adapter is exercised with no account, token, or network", async () => {
+  const recorder = transportRecorder(() =>
+    new Response(JSON.stringify({ url: "https://x.deno.dev", id: "rev-9" }), {
+      status: 201,
+      headers: { "content-type": "application/json" },
+    })
+  );
+  const adapter = createDenoDeployAdapter({
+    apiOrigin: "https://api.deno.com",
+    transport: recorder.fetch,
+  });
+  const upload = await adapter.upload({
+    target: { kind: "deno-deploy", project: "bookmarks" },
+    revision: "abc",
+    token: TOKEN,
+  });
+  assert.equal(upload.url, "https://x.deno.dev");
+  assert.equal(upload.revision, "rev-9");
+
+  const health = await adapter.health({ url: "https://x.deno.dev" });
+  assert.equal(health.status, "passed");
+});
+
+Deno.test("AC-F013-013 · a transport or platform failure is a failed deployment", async () => {
+  const rejecting = createDenoDeployAdapter({
+    apiOrigin: "https://api.deno.com",
+    transport: (() =>
+      Promise.reject(
+        new TypeError("network unreachable"),
+      )) as typeof globalThis.fetch,
+  });
+  await assert.rejects(
+    () =>
+      Promise.resolve(rejecting.upload({
+        target: { kind: "deno-deploy", project: "bookmarks" },
+        revision: "abc",
+        token: TOKEN,
+      })),
+    (error: unknown) =>
+      error instanceof Error && /network unreachable|upload failed/i.test(
+        error.message,
+      ),
+  );
+
+  const refusing = createDenoDeployAdapter({
+    apiOrigin: "https://api.deno.com",
+    transport: transportRecorder(() =>
+      new Response("forbidden", { status: 403 })
+    ).fetch,
+  });
+  const outcome = await refusing.health({ url: "https://x.deno.dev" });
+  assert.equal(outcome.status, "failed");
+  assert.match(outcome.evidence, /403/);
 });
