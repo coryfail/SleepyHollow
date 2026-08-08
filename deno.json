@@ -52,7 +52,7 @@
     "verify:check": "deno fmt --check cli/check/*.ts && deno lint cli/check/*.ts && deno task check:check && deno task test:check",
     "verify:cli": "deno fmt --check cli/main.ts cli/adapters.ts cli/dispatcher.ts cli/cli_test.ts && deno lint cli/main.ts cli/adapters.ts cli/dispatcher.ts cli/cli_test.ts && deno task check:cli && deno task test:cli",
     "verify:test-command": "deno fmt --check cli/test/*.ts && deno lint cli/test/*.ts && deno task check:test-command && deno task test:test-command",
-    "verify:dev": "deno fmt --check cli/main.ts cli/adapters.ts cli/dispatcher.ts cli/dev/*.ts && deno lint cli/main.ts cli/adapters.ts cli/dispatcher.ts cli/dev/command.ts cli/dev/local.ts cli/dev/mod.ts cli/dev/render.ts cli/dev/types.ts cli/dev/worker.ts && deno task check:dev && deno task test:dev",
+    "verify:dev": "deno fmt --check cli/main.ts cli/adapters.ts cli/dispatcher.ts cli/dev/*.ts && deno lint cli/main.ts cli/adapters.ts cli/dispatcher.ts cli/dev/*.ts && deno task check:dev && deno task test:dev",
     "verify:evidence": "deno fmt --check cli/evidence/*.ts && deno lint cli/evidence/*.ts && deno task check:evidence && deno task test:evidence",
     "verify:deploy": "deno fmt --check cli/deploy/*.ts && deno lint cli/deploy/*.ts && deno task check:deploy && deno task test:deploy",
     "verify:framework": "deno task verify:routing && deno task verify:validation && deno task verify:kv && deno task verify:security && deno task verify:config && deno task verify:testing && deno task verify:generate && deno task verify:services"

@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F015
 title: Local development command
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "12"
@@ -259,6 +259,26 @@ other digest normalization is permitted.
   verifier because its approval quota is exhausted. SH-F015 remains `approved`,
   not `verified`; no implementation digest or passing verification claim is
   sealed until both real-listener probes run successfully.
+
+### Verification, loopback closure
+
+- Status: passed. The blocker recorded above is resolved.
+- Verified at: 2026-08-08T14:40:47Z.
+- Command: `deno task verify:dev` using Deno `2.9.5` on macOS arm64, in an
+  environment that permits loopback binding.
+- Result: `7 passed | 0 failed`. AC-F015-001 and AC-F015-006 bound real
+  listeners rather than stopping at the sandbox denial, reporting
+  `Listening on http://127.0.0.1:<port>/` for each. Both real-listener probes
+  the prior entry required have now run successfully.
+- Lint-scope correction: `verify:dev` enumerated production files individually
+  and omitted `cli/dev/dev_test.ts`, so two real lint errors in the mapped test
+  file were invisible to the component gate and to CI. An unused `DevDiagnostic`
+  import was removed, `unusedPort` was made synchronous because it awaited
+  nothing, and the lint invocation now covers `cli/dev/*.ts`. No test assertion
+  was weakened and no mapped behavior changed.
+- Regression scope: `verify:framework`, `verify:create`, `verify:planning`,
+  `verify:check`, `verify:cli`, `verify:test-command`, `verify:skill`,
+  `verify:deploy`, and `verify:evidence` all passed at the same revision.
 
 ### Delivery
 

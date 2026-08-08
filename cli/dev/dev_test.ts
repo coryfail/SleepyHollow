@@ -2,7 +2,6 @@ import {
   type ActiveDevRuntime,
   DevCommandError,
   type DevDependencies,
-  type DevDiagnostic,
   type DevEvent,
   type DevPrepareOptions,
   type DevWatcher,
@@ -100,7 +99,7 @@ function jsonHarness(options: {
   return { events, controller, watcher, run };
 }
 
-async function unusedPort(): Promise<number> {
+function unusedPort(): number {
   const listener = Deno.listen({ hostname: "127.0.0.1", port: 0 });
   const port = (listener.addr as Deno.NetAddr).port;
   listener.close();
@@ -114,7 +113,7 @@ Deno.test("AC-F015-001 · empty scaffold starts a real loopback application", as
     `${root}/sleepyhollow.config.ts`,
     "export default { apiDirectory: 'api' };\n",
   );
-  const port = await unusedPort();
+  const port = unusedPort();
   const events: DevEvent[] = [];
   const controller = new AbortController();
   const watcher = new QueueWatcher();
@@ -323,7 +322,7 @@ Deno.test("AC-F015-005 · startup failure is nonzero, located, and fully cleaned
 });
 
 Deno.test("AC-F015-006 · cancellation releases watcher and listener exactly once", async () => {
-  const port = await unusedPort();
+  const port = unusedPort();
   const watcher = new QueueWatcher();
   const controller = new AbortController();
   const events: DevEvent[] = [];
