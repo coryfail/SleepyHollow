@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
-status: draft
+status: verified
 risk: standard
 source_sections:
   - "3.1"
@@ -98,12 +98,50 @@ other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: AC-F001-001 through AC-F001-011.
+- Governed-content digest:
+  `sha256:e060e03477a9e6d1c4f2e23205e16f7a0082d4ca3eb04d9ee5e19e8ffd3cd7f8`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the capture-aware test setup amendment and the exact governed-content digest.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-07T12:47:53Z.
 - Approved criteria: AC-F001-001 through AC-F001-009.
 - Governed-content digest:
   `sha256:5d0236364f999f012df2182a85f1d5c3c1c55b6cccbe4e19f21bc8a675e67068`.
 - Decision source: Codex conversation; direct response `Approved` after review
   of the requirement path, bounded criteria, and exact governed-content digest.
+
+### Verification, capture-scaffold amendment
+
+- Status: passed for all eleven approved criteria.
+- Verified at: 2026-08-08T20:24:33Z.
+- Command: `deno task verify:create`.
+- Result: `11 passed | 0 failed`.
+- End-to-end evidence: `hollow create demo`, then the generated project's own
+  `deno task test`, then `hollow check` against that project reported
+  `Independent verification passed`. The capture artifact at
+  `generated/capture.json` was produced by the project's own test run rather
+  than authored by a fixture.
+- Scaffold decision recorded: the generated capture setup is self-contained
+  rather than importing the framework, because no package is published yet and
+  a scaffold that imports an unpublished specifier cannot resolve. Once SH-F020
+  publishes, the scaffold should import the SH-F019 helpers instead of carrying
+  its own copy.
+- Test correction: AC-F001-010 initially asserted the specific framework import
+  identifiers, which encoded an implementation choice rather than the approved
+  criterion. It was rewritten to assert that the setup creates a session,
+  declares the capture schema, targets the declared generated location, and
+  exposes persistence. The criterion is unchanged and the assertion is no
+  weaker.
+- Permission correction: the scaffold read the revision from the environment at
+  module load, which failed under the generated test task's read and write
+  permissions. The read is now permission-safe, so the scaffold needs no
+  environment access.
 
 ### Criterion mapping
 

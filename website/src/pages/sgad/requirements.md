@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: website-sgad-page
 title: SGAD methodology page
-status: draft
+status: verified
 risk: standard
 depends_on:
   - sleepy-hollow-website
@@ -134,6 +134,17 @@ omitting the single top-level frontmatter `status:` line and its line ending. Th
 status field is a lifecycle projection for routing and human readability; no
 other digest normalization is permitted.
 
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:bb13e32a8e656e3bc3ecb67c3136e9c79ec62304136a85d5ab4071c662fc96fb`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
 ### Approval, unbound
 
 - Status: no recorded approval binds the current content.
@@ -158,6 +169,20 @@ other digest normalization is permitted.
   `sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170`.
 - Decision: publish the standalone SGAD skill with the short agent-skills CLI
   installation command.
+
+### Verification, current content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the website link, repository-consistency, and two-page structure suites.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 

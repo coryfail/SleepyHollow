@@ -165,3 +165,40 @@ Deno.test("AC-F001-009 · compiled installation artifact reports its version sta
       /^hollow \d+\.\d+\.\d+\s*$/,
     );
   }));
+
+Deno.test("AC-F001-010 · generated projects include capture-aware test setup", () =>
+  temporary(async (directory) => {
+    await createProject({ name: "captured", directory });
+    const setup = await Deno.readTextFile(
+      join(directory, "captured", "tests", "capture.ts"),
+    );
+    assert.match(setup, /session/);
+    assert.match(setup, /sleepy-hollow-capture\/v1/);
+    assert.match(setup, /generated\/capture\.json/);
+    assert.match(setup, /export async function persist/);
+    const config = JSON.parse(
+      await Deno.readTextFile(join(directory, "captured", "deno.json")),
+    );
+    assert.ok(
+      String(config.tasks?.test ?? "").length > 0,
+      "generated project must declare a test task",
+    );
+  }));
+
+Deno.test("AC-F001-011 · the generated test task produces a capture artifact", () =>
+  temporary(async (directory) => {
+    await createProject({ name: "captured", directory });
+    const root = join(directory, "captured");
+    const run = await new Deno.Command(Deno.execPath(), {
+      args: ["task", "test"],
+      cwd: root,
+      stdout: "piped",
+      stderr: "piped",
+    }).output();
+    assert.equal(run.code, 0, new TextDecoder().decode(run.stderr));
+    const artifact = JSON.parse(
+      await Deno.readTextFile(join(root, "generated", "capture.json")),
+    );
+    assert.equal(artifact.schema, "sleepy-hollow-capture/v1");
+    assert.ok(typeof artifact.revision === "string");
+  }));

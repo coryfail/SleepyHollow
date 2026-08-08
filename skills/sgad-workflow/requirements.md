@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F017
 title: Standalone SGAD workflow skill
-status: draft
+status: verified
 risk: standard
 source_sections:
   - "4.6"
@@ -140,6 +140,17 @@ omitting the single top-level frontmatter `status:` line and its line ending. Th
 status field is a lifecycle projection for routing and human readability; no
 other digest normalization is permitted.
 
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:6fe479cf0963f8068dbe05e476150794cccf0e9960b8730da50d73f77eef1374`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
 ### Approval, unbound
 
 - Status: no recorded approval binds the current content.
@@ -164,6 +175,20 @@ other digest normalization is permitted.
   `sha256:f080aba49ed769339a504cd21be0bfed710b77f2a44071caae910dfb994ce64c`.
 - Decision source: Codex conversation; publish the standalone SGAD workflow
   skill for framework-independent use.
+
+### Verification, current content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the repository-consistency suite covering the packaged skill and its references.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 
