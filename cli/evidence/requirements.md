@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F018
 title: Repository evidence loader
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "3.6"
@@ -187,7 +187,19 @@ readability; no other digest normalization is permitted.
 
 ### Approval
 
-- Status: invalidated; pending re-approval of the current content.
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T14:19:02Z.
+- Approved criteria: AC-F018-001 through AC-F018-013.
+- Governed-content digest:
+  `sha256:c40a9ffdd22ee0368b0467ff98b75986e1a599a8c3ba2bcd14143914dd8c12bf`.
+- Decision source: Claude conversation; direct response `Approved` after review
+  of the corrected OPEN-012 resolution, the SH-F001 location source, the bounded
+  criteria, and the exact governed-content digest.
+
+### Invalidated approval
+
+- Status: invalidated before any downstream evidence existed.
 - Invalidated at: 2026-08-08T14:13:30Z.
 - Reason: after approval, review found that the recorded OPEN-012 resolution
   misattributed the source of discoverable locations. The SH-F012 configuration
@@ -222,15 +234,55 @@ readability; no other digest normalization is permitted.
 
 ### Criterion mapping
 
-- Status: pending approval and governed tests.
+- Status: incomplete. Nine of thirteen approved criteria are mapped.
+- AC-F018-001 -> `evidence_test.ts` on-disk evidence assembly test.
+- AC-F018-002 -> `evidence_test.ts` governed-drift approval-binding test.
+- AC-F018-003 -> `evidence_test.ts` status-only projection test.
+- AC-F018-004 -> `evidence_test.ts` source-authored claim rejection test.
+- AC-F018-005 -> `evidence_test.ts` deterministic repeat-load test.
+- AC-F018-006 -> `evidence_test.ts` declared-location-only discovery test.
+- AC-F018-007 -> `evidence_test.ts` malformed and duplicate fail-closed test.
+- AC-F018-012 -> `evidence_test.ts` per-service scoping test.
+- AC-F018-013 -> `evidence_test.ts` missing and invalid configuration test.
+- AC-F018-008, AC-F018-009, AC-F018-010, and AC-F018-011 are unmapped. They
+  require the behavioral-evidence layer and the command integration, neither of
+  which exists yet.
 
 ### Red-state evidence
 
-- Status: pending approved test execution against a healthy baseline.
+- Status: failed as expected for the nine mapped criteria.
+- Observed at: 2026-08-08T14:21:00Z.
+- Base revision: `62d966e` plus the approved SH-F018 requirement, the nine
+  mapped tests, and typed nonfunctional seams.
+- Commands: `deno task check:evidence` and `deno task test:evidence` using Deno
+  `2.9.5` on macOS arm64.
+- Result: `deno task check:evidence` passed, establishing a healthy typed
+  baseline. `deno task test:evidence` reported `0 passed | 9 failed`.
+- Red-state correction: the first red run reported `1 passed | 8 failed` because
+  AC-F018-006 asserted only the absence of an undeclared requirement, which an
+  empty seam satisfies vacuously. The test was strengthened to assert the
+  declared inventory and the read paths before implementation, after which all
+  nine failed. A criterion test that passes against a nonfunctional seam is not
+  red-state evidence.
 
 ### Verification
 
-- Status: pending implementation and independent verification.
+- Status: not verified. Partial component verification only.
+- Observed at: 2026-08-08T14:24:25Z.
+- Command: `deno task verify:evidence`, comprising `deno fmt --check`,
+  `deno lint`, `deno task check:evidence`, and `deno task test:evidence`.
+- Result: `9 passed | 0 failed` for the mapped criteria.
+- Regression scope: `verify:framework`, `verify:create`, `verify:planning`,
+  `verify:check`, `verify:cli`, `verify:test-command`, `verify:dev`,
+  `verify:skill`, and `verify:deploy` all passed at the same revision.
+- Blocking gap: AC-F018-008 and AC-F018-009 through AC-F018-011 have neither
+  tests nor implementation. The loader currently assembles requirement evidence
+  and project locations only. It does not yet extract routes, schema coverage,
+  security declarations, or data operations, and it is not yet supplied to
+  `hollow check`, `hollow test`, or `hollow deploy`. Those commands therefore
+  still fail closed without a caller-supplied inventory.
+- This requirement must not be treated as verified until every approved
+  criterion is mapped, red, implemented, and independently checked.
 
 ### Delivery
 
