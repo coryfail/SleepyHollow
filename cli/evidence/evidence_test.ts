@@ -5,6 +5,7 @@ import { createProject } from "../create/mod.ts";
 import {
   EvidenceError,
   loadRequirementEvidence,
+  loadVerificationInventory,
   resolveProjectLocations,
 } from "./mod.ts";
 import type { EvidenceDiagnostic } from "./types.ts";
@@ -369,4 +370,142 @@ Deno.test("AC-F018-013 · a missing or invalid project configuration fails close
     await caught(() => resolveProjectLocations({ projectRoot: invalid })),
   );
   assert.ok(reported.includes("SH_EVIDENCE_PROJECT_CONFIG_INVALID"));
+});
+
+function captureArtifact(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    schema: "sleepy-hollow-capture/v1",
+    runner: "deno test",
+    revision: "test-revision",
+    requests: [{
+      sequence: 1,
+      method: "POST",
+      path: "/bookmarks",
+      readLocations: ["body", "query"],
+      responseStatus: 201,
+      attribution: {
+        requirementId: "EP-BOOKMARKS-CREATE",
+        criterionId: "AC-EP-001",
+      },
+    }],
+    dataOperations: [{
+      sequence: 2,
+      resource: "bookmarks",
+      kind: "query",
+      index: "owner",
+      limit: 25,
+      attribution: {
+        requirementId: "EP-BOOKMARKS-CREATE",
+        criterionId: "AC-EP-001",
+      },
+    }],
+    uncapturedRoutes: [],
+    ...overrides,
+  };
+}
+
+async function writeCapture(
+  projectRoot: string,
+  artifact: Record<string, unknown>,
+): Promise<void> {
+  await Deno.writeTextFile(
+    `${projectRoot}/generated/capture.json`,
+    JSON.stringify(artifact, null, 2),
+  );
+}
+
+async function writeRoute(projectRoot: string): Promise<void> {
+  const routingModule = new URL("../../core/routing/mod.ts", import.meta.url)
+    .href;
+  await Deno.writeTextFile(
+    `${projectRoot}/api/bookmarks/route.ts`,
+    `import { defineRoute } from ${JSON.stringify(routingModule)};
+
+export default defineRoute({
+  POST: {
+    schemas: { body: { contract: { type: "object" } } },
+    security: { authentication: "none" },
+    contract: {},
+    handler: () => new Response(null, { status: 201 }),
+  },
+});
+`,
+  );
+}
+
+Deno.test("AC-F018-008 · an observed read with no declared schema is missing coverage", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  await writeRoute(root);
+  await writeCapture(root, captureArtifact());
+  const project = await resolveProjectLocations({ projectRoot: root });
+  const inventory = await loadVerificationInventory(project, {
+    projectRoot: root,
+    revision: "test-revision",
+  });
+  const route = inventory.routes.find((item) => item.method === "POST");
+  assert.ok(route);
+  assert.deepEqual([...route.requestSchemaLocations].sort(), ["body"]);
+  assert.deepEqual([...route.requiredRequestLocations].sort(), [
+    "body",
+    "query",
+  ]);
+});
+
+Deno.test("AC-F018-014 · an uncaptured route is carried through as uncaptured", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  await writeRoute(root);
+  await writeCapture(
+    root,
+    captureArtifact({
+      requests: [],
+      dataOperations: [],
+      uncapturedRoutes: [{ method: "POST", path: "/bookmarks" }],
+    }),
+  );
+  const project = await resolveProjectLocations({ projectRoot: root });
+  const inventory = await loadVerificationInventory(project, {
+    projectRoot: root,
+    revision: "test-revision",
+  });
+  assert.deepEqual(inventory.uncapturedRoutes, [{
+    method: "POST",
+    path: "/bookmarks",
+  }]);
+  const route = inventory.routes.find((item) => item.method === "POST");
+  assert.ok(route);
+  assert.deepEqual(route.requiredRequestLocations, []);
+  assert.equal(route.captured, false);
+});
+
+Deno.test("AC-F018-015 · a stale capture artifact is rejected", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  await writeRoute(root);
+  await writeCapture(root, captureArtifact({ revision: "an-older-revision" }));
+  const project = await resolveProjectLocations({ projectRoot: root });
+  const reported = codes(
+    await caught(() =>
+      loadVerificationInventory(project, {
+        projectRoot: root,
+        revision: "test-revision",
+      })
+    ),
+  );
+  assert.ok(reported.includes("SH_EVIDENCE_CAPTURE_STALE"));
 });

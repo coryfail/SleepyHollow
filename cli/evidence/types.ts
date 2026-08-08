@@ -63,3 +63,42 @@ export interface RequirementInventory {
   readonly requirements: readonly LoadedRequirement[];
   readonly checkRequirements: readonly CheckRequirement[];
 }
+
+export interface EvidenceCaptureOptions extends EvidenceLoadOptions {
+  readonly revision: string;
+}
+
+export interface EvidenceRoute {
+  readonly requirementId?: string;
+  readonly method: string;
+  readonly path: string;
+  readonly source: string;
+  readonly requestSchemaLocations: readonly string[];
+  readonly requiredRequestLocations: readonly string[];
+  readonly responseSchemaStatuses: readonly number[];
+  readonly requiredResponseStatuses: readonly number[];
+  readonly authentication: "none" | "required";
+  readonly captured: boolean;
+}
+
+export interface EvidenceVerificationInventory {
+  readonly projectRootDisplay: string;
+  readonly requirements: readonly LoadedRequirement[];
+  readonly routes: readonly EvidenceRoute[];
+  readonly uncapturedRoutes: readonly {
+    readonly method: string;
+    readonly path: string;
+  }[];
+  readonly dataOperations: readonly {
+    readonly id: string;
+    readonly requirementId: string;
+    readonly source: string;
+    readonly resource: string;
+    readonly kind: string;
+    readonly index?: string;
+    readonly limit?: number;
+    readonly versionstampCheck?: boolean;
+    readonly atomic?: boolean;
+    readonly rawJustification?: string;
+  }[];
+}
