@@ -24,6 +24,7 @@ depends_on:
   - SH-F013
   - SH-F014
   - SH-F016
+  - SH-F019
 open_decisions:
   - OPEN-012
 owners:
@@ -95,16 +96,28 @@ only from the native runner result.
 
 ### Behavioral evidence
 
-The loader shall discover routes through the SH-F002 route discovery,
-request and response schema coverage through the SH-F003 definitions, declared
-authentication and authorization through the SH-F005 declarations, data
-operations and declared indexes through the SH-F004 definitions, and
-configuration diagnostics through SH-F012. Generated-artifact state and contract
-changes come from SH-F010.
+The loader shall discover routes through the SH-F002 route discovery, declared
+request and response schemas through the SH-F003 definitions, declared
+authentication and authorization through the SH-F005 declarations, declared
+index names through the SH-F004 definitions, and configuration diagnostics
+through SH-F012. Generated-artifact state and contract changes come from
+SH-F010.
 
-The loader shall not infer behavior that a project does not declare. A location
-a handler reads without a declared schema is reported as missing coverage rather
-than inferred.
+Observed behavior comes from the SH-F019 capture artifact: the request locations
+a handler read, the response statuses it returned, and the data operations it
+performed with their index, bound, versionstamp check, and atomicity. The loader
+shall not infer any of these from handler source and shall not instrument the
+runtime itself.
+
+The loader shall not infer behavior that a project does not declare or that
+capture did not observe. A location observed as read with no corresponding
+declared schema is reported as missing coverage rather than inferred. A route
+the capture artifact reports as uncaptured is carried into the inventory as
+uncaptured; the loader shall not substitute an empty observation set that would
+let a coverage or data phase pass on absent evidence.
+
+The loader shall reject a capture artifact whose recorded revision does not
+match the revision under verification, rather than admitting stale observations.
 
 ### Failure
 
@@ -146,8 +159,15 @@ selection, and delivery rules shall remain unchanged.
 - AC-F018-007: A malformed requirement, unreadable declared location, or
   duplicate requirement identity fails closed with a diagnostic identifying the
   file, the line when known, and the correction.
-- AC-F018-008: A handler-read request location with no declared schema is
-  reported as missing coverage rather than inferred from the handler.
+- AC-F018-008: A request location the capture artifact records as read, with no
+  corresponding declared schema, is reported as missing coverage rather than
+  inferred from the handler.
+- AC-F018-014: A route the capture artifact reports as uncaptured is carried
+  into the inventory as uncaptured, and no empty observation set is substituted
+  for it.
+- AC-F018-015: A capture artifact whose recorded revision does not match the
+  revision under verification is rejected with a diagnostic rather than admitted
+  as stale evidence.
 - AC-F018-009: `hollow check` run against a real generated project completes its
   verification phases and returns a result without a caller-supplied inventory.
 - AC-F018-010: `hollow test` run against a real generated project selects and
@@ -168,8 +188,13 @@ selection, and delivery rules shall remain unchanged.
 ## Dependencies and assumptions
 
 The loader consumes the public module boundaries of SH-F001 through SH-F007,
-SH-F010, SH-F012, and SH-F014, and produces the inventory shapes owned by
-SH-F008, SH-F013, and SH-F016. It adds no new verification authority.
+SH-F010, SH-F012, SH-F014, and SH-F019, and produces the inventory shapes owned
+by SH-F008, SH-F013, and SH-F016. It adds no new verification authority.
+
+SH-F019 supplies the observed behavior that no static artifact carries. The
+loader treats a capture record as evidence of what executed under test, not as
+evidence that untested behavior is correct. Whether uncaptured behavior fails
+verification remains an SH-F008 decision.
 
 OPEN-012 is resolved in the discovery requirements above: the SH-F001 project
 configuration is the sole source of discoverable locations, and SH-F014 service
@@ -188,6 +213,34 @@ readability; no other digest normalization is permitted.
 ### Approval
 
 - Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T14:44:18Z.
+- Approved criteria: AC-F018-001 through AC-F018-015.
+- Governed-content digest:
+  `sha256:d2ab29ec6e81591d1fda77dc8af5ab614905ec30af14ff8643efcd9062262dc7`.
+- Decision source: Claude conversation; direct response `Approve both` after
+  review of the capture-sourced behavioral evidence, the uncaptured-route and
+  stale-artifact criteria, and the exact governed-content digest.
+
+### Invalidated approval
+
+- Status: invalidated by the change recorded below.
+- Invalidated at: 2026-08-08T14:40:47Z.
+- Reason: the owner selected runtime capture over authored declarations as the
+  source of behavioral evidence. The behavioral-evidence requirements now source
+  observed request locations, response statuses, and data operations from the
+  SH-F019 capture artifact instead of the SH-F004 definitions, which own index
+  definitions rather than call sites. AC-F018-008 was reworded to observed
+  reads, and AC-F018-014 and AC-F018-015 were added for uncaptured routes and
+  stale artifacts.
+- Downstream impact: the nine implemented criteria are unaffected in substance.
+  They cover project locations and requirement evidence, which this change does
+  not touch, and they continue to pass. Their verification entry below is
+  superseded and must be re-run against the re-approved content.
+
+### Superseded approval
+
+- Status: approved, then invalidated by the change recorded above.
 - Approver: human-project-owner.
 - Approved at: 2026-08-08T14:19:02Z.
 - Approved criteria: AC-F018-001 through AC-F018-013.
@@ -267,7 +320,8 @@ readability; no other digest normalization is permitted.
 
 ### Verification
 
-- Status: not verified. Partial component verification only.
+- Status: superseded. The verification below predates the capture-sourced
+  re-approval and must be re-run against the re-approved content.
 - Observed at: 2026-08-08T14:24:25Z.
 - Command: `deno task verify:evidence`, comprising `deno fmt --check`,
   `deno lint`, `deno task check:evidence`, and `deno task test:evidence`.
