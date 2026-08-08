@@ -1,3 +1,4 @@
+import type { CriterionTestSpec } from "../testing/mod.ts";
 import type {
   CaptureArtifact,
   CaptureAttribution,
@@ -80,6 +81,47 @@ export function session(options: CaptureSessionOptions): CaptureSession {
         ),
         uncapturedRoutes: uncaptured,
       };
+    },
+  };
+}
+
+export async function persist(
+  active: CaptureSession,
+  path: string,
+): Promise<void> {
+  const staging = `${path}.partial`;
+  const body = `${JSON.stringify(active.artifact(), null, 2)}\n`;
+  try {
+    await Deno.writeTextFile(staging, body);
+  } catch (error) {
+    await Deno.remove(staging).catch(() => undefined);
+    throw error;
+  }
+  try {
+    await Deno.rename(staging, path);
+  } catch (error) {
+    await Deno.remove(staging).catch(() => undefined);
+    throw error;
+  }
+}
+
+export function bind(
+  spec: CriterionTestSpec,
+  active: CaptureSession,
+): CriterionTestSpec {
+  const attribution = {
+    requirementId: spec.requirementId,
+    criterionId: spec.criteria[0] ?? "",
+  };
+  return {
+    ...spec,
+    fn: async (context) => {
+      active.enter(attribution);
+      try {
+        await (spec.fn as (input: unknown) => unknown)(context);
+      } finally {
+        active.exit();
+      }
     },
   };
 }

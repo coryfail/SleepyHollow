@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 
 import type { NormalizedRoute } from "../routing/mod.ts";
 import {
+  captureCriterionTest,
   captureRepository,
   captureRoute,
   createCaptureSession,
+  persistCaptureSession,
 } from "./mod.ts";
 import type { CaptureSession } from "./types.ts";
 
@@ -257,4 +259,66 @@ Deno.test("AC-F019-012 · the artifact records its runner and revision", () => {
   assert.equal(artifact.schema, "sleepy-hollow-capture/v1");
   assert.equal(artifact.runner, "deno test");
   assert.equal(artifact.revision, "916d706");
+});
+
+Deno.test("AC-F019-013 · persisting writes the complete artifact to the supplied location", async () => {
+  const active = newSession();
+  active.declareRoute({ method: "POST", path: "/bookmarks" });
+  const repo = captureRepository(fakeRepository(), active);
+  await repo.list({ index: "owner", value: "u1", limit: 25 });
+  const directory = await Deno.makeTempDir({ prefix: "sh-capture-" });
+  const target = `${directory}/capture.json`;
+
+  await persistCaptureSession(active, target);
+
+  const written = await Deno.readTextFile(target);
+  assert.deepEqual(
+    JSON.parse(written),
+    JSON.parse(JSON.stringify(active.artifact())),
+  );
+  await Deno.remove(directory, { recursive: true });
+});
+
+Deno.test("AC-F019-014 · a persistence failure leaves no partial artifact", async () => {
+  const active = newSession();
+  const directory = await Deno.makeTempDir({ prefix: "sh-capture-" });
+  const target = `${directory}/missing/capture.json`;
+
+  await assert.rejects(() => persistCaptureSession(active, target));
+
+  let present = true;
+  try {
+    await Deno.stat(target);
+  } catch {
+    present = false;
+  }
+  assert.equal(present, false);
+  assert.deepEqual([...Deno.readDirSync(directory)].map((e) => e.name), []);
+  await Deno.remove(directory, { recursive: true });
+});
+
+Deno.test("AC-F019-015 · criterion tests attribute records without a caller-managed scope", async () => {
+  const active = newSession();
+  const repo = captureRepository(fakeRepository(), active);
+  const spec = captureCriterionTest({
+    id: "T-BOOKMARKS-001",
+    requirementId: "EP-BOOKMARKS-CREATE",
+    criteria: ["AC-EP-001"],
+    name: "creates a bookmark",
+    sourcePath: "api/bookmarks/route_test.ts",
+    fn: async () => {
+      await repo.get("one");
+    },
+  }, active);
+
+  await spec.fn({} as Parameters<typeof spec.fn>[0]);
+  await repo.get("outside");
+
+  const recorded = active.artifact().dataOperations;
+  assert.equal(recorded.length, 2);
+  assert.deepEqual(recorded[0].attribution, {
+    requirementId: "EP-BOOKMARKS-CREATE",
+    criterionId: "AC-EP-001",
+  });
+  assert.equal(recorded[1].attribution, undefined);
 });

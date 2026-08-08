@@ -37,7 +37,7 @@
     "test:cli": "deno test cli/cli_test.ts",
     "test:test-command": "deno test --unstable-kv --allow-read --allow-write cli/test/test_test.ts",
     "test:dev": "deno test --allow-read --allow-write --allow-net cli/dev/dev_test.ts",
-    "test:capture": "deno test core/capture/capture_test.ts",
+    "test:capture": "deno test --allow-read --allow-write core/capture/capture_test.ts",
     "test:evidence": "deno test --allow-read --allow-write --allow-run cli/evidence/evidence_test.ts",
     "test:deploy": "deno test cli/deploy/deploy_test.ts",
     "verify:routing": "deno fmt --check core/routing/*.ts core/routing/testdata/**/*.ts && deno lint core/routing/*.ts core/routing/testdata/**/*.ts && deno task check:routing && deno task test:routing",

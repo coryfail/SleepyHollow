@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F019
 title: Runtime evidence capture
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "8"
@@ -244,6 +244,21 @@ readability; no other digest normalization is permitted.
   `core/kv`, `core/security`, or `core/testing` was modified. Capture wraps
   their public surfaces through a delegating proxy, so their governed content
   and verified status are untouched.
+### Verification, complete
+
+- Status: passed for all fifteen approved criteria.
+- Verified at: 2026-08-08T17:38:51Z.
+- Command: `deno task verify:capture`.
+- Result: `15 passed | 0 failed`.
+- Closure: the withdrawn claim recorded below is resolved. AC-F019-013 now
+  covers persistence, and the implementation writes through a staging file and
+  renames, so a failed write cannot leave a partial artifact at the target.
+  AC-F019-015 covers automatic attribution through a wrapped criterion test, so
+  a record cannot reach the wrong criterion because a caller forgot to close a
+  scope.
+- Residual risk: capture observes only what tests exercise, and behavior no test
+  reaches carries no evidence.
+
 ### Verification, withdrawn
 
 - Status: the verified claim above is withdrawn. SH-F019 returns to `approved`.

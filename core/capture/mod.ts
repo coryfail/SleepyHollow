@@ -1,7 +1,8 @@
 import type { NormalizedRoute } from "../routing/mod.ts";
 import { repository } from "./repository.ts";
 import { route } from "./route.ts";
-import { session } from "./session.ts";
+import { bind, persist, session } from "./session.ts";
+import type { CriterionTestSpec } from "../testing/mod.ts";
 import type { CaptureSession, CaptureSessionOptions } from "./types.ts";
 
 export * from "./types.ts";
@@ -24,4 +25,18 @@ export function captureRoute(
   active: CaptureSession,
 ): NormalizedRoute {
   return route(target, active);
+}
+
+export function persistCaptureSession(
+  active: CaptureSession,
+  path: string,
+): Promise<void> {
+  return persist(active, path);
+}
+
+export function captureCriterionTest(
+  spec: CriterionTestSpec,
+  active: CaptureSession,
+): CriterionTestSpec {
+  return bind(spec, active);
 }
