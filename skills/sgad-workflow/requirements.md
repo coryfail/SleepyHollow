@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F017
 title: Standalone SGAD workflow skill
-status: approved
+status: draft
 risk: standard
 source_sections:
   - "4.6"
@@ -139,6 +139,20 @@ The governed-content digest covers the exact UTF-8 bytes before this heading aft
 omitting the single top-level frontmatter `status:` line and its line ending. The
 status field is a lifecycle projection for routing and human readability; no
 other digest normalization is permitted.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:6fe479cf0963f8068dbe05e476150794cccf0e9960b8730da50d73f77eef1374`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
 
 ### Approval
 

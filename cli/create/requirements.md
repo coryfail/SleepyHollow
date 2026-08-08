@@ -2,13 +2,14 @@
 schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "3.1"
   - "12"
   - "15.1"
-depends_on: []
+depends_on:
+  - SH-F019
 open_decisions: []
 owners:
   - Sleepy Hollow maintainers
@@ -41,6 +42,17 @@ The scaffold shall make the intended locations for `requirements/application.md`
 endpoint-local requirements, runtime configuration, API routes, models, tests,
 and generated artifacts evident. It shall include concise guidance for activating
 or installing the official skill in supported agent environments.
+
+### Capture-aware test setup
+
+A generated project shall include test setup that enables SH-F019 runtime
+evidence capture and persists the artifact to the declared generated location,
+so a created project can produce the observed evidence that `hollow check`
+requires.
+
+Without this, a newly created project yields no capture artifact, and its first
+`hollow check` fails closed for missing evidence rather than for any defect in
+the project.
 
 ## Acceptance criteria
 
@@ -105,6 +117,10 @@ other digest normalization is permitted.
 - AC-F001-007 -> `create_test.ts` stable JSON result and diagnostic test.
 - AC-F001-008 -> `create_test.ts` repeat-attempt preservation test.
 - AC-F001-009 -> `create_test.ts` compiled standalone CLI version test.
+- AC-F001-010: A generated project includes test setup that creates a capture
+  session and persists its artifact to the declared generated location.
+- AC-F001-011: Running the generated project's own test task produces a capture
+  artifact at the declared generated location.
 
 ### Red-state evidence
 

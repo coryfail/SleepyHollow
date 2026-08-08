@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-website
 title: Sleepy Hollow public website
-status: approved
+status: draft
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -198,6 +198,20 @@ The governed-content digest covers the exact UTF-8 bytes before this heading aft
 omitting the single top-level frontmatter `status:` line and its line ending. The
 status field is a lifecycle projection for routing and human readability; no
 other digest normalization is permitted.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:e94af44b188d2ea6fedd19003d0612385a72babf483c9b89627efcb2a8614ed9`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
 
 ### Approval
 
