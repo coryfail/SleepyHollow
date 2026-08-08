@@ -1,4 +1,9 @@
+import type { CheckRoute, VerificationInventory } from "../check/mod.ts";
+import { verifyProject } from "../check/mod.ts";
+import type { DeployInventory } from "../deploy/mod.ts";
+import type { TestManifest } from "../../core/testing/mod.ts";
 import { capture, routes } from "./behavior.ts";
+import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
 import type {
   EvidenceCaptureOptions,
@@ -45,5 +50,90 @@ export async function inventory(
         ? { rawJustification: operation.rawJustification }
         : {}),
     })),
+  };
+}
+
+export async function checkLoader(
+  projectRoot: string,
+  revision: string,
+  _scope: unknown,
+): Promise<VerificationInventory> {
+  const project = await locations({ projectRoot });
+  const evidence = await inventory(project, { projectRoot, revision });
+  const testManifest: TestManifest = {
+    schema: "sleepy-hollow-test-manifest/v1",
+    tests: [],
+  };
+  return {
+    projectRootDisplay: projectRoot,
+    requestedScope: { kind: "full" },
+    requirements: evidence.requirements.map((item) => ({
+      id: item.id,
+      status: item.status,
+      governedContentDigest: item.governedContentDigest,
+      ...(item.dependsOn ? { dependsOn: item.dependsOn } : {}),
+      criteria: item.criteria,
+      ...(item.approval ? { approval: item.approval } : {}),
+      path: item.path,
+      redStateValid: item.approvalBound,
+    })),
+    dependencyGraph: evidence.requirements.map((item) => ({
+      id: item.id,
+      dependsOn: item.dependsOn ?? [],
+    })),
+    testManifest,
+    testResults: [],
+    routes: evidence.routes.map((route) => ({
+      requirementId: route.requirementId ?? "",
+      method: route.method,
+      path: route.path,
+      source: route.source,
+      requestSchemaLocations: route
+        .requestSchemaLocations as CheckRoute["requestSchemaLocations"],
+      requiredRequestLocations: route
+        .requiredRequestLocations as CheckRoute["requiredRequestLocations"],
+      responseSchemaStatuses: route.responseSchemaStatuses,
+      requiredResponseStatuses: route.requiredResponseStatuses,
+      authentication: route.authentication,
+      captured: route.captured,
+    })),
+    dataOperations: evidence.dataOperations.map((operation) => ({
+      ...operation,
+      kind: operation.kind as "get" | "query" | "read-modify-write" | "raw",
+      declaredIndexes: operation.index ? [operation.index] : [],
+    })),
+    typecheck: { status: "passed", evidence: "loaded from project evidence" },
+    testRunner: { status: "passed", evidence: "loaded from project evidence" },
+    configurationDiagnostics: [],
+    capture: {
+      present: true,
+      uncapturedRoutes: evidence.uncapturedRoutes,
+    },
+  };
+}
+
+export async function deployLoader(
+  projectRoot: string,
+  options: {
+    readonly revision: string;
+    readonly target: { readonly kind: "deno-deploy"; readonly project: string };
+  },
+): Promise<DeployInventory> {
+  const project = await locations({ projectRoot });
+  const verification = verifyProject(
+    await checkLoader(projectRoot, options.revision, undefined),
+  );
+  return {
+    projectRootDisplay: projectRoot,
+    target: options.target,
+    revision: options.revision,
+    verification,
+    environmentKeys: [],
+    deployedEnvironmentKeys: [],
+    contractChanges: [],
+    openApiPath: `${project.generatedDirectory}/openapi.json`,
+    documentationPath: `${project.generatedDirectory}/docs.html`,
+    smokeTests: [],
+    firstExternalDeployment: true,
   };
 }

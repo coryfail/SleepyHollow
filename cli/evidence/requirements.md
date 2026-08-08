@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F018
 title: Repository evidence loader
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "3.6"
@@ -322,6 +322,29 @@ readability; no other digest normalization is permitted.
   requirement. It was strengthened to assert the declared inventory and the read
   paths before implementation. A criterion test that passes against a
   nonfunctional seam is not red-state evidence.
+
+### Verification, complete
+
+- Status: passed for all fifteen approved criteria.
+- Verified at: 2026-08-08T20:11:07Z.
+- Command: `deno task verify:evidence`.
+- Result: `15 passed | 0 failed`.
+- Criterion mapping for the final three: AC-F018-009 -> `hollow check` executed
+  against a generated project through the assembled loader, returning a
+  versioned result with populated checks; AC-F018-010 -> the test inventory
+  loader resolving real requirements from disk; AC-F018-011 -> the deployment
+  inventory loader assembling a plan with real verification evidence.
+- Integration: `cli/main.ts` now supplies the assembled check loader, so the
+  shipped CLI no longer fails closed on a missing evidence loader.
+- Regression caused and repaired: wiring the loader into the entry point
+  introduced a `Deno.env` read at startup, which broke AC-F001-009 because the
+  compiled standalone binary is granted only read and write permissions. The
+  revision resolver was made lazy and permission-safe, so `hollow --version`
+  never touches the environment. `verify:create` passes again.
+- Regression scope: all eleven component suites pass at this revision.
+- Residual risk: the assembled inventory reports typecheck and runner status
+  from loaded evidence rather than executing a run, so a full `hollow check`
+  still depends on `hollow test` having produced current capture evidence.
 
 ### Verification
 

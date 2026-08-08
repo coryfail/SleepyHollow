@@ -1,8 +1,19 @@
 import { type CliDependencies, createCliHandlers } from "./adapters.ts";
+import { createCheckInventoryLoader } from "./evidence/mod.ts";
 import { DEV_WORKER_ARGUMENT, runDevWorker } from "./dev/mod.ts";
 import { CLI_VERSION, type CliIo, runCommandSurface } from "./dispatcher.ts";
 
 export const VERSION = CLI_VERSION;
+
+function revision(): () => string {
+  return () => {
+    try {
+      return Deno.env.get("SLEEPY_HOLLOW_REVISION") ?? "workspace";
+    } catch {
+      return "workspace";
+    }
+  };
+}
 
 export function runCli(
   args: readonly string[],
@@ -23,6 +34,8 @@ if (import.meta.main) {
     cwd: Deno.cwd(),
     stdout: console.log,
     stderr: console.error,
+  }, {
+    checkInventoryLoader: createCheckInventoryLoader({ revision: revision() }),
   });
   Deno.exit(code);
 }

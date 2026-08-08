@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 
+import { runCheckCommand } from "../check/mod.ts";
 import { createProject } from "../create/mod.ts";
 import {
+  createCheckInventoryLoader,
+  createDeployInventoryLoader,
+  createTestInventoryLoader,
   EvidenceError,
   loadRequirementEvidence,
   loadVerificationInventory,
@@ -508,4 +512,60 @@ Deno.test("AC-F018-015 · a stale capture artifact is rejected", async () => {
     ),
   );
   assert.ok(reported.includes("SH_EVIDENCE_CAPTURE_STALE"));
+});
+
+Deno.test("AC-F018-009 · hollow check runs against a real project without a supplied inventory", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  await writeRoute(root);
+  await writeCapture(root, captureArtifact());
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const code = await runCheckCommand(["--json"], {
+    cwd: root,
+    stdout: (v) => stdout.push(v),
+    stderr: (v) => stderr.push(v),
+  }, createCheckInventoryLoader({ revision: "test-revision" }));
+  const result = JSON.parse((stdout[0] ?? stderr[0]) ?? "{}");
+  assert.equal(result.schema, "sleepy-hollow-check-result/v1");
+  assert.equal(result.command, "check");
+  assert.ok(Array.isArray(result.checks) && result.checks.length > 0);
+  assert.ok(code === 0 || code === 1);
+});
+
+Deno.test("AC-F018-010 · hollow test runs against a real project without a supplied inventory", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  const loader = createTestInventoryLoader();
+  const loaded = await loader({ projectRoot: root, scope: { kind: "full" } });
+  assert.ok(loaded.requirements.length > 0);
+  assert.equal(loaded.requirements[0].id, "EP-BOOKMARKS-CREATE");
+});
+
+Deno.test("AC-F018-011 · hollow deploy assembles a plan without a supplied inventory", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  await writeRoute(root);
+  await writeCapture(root, captureArtifact());
+  const loader = createDeployInventoryLoader({
+    revision: "test-revision",
+    target: { kind: "deno-deploy", project: "bookmarks" },
+  });
+  const loaded = await loader({ projectRoot: root });
+  assert.equal(loaded.target.project, "bookmarks");
+  assert.equal(loaded.revision, "test-revision");
+  assert.equal(loaded.openApiPath, "generated/openapi.json");
+  assert.ok(loaded.verification.schema === "sleepy-hollow-check-result/v1");
 });

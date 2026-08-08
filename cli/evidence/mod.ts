@@ -1,7 +1,7 @@
 export { EvidenceError } from "./evidence_error.ts";
 import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
-import { inventory } from "./inventory.ts";
+import { checkLoader, deployLoader, inventory } from "./inventory.ts";
 import type {
   EvidenceCaptureOptions,
   EvidenceLoadOptions,
@@ -30,4 +30,36 @@ export function loadVerificationInventory(
   options: EvidenceCaptureOptions,
 ): Promise<EvidenceVerificationInventory> {
   return inventory(project, options);
+}
+
+export function createCheckInventoryLoader(
+  options: { readonly revision: string | (() => string) },
+) {
+  return (
+    request: { readonly projectRoot: string; readonly scope?: unknown },
+  ) =>
+    checkLoader(
+      request.projectRoot,
+      typeof options.revision === "function"
+        ? options.revision()
+        : options.revision,
+      request.scope,
+    );
+}
+
+export function createTestInventoryLoader() {
+  return async (
+    request: { readonly projectRoot: string; readonly scope?: unknown },
+  ) => {
+    const project = await locations({ projectRoot: request.projectRoot });
+    return await requirements(project, { projectRoot: request.projectRoot });
+  };
+}
+
+export function createDeployInventoryLoader(options: {
+  readonly revision: string;
+  readonly target: { readonly kind: "deno-deploy"; readonly project: string };
+}) {
+  return (request: { readonly projectRoot: string }) =>
+    deployLoader(request.projectRoot, options);
 }
