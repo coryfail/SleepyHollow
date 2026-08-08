@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F008
 title: Independent verification
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "3.6"
@@ -305,6 +305,25 @@ other digest normalization is permitted.
   only at the explicit `SH_CHECK_NOT_IMPLEMENTED` boundary in
   `cli/check/mod.ts`, with no fixture, compilation, permission, dependency, or
   unrelated infrastructure failure.
+
+### Verification, observed-coverage amendment
+
+- Status: passed for all fifteen approved criteria.
+- Verified at: 2026-08-08T17:43:33Z.
+- Command: `deno task verify:check`.
+- Result: `15 passed | 0 failed`.
+- Criterion mapping: AC-F008-012 -> unobserved route failure test;
+  AC-F008-013 -> observed-route non-regression guard; AC-F008-014 -> recorded
+  justification acceptance test; AC-F008-015 -> missing, stale, and unreadable
+  capture failure test.
+- Red state: `12 passed | 3 failed` against a healthy typed baseline. AC-F008-013
+  passed before implementation because it asserts that an observed route does
+  not fail, which no rule could violate while no rule existed. It is a guard
+  against an over-broad rule rather than a demonstration of missing behavior,
+  and it becomes falsifiable once the rule exists.
+- An unobserved route accepted by a recorded justification is reported as a
+  warning carrying that justification, so the exception is visible in the result
+  rather than silent.
 
 ### Verification, superseded
 

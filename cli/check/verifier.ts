@@ -363,6 +363,63 @@ export function verify(inventory: VerificationInventory): CheckResult {
     }
   }
 
+  const capture = inventory.capture;
+  if (capture) {
+    if (!capture.present || capture.stale || capture.unreadable) {
+      diagnostics.push(diagnostic(
+        "SH_CHECK_CAPTURE_UNUSABLE",
+        "traceability",
+        capture.unreadable
+          ? "The capture artifact could not be read"
+          : capture.stale
+          ? "The capture artifact is stale for the revision under verification"
+          : "No capture artifact exists for this project",
+        { path: "generated/capture.json" },
+        {
+          present: capture.present,
+          stale: capture.stale ?? false,
+          unreadable: capture.unreadable ?? false,
+        },
+        "Run hollow test with capture enabled against the current revision.",
+      ));
+    }
+    for (const route of capture.uncapturedRoutes) {
+      if (route.requirementId && !requirementIds.has(route.requirementId)) {
+        continue;
+      }
+      if (route.justification) {
+        diagnostics.push(diagnostic(
+          "SH_CHECK_ROUTE_UNOBSERVED_ACCEPTED",
+          "routes",
+          `${route.method} ${route.path} was never observed and is accepted by a recorded justification: ${route.justification}`,
+          {
+            route: `${route.method} ${route.path}`,
+            ...(route.requirementId
+              ? { requirementId: route.requirementId }
+              : {}),
+          },
+          { justification: route.justification },
+          "Remove the justification once a mapped test exercises the route.",
+          "warning",
+        ));
+        continue;
+      }
+      diagnostics.push(diagnostic(
+        "SH_CHECK_ROUTE_UNOBSERVED",
+        "routes",
+        `${route.method} ${route.path} carries approved criteria but runtime capture never observed it`,
+        {
+          route: `${route.method} ${route.path}`,
+          ...(route.requirementId
+            ? { requirementId: route.requirementId }
+            : {}),
+        },
+        { method: route.method, path: route.path },
+        "Exercise the route from a mapped test, or record a justification for the exception.",
+      ));
+    }
+  }
+
   for (
     const operation of inventory.dataOperations.filter((item) =>
       requirementIds.has(item.requirementId)

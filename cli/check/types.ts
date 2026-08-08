@@ -81,6 +81,7 @@ export interface CheckRoute {
   readonly authentication: "none" | "required";
   readonly authorizationRequirementId?: string;
   readonly authorizationGuard?: string;
+  readonly captured?: boolean;
 }
 
 export interface CheckDataOperation {
@@ -99,7 +100,20 @@ export interface CheckDataOperation {
   readonly requesterServiceId?: string;
 }
 
+export interface CaptureEvidence {
+  readonly present: boolean;
+  readonly stale?: boolean;
+  readonly unreadable?: boolean;
+  readonly uncapturedRoutes: readonly {
+    readonly method: string;
+    readonly path: string;
+    readonly requirementId?: string;
+    readonly justification?: string;
+  }[];
+}
+
 export interface VerificationInventory {
+  readonly capture?: CaptureEvidence;
   readonly projectRootDisplay: string;
   readonly requestedScope: RequestedCheckScope;
   readonly requirements: readonly CheckRequirement[];

@@ -357,3 +357,86 @@ Deno.test("AC-F008-011 · source self-certification cannot override fixed failur
   );
   assert.ok(codes(result).includes("SH_CHECK_TEST_RUNNER_FAILED"));
 });
+
+function captured(
+  overrides: Partial<VerificationInventory["capture"] & object> = {},
+): VerificationInventory {
+  const base = inventory();
+  return {
+    ...base,
+    routes: base.routes.map((route) => ({ ...route, captured: true })),
+    capture: { present: true, uncapturedRoutes: [], ...overrides },
+  };
+}
+
+Deno.test("AC-F008-012 · an unobserved route with approved criteria fails", () => {
+  const base = captured();
+  const result = verifyProject({
+    ...base,
+    routes: base.routes.map((route) => ({ ...route, captured: false })),
+    capture: {
+      present: true,
+      uncapturedRoutes: [{
+        method: base.routes[0].method,
+        path: base.routes[0].path,
+        requirementId: base.routes[0].requirementId,
+      }],
+    },
+  });
+  assert.equal(result.ok, false);
+  const diagnostic = result.diagnostics.find((item) =>
+    item.code === "SH_CHECK_ROUTE_UNOBSERVED"
+  );
+  assert.ok(diagnostic);
+  assert.match(renderHumanCheckResult(result), /SH_CHECK_ROUTE_UNOBSERVED/);
+});
+
+Deno.test("AC-F008-013 · a criterion verified below the transport boundary does not fail", () => {
+  const result = verifyProject(captured());
+  assert.equal(result.ok, true);
+  assert.ok(
+    !result.diagnostics.some((item) =>
+      item.code === "SH_CHECK_ROUTE_UNOBSERVED"
+    ),
+  );
+});
+
+Deno.test("AC-F008-014 · a recorded justification accepts an unobserved route", () => {
+  const base = captured();
+  const result = verifyProject({
+    ...base,
+    routes: base.routes.map((route) => ({ ...route, captured: false })),
+    capture: {
+      present: true,
+      uncapturedRoutes: [{
+        method: base.routes[0].method,
+        path: base.routes[0].path,
+        requirementId: base.routes[0].requirementId,
+        justification: "covered by a contract test outside the transport layer",
+      }],
+    },
+  });
+  assert.equal(result.ok, true);
+  assert.match(
+    renderHumanCheckResult(result),
+    /covered by a contract test outside the transport layer/,
+  );
+});
+
+Deno.test("AC-F008-015 · a missing or stale capture artifact fails verification", () => {
+  for (
+    const capture of [
+      { present: false, uncapturedRoutes: [] },
+      { present: true, stale: true, uncapturedRoutes: [] },
+      { present: true, unreadable: true, uncapturedRoutes: [] },
+    ]
+  ) {
+    const result = verifyProject({ ...captured(), capture });
+    assert.equal(result.ok, false, JSON.stringify(capture));
+    assert.ok(
+      result.diagnostics.some((item) =>
+        item.code === "SH_CHECK_CAPTURE_UNUSABLE"
+      ),
+    );
+  }
+});
