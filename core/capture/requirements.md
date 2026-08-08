@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F019
 title: Runtime evidence capture
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "8"
@@ -166,15 +166,56 @@ readability; no other digest normalization is permitted.
 
 ### Criterion mapping
 
-- Status: pending approval and governed tests.
+- AC-F019-001 -> `capture_test.ts` repository transparency test covering values,
+  versionstamps, metadata, and rethrown errors.
+- AC-F019-002 -> `capture_test.ts` route response-identity test.
+- AC-F019-003 -> `capture_test.ts` bounded indexed query record test.
+- AC-F019-004 -> `capture_test.ts` read-modify-write versionstamp and atomicity
+  test.
+- AC-F019-005 -> `capture_test.ts` raw justification record test.
+- AC-F019-006 -> `capture_test.ts` read-location observation test.
+- AC-F019-007 -> `capture_test.ts` observed response-status test.
+- AC-F019-008 -> `capture_test.ts` criterion attribution test.
+- AC-F019-009 -> `capture_test.ts` unattributed retention test.
+- AC-F019-010 -> `capture_test.ts` uncaptured-route reporting test.
+- AC-F019-011 -> `capture_test.ts` byte-identical artifact test.
+- AC-F019-012 -> `capture_test.ts` runner and revision provenance test.
 
 ### Red-state evidence
 
-- Status: pending approved test execution against a healthy baseline.
+- Status: failed as expected.
+- Observed at: 2026-08-08T14:46:00Z.
+- Base revision: `916d706` plus the approved SH-F019 requirement, the twelve
+  mapped tests, and typed nonfunctional seams.
+- Commands: `deno task check:capture` and `deno task test:capture` using Deno
+  `2.9.5` on macOS arm64.
+- Result: `deno task check:capture` passed, establishing a healthy typed
+  baseline. `deno task test:capture` reported `0 passed | 12 failed`, every
+  failure an assertion or a seam that threw for unimplemented behavior.
+- Baseline correction: the first attempt failed type checking because two test
+  fixture casts converted between the handler context and a record type without
+  an intermediate `unknown`. That is a broken baseline, not red-state evidence.
+  The casts were corrected and the run repeated before red state was recorded.
 
 ### Verification
 
-- Status: pending implementation and independent verification.
+- Status: passed.
+- Verified at: 2026-08-08T14:47:11Z.
+- Command: `deno task verify:capture`, comprising `deno fmt --check`,
+  `deno lint`, `deno task check:capture`, and `deno task test:capture`.
+- Result: `12 passed | 0 failed`.
+- Regression scope: `verify:framework`, `verify:create`, `verify:planning`,
+  `verify:check`, `verify:cli`, `verify:test-command`, `verify:dev`,
+  `verify:skill`, `verify:deploy`, and `verify:evidence` all passed at the same
+  revision, confirming that wrapping introduced no change to the components it
+  wraps.
+- Additive boundary confirmed: no file under `core/routing`, `core/validation`,
+  `core/kv`, `core/security`, or `core/testing` was modified. Capture wraps
+  their public surfaces through a delegating proxy, so their governed content
+  and verified status are untouched.
+- Residual risk: capture observes only what tests exercise. Behavior no test
+  reaches is reported as uncaptured and carries no evidence. Whether uncaptured
+  behavior fails verification is an SH-F008 decision that remains open.
 
 ### Delivery
 
