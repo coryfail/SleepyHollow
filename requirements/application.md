@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-application
 title: Sleepy Hollow requirements and architecture specification
-status: draft
+status: approved
 risk: standard
 depends_on: []
 owners:
@@ -11,9 +11,9 @@ owners:
 
 # Sleepy Hollow Requirements and Architecture Specification
 
-**Version:** 0.4.0
+**Version:** 0.5.0
 
-**Date:** August 6, 2026
+**Date:** August 8, 2026
 
 ## 1. Executive summary
 
@@ -93,6 +93,7 @@ The user should receive:
 4. **Approval is granular.** A user can approve and build one endpoint without approving the entire implementation backlog.
 5. **TDD is the implementation pattern.** Approved acceptance criteria become failing tests before implementation begins.
 6. **Verification is independent.** The skill cannot declare its own output correct without framework checks and passing tests.
+6a. **Verification rests on observed behavior.** The framework records what handlers actually read and perform while their mapped tests run, so verification checks evidence rather than author claims. Behavior no test exercises is reported as uncaptured and is never certified.
 7. **The kernel stays small.** A narrow, predictable API is easier for humans and agents to use correctly.
 8. **Secure behavior should be difficult to forget.** Validation and basic protections are framework defaults.
 9. **Authentication is application-defined.** The planning workflow selects the right approach for each application.
@@ -928,6 +929,21 @@ Standalone executables and additional cloud adapters are deferred until the init
 | SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
 | SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD workflow skill |
 | SH-F018 | `cli/evidence/requirements.md` | Repository evidence loading for check, test, and deploy |
+| SH-F019 | `core/capture/requirements.md` | Runtime evidence capture during test execution |
+| SH-F020 | `packaging/requirements.md` | Distribution and public API surface |
+
+### 15.5 Distribution
+
+Sleepy Hollow is distributed as one package with a declared name, semantic
+version, and explicit export map. Only exported entry points are public API.
+
+It publishes to JSR as the primary registry for Deno consumers and to npm for
+reach, both from the same verified revision at the same version. The framework
+targets Deno and depends on Deno KV, Deno runtime APIs, and Deno Deploy. npm
+publication is a distribution channel for Deno consumers, not a claim of Node
+support, and the published metadata states this plainly.
+
+Publication requires that verification pass for the revision being published.
 
 ## 16. MVP acceptance criteria
 
@@ -1061,6 +1077,7 @@ The following decisions require prototypes or focused evaluation before their ex
 | OPEN-009 | Generated client shape | Proposed resolution in SH-F010: one dependency-free Web Standards TypeScript module with required base URL, injectable fetch and neutral authentication hook, optional fail-closed response validation, and no persistence or framework-runtime access |
 | OPEN-010 | Skill portability | Rich Codex skill plus useful Claude and generic-agent guidance |
 | OPEN-011 | Deno Deploy integration | Fast setup with safe credential handling and reliable smoke tests |
+| OPEN-012 | Discoverable project locations | Resolved in SH-F018: the SH-F001 project configuration is the sole source of discoverable locations, scoped per service through SH-F014 |
 
 ## 20. Definition of done for an endpoint
 
@@ -1099,6 +1116,17 @@ status field is a lifecycle projection for routing and human readability; no
 other digest normalization is permitted.
 
 ### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T17:34:18Z.
+- Approved criteria: the complete specification.
+- Governed-content digest:
+  `sha256:481b68b853cd8b5fb45aa829066a3a666f7556bed9b76f254ea087aa7d31e076`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the reconciled component inventory, the observed-evidence verification model, and the distribution model, and the exact governed-content digest.
+
+### Superseded approval
 
 - Status: pending exact-content product approval.
 - Approver, time, approved criteria, digest, and decision source: pending.

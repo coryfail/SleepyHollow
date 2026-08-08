@@ -39,6 +39,8 @@ implementable source.
   returned through SH-F002 and SH-F003.
 - Association of every record with the requirement and criterion under test.
 - A deterministic capture artifact the SH-F018 loader reads.
+- Persistence of that artifact to the project's declared generated location.
+- Binding record attribution to the executing SH-F007 criterion test.
 
 ## Requirements
 
@@ -89,11 +91,23 @@ would let a verification phase pass on no evidence.
 
 ### Artifact
 
-Capture shall write one deterministic artifact to the project's declared
-generated location. Two runs over identical code exercising identical tests
-shall produce byte-identical artifacts, including record ordering. The artifact
-shall record the runner and revision that produced it so stale evidence is
-detectable.
+Capture shall expose a persistence operation that writes one deterministic
+artifact to a caller-supplied location, which a Sleepy Hollow project resolves
+to its declared generated location. Two runs over identical code exercising
+identical tests shall produce byte-identical artifacts, including record
+ordering. The artifact shall record the runner and revision that produced it so
+stale evidence is detectable.
+
+Persistence shall write the complete artifact or fail. It shall not leave a
+partial artifact that a later verification could read as complete evidence.
+
+### Criterion binding
+
+Capture shall bind attribution to the executing SH-F007 criterion test without
+requiring a caller to open and close a scope by hand, so a record cannot be
+attributed to the wrong criterion because a caller forgot to close one. A
+caller may still scope attribution explicitly for records produced outside a
+criterion test.
 
 ## Acceptance criteria
 
@@ -118,6 +132,12 @@ detectable.
 - AC-F019-011: Two runs over identical code and tests produce byte-identical
   capture artifacts, including record ordering.
 - AC-F019-012: The artifact records the runner and revision that produced it.
+- AC-F019-013: Persisting a session writes the complete artifact to the supplied
+  location, and the written bytes equal the artifact the session reports.
+- AC-F019-014: A persistence failure leaves no partial artifact at the target
+  location.
+- AC-F019-015: Records produced inside an SH-F007 criterion test are attributed
+  to that criterion without an explicit caller-managed scope.
 
 ## Out of scope
 
@@ -152,6 +172,17 @@ ending. The status field is a lifecycle projection for routing and human
 readability; no other digest normalization is permitted.
 
 ### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T17:34:18Z.
+- Approved criteria: AC-F019-001 through AC-F019-015.
+- Governed-content digest:
+  `sha256:9280cab006e7a6faad24a9dedc79a294785387688c2114199f331bd167670dc2`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of artifact persistence, the no-partial-write rule, and automatic criterion binding, and the exact governed-content digest.
+
+### Superseded approval
 
 - Status: approved.
 - Approver: human-project-owner.

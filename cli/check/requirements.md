@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F008
 title: Independent verification
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "3.6"
@@ -12,6 +12,7 @@ source_sections:
   - "11.3"
 depends_on:
   - SH-F002
+  - SH-F019
   - SH-F003
   - SH-F004
   - SH-F005
@@ -175,6 +176,26 @@ deterministically sorted so repeated checks of unchanged inputs produce the same
 semantic result; durations are observational and excluded from equality or
 eligibility decisions.
 
+### Observed-coverage verification
+
+Verification shall treat a route that carries approved acceptance criteria but
+that runtime capture never observed as a failure. A criterion mapped to a
+passing test asserts that the test covers that behavior; capture showing the
+route was never reached proves the mapping is false, and reporting it as a
+warning would let a test that never exercises its handler read as verification.
+
+A criterion mapped to a passing test that produced no route observation shall
+not fail on that basis alone, because a criterion may legitimately be verified
+below the transport boundary. Only a route with approved criteria and no
+observation at all fails.
+
+An uncaptured route may be accepted only with a recorded justification, which
+shall appear in the verification result so the exception is visible rather than
+silent.
+
+A capture artifact that is missing, stale, or unreadable shall fail
+verification rather than being treated as an absence of findings.
+
 ## Acceptance criteria
 
 - AC-F008-001: `hollow check` returns success for a conforming project and a
@@ -199,6 +220,14 @@ eligibility decisions.
   or clearly escalates to the full check when safe impact analysis is impossible.
 - AC-F008-011: The verifier cannot mark its own failing checks successful through
   endpoint source metadata or an agent-authored completion message.
+- AC-F008-012: A route carrying approved acceptance criteria that capture never
+  observed fails verification and names the unobserved route.
+- AC-F008-013: A criterion mapped to a passing test with no route observation
+  does not fail on that basis alone.
+- AC-F008-014: An uncaptured route accompanied by a recorded justification
+  passes, and the justification appears in the verification result.
+- AC-F008-015: A missing, stale, or unreadable capture artifact fails
+  verification rather than reporting no findings.
 
 ## Out of scope
 
@@ -228,6 +257,17 @@ status field is a lifecycle projection for routing and human readability; no
 other digest normalization is permitted.
 
 ### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T17:34:18Z.
+- Approved criteria: AC-F008-001 through AC-F008-015.
+- Governed-content digest:
+  `sha256:4a47c5ea70b224e24502cc74dfb868a4853c395428489879f53a885953b26a62`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of fail-closed verification of observed coverage with a recorded-justification exception, and the exact governed-content digest.
+
+### Superseded approval
 
 - Status: approved.
 - Approver: human-project-owner.
@@ -265,6 +305,12 @@ other digest normalization is permitted.
   only at the explicit `SH_CHECK_NOT_IMPLEMENTED` boundary in
   `cli/check/mod.ts`, with no fixture, compilation, permission, dependency, or
   unrelated infrastructure failure.
+
+### Verification, superseded
+
+- Status: superseded. The verification recorded below predates the observed-coverage amendment approved at 2026-08-08T17:34:18Z and no
+  longer covers the approved criteria. It must be re-run before this component
+  is treated as verified again.
 
 ### Verification
 

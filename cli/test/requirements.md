@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F016
 title: Test command
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "11"
@@ -10,6 +10,7 @@ source_sections:
 depends_on:
   - SH-F006
   - SH-F007
+  - SH-F019
 open_decisions:
   - OPEN-006
 owners:
@@ -31,6 +32,21 @@ and reporting their acceptance-criterion coverage.
 - Human and JSON results with criterion mapping.
 
 ## Requirements
+
+### Capture during test execution
+
+`hollow test` shall enable SH-F019 runtime evidence capture for the tests it
+executes and shall persist the resulting artifact to the project's declared
+generated location when the run completes.
+
+Capture shall not change test selection, execution, or reported results. A run
+whose tests all pass shall report success whether or not capture observed
+anything, because interpreting captured evidence belongs to SH-F008 rather than
+to the test command.
+
+A persistence failure shall be reported as a command diagnostic and shall not
+be silently discarded, because a missing artifact causes later verification to
+fail closed for a reason unrelated to the code under test.
 
 ### Invocation and scope
 
@@ -172,6 +188,12 @@ authority that evaluates test evidence with every other required control.
   test explicitly declares a shared fixture.
 - AC-F016-007: A passing test run alone does not change a requirement from
   `approved` to `verified`.
+- AC-F016-008: `hollow test` persists an SH-F019 capture artifact to the declared
+  generated location for a run that executes at least one test.
+- AC-F016-009: Enabling capture changes neither test selection, execution, nor
+  the reported criterion results for an otherwise identical run.
+- AC-F016-010: A capture persistence failure is reported as a command diagnostic
+  rather than discarded.
 
 ## Out of scope
 
@@ -217,6 +239,17 @@ other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-08T17:34:18Z.
+- Approved criteria: AC-F016-001 through AC-F016-010.
+- Governed-content digest:
+  `sha256:86067cb8f7f84d73bc3a91f9b72390b05fa3efa20ab44bf4c3d4b78e8b75fb13`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of capture invocation and artifact persistence during test execution, and the exact governed-content digest.
+
+### Superseded approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-07T19:47:51Z.
 - Approved criteria: AC-F016-001 through AC-F016-007.
 - Governed-content digest:
@@ -251,6 +284,12 @@ other digest normalization is permitted.
   only at the explicit `SH_TEST_COMMAND_NOT_IMPLEMENTED` boundary in
   `cli/test/mod.ts`, with no fixture, compilation, dependency, permission, or
   unrelated infrastructure failure.
+
+### Verification, superseded
+
+- Status: superseded. The verification recorded below predates the capture-invocation amendment approved at 2026-08-08T17:34:18Z and no
+  longer covers the approved criteria. It must be re-run before this component
+  is treated as verified again.
 
 ### Verification
 
