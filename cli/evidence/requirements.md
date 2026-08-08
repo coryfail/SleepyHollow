@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F018
 title: Repository evidence loader
-status: approved
+status: draft
 risk: standard
 source_sections:
   - "3.6"
@@ -10,6 +10,7 @@ source_sections:
   - "11"
   - "12"
 depends_on:
+  - SH-F001
   - SH-F002
   - SH-F003
   - SH-F004
@@ -57,14 +58,19 @@ change to the verification rules those components own.
 
 ### Discovery
 
-OPEN-012 is resolved with declared configuration as the sole source of
-discoverable locations. The loader shall derive the API directory, requirements
-locations, and generated-output location from the SH-F012 typed configuration.
-When a project declares multiple services under SH-F014, the loader shall derive
-each service's roots from that service declaration and shall scope discovery per
-service so that one service's evidence is never attributed to another. No
-separate discovery manifest is introduced, and undeclared locations are not
-discovered.
+OPEN-012 is resolved with declared project configuration as the sole source of
+discoverable locations. The loader shall derive the API directory, the
+requirements file, and the generated-output location from the SH-F001 project
+configuration, which a created project declares as a typed `SleepyHollowProject`
+in `sleepyhollow.config.ts`. When a project declares multiple services under
+SH-F014, the loader shall derive each service's location from that service
+definition's declared root and shall scope discovery per service so that one
+service's evidence is never attributed to another. No separate discovery
+manifest is introduced, and undeclared locations are not discovered.
+
+The SH-F012 configuration governs runtime modes, keys, and secrets rather than
+repository layout. The loader consumes it only to collect the configuration
+diagnostics the verification inventory carries, never to locate files.
 
 Discovery shall begin at a declared project root and shall traverse only the
 locations a Sleepy Hollow project declares. It shall not walk the entire
@@ -135,8 +141,8 @@ selection, and delivery rules shall remain unchanged.
 - AC-F018-012: A multi-service project scopes discovery per declared service, so
   no service's requirements, routes, or data operations are attributed to
   another.
-- AC-F018-013: An invalid or unreadable project configuration fails closed with
-  a diagnostic and produces no partial inventory.
+- AC-F018-013: A missing, unreadable, or invalid project configuration fails
+  closed with a diagnostic and produces no partial inventory.
 - AC-F018-007: A malformed requirement, unreadable declared location, or
   duplicate requirement identity fails closed with a diagnostic identifying the
   file, the line when known, and the correction.
@@ -161,15 +167,16 @@ selection, and delivery rules shall remain unchanged.
 
 ## Dependencies and assumptions
 
-The loader consumes the public module boundaries of SH-F002 through SH-F007,
+The loader consumes the public module boundaries of SH-F001 through SH-F007,
 SH-F010, SH-F012, and SH-F014, and produces the inventory shapes owned by
 SH-F008, SH-F013, and SH-F016. It adds no new verification authority.
 
-OPEN-012 is resolved in the discovery requirements above: declared configuration
-is the sole source of discoverable locations, and SH-F014 service declarations
-scope discovery for a multi-service project. The loader therefore depends on a
-project's configuration being valid before evidence can be assembled, and an
-invalid configuration is reported as a failure rather than a partial inventory.
+OPEN-012 is resolved in the discovery requirements above: the SH-F001 project
+configuration is the sole source of discoverable locations, and SH-F014 service
+definitions scope discovery for a multi-service project. The loader therefore
+depends on a project's declared configuration being present and valid before
+evidence can be assembled, and a missing, unreadable, or invalid project
+configuration is reported as a failure rather than a partial inventory.
 
 ## Governance record
 
@@ -180,7 +187,23 @@ readability; no other digest normalization is permitted.
 
 ### Approval
 
-- Status: approved.
+- Status: invalidated; pending re-approval of the current content.
+- Invalidated at: 2026-08-08T14:13:30Z.
+- Reason: after approval, review found that the recorded OPEN-012 resolution
+  misattributed the source of discoverable locations. The SH-F012 configuration
+  governs runtime modes, keys, and secrets and declares no repository layout.
+  Project locations are declared by the SH-F001 `SleepyHollowProject`
+  configuration. Correcting the discovery requirements, adding SH-F001 to the
+  dependencies, and widening AC-F018-013 to a missing configuration changed
+  governed bytes.
+- Current governed-content digest awaiting approval:
+  `sha256:c40a9ffdd22ee0368b0467ff98b75986e1a599a8c3ba2bcd14143914dd8c12bf`.
+- Downstream impact: none. No criterion mapping, red-state evidence,
+  verification, or implementation existed at the time of invalidation.
+
+### Superseded approval
+
+- Status: approved, then invalidated by the correction recorded above.
 - Approver: human-project-owner.
 - Approved at: 2026-08-08T14:13:30Z.
 - Approved criteria: AC-F018-001 through AC-F018-013.
