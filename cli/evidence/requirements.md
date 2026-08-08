@@ -287,7 +287,7 @@ readability; no other digest normalization is permitted.
 
 ### Criterion mapping
 
-- Status: incomplete. Nine of thirteen approved criteria are mapped.
+- Status: incomplete. Twelve of fifteen approved criteria are mapped.
 - AC-F018-001 -> `evidence_test.ts` on-disk evidence assembly test.
 - AC-F018-002 -> `evidence_test.ts` governed-drift approval-binding test.
 - AC-F018-003 -> `evidence_test.ts` status-only projection test.
@@ -295,45 +295,53 @@ readability; no other digest normalization is permitted.
 - AC-F018-005 -> `evidence_test.ts` deterministic repeat-load test.
 - AC-F018-006 -> `evidence_test.ts` declared-location-only discovery test.
 - AC-F018-007 -> `evidence_test.ts` malformed and duplicate fail-closed test.
+- AC-F018-008 -> `evidence_test.ts` observed-read missing-coverage test.
 - AC-F018-012 -> `evidence_test.ts` per-service scoping test.
 - AC-F018-013 -> `evidence_test.ts` missing and invalid configuration test.
-- AC-F018-008, AC-F018-009, AC-F018-010, and AC-F018-011 are unmapped. They
-  require the behavioral-evidence layer and the command integration, neither of
-  which exists yet.
+- AC-F018-014 -> `evidence_test.ts` uncaptured-route carry-through test.
+- AC-F018-015 -> `evidence_test.ts` stale capture-artifact rejection test.
+- AC-F018-009, AC-F018-010, and AC-F018-011 are unmapped. They require the
+  command integration described in the blocking gap below.
 
 ### Red-state evidence
 
-- Status: failed as expected for the nine mapped criteria.
-- Observed at: 2026-08-08T14:21:00Z.
-- Base revision: `62d966e` plus the approved SH-F018 requirement, the nine
-  mapped tests, and typed nonfunctional seams.
+- Status: failed as expected for the twelve mapped criteria.
+- Observed at: 2026-08-08T14:21:00Z for the first nine and 2026-08-08T14:52:00Z
+  for AC-F018-008, AC-F018-014, and AC-F018-015.
+- Base revision: `62d966e` for the first nine and `2ed9e80` for the second three,
+  each with the approved requirement, mapped tests, and typed nonfunctional
+  seams present.
 - Commands: `deno task check:evidence` and `deno task test:evidence` using Deno
   `2.9.5` on macOS arm64.
-- Result: `deno task check:evidence` passed, establishing a healthy typed
-  baseline. `deno task test:evidence` reported `0 passed | 9 failed`.
-- Red-state correction: the first red run reported `1 passed | 8 failed` because
-  AC-F018-006 asserted only the absence of an undeclared requirement, which an
-  empty seam satisfies vacuously. The test was strengthened to assert the
-  declared inventory and the read paths before implementation, after which all
-  nine failed. A criterion test that passes against a nonfunctional seam is not
-  red-state evidence.
+- Result: type checking passed in both rounds, establishing a healthy typed
+  baseline. The first round reported `0 passed | 9 failed` and the second
+  reported `9 passed | 3 failed`, the three failures being the newly mapped
+  criteria whose seams threw for unimplemented behavior.
+- Red-state correction: in the first round AC-F018-006 initially passed against
+  an empty seam because it asserted only the absence of an undeclared
+  requirement. It was strengthened to assert the declared inventory and the read
+  paths before implementation. A criterion test that passes against a
+  nonfunctional seam is not red-state evidence.
 
 ### Verification
 
-- Status: superseded. The verification below predates the capture-sourced
-  re-approval and must be re-run against the re-approved content.
-- Observed at: 2026-08-08T14:24:25Z.
+- Status: not verified. Partial component verification only.
+- Observed at: 2026-08-08T14:53:00Z.
 - Command: `deno task verify:evidence`, comprising `deno fmt --check`,
   `deno lint`, `deno task check:evidence`, and `deno task test:evidence`.
-- Result: `9 passed | 0 failed` for the mapped criteria.
+- Result: `12 passed | 0 failed` for the mapped criteria.
 - Regression scope: `verify:framework`, `verify:create`, `verify:planning`,
   `verify:check`, `verify:cli`, `verify:test-command`, `verify:dev`,
-  `verify:skill`, and `verify:deploy` all passed at the same revision.
-- Blocking gap: AC-F018-008 and AC-F018-009 through AC-F018-011 have neither
-  tests nor implementation. The loader currently assembles requirement evidence
-  and project locations only. It does not yet extract routes, schema coverage,
-  security declarations, or data operations, and it is not yet supplied to
-  `hollow check`, `hollow test`, or `hollow deploy`. Those commands therefore
+  `verify:skill`, `verify:deploy`, and `verify:capture` all passed at the same
+  revision.
+- Blocking gap: AC-F018-009, AC-F018-010, and AC-F018-011 have neither tests nor
+  implementation. The loader assembles project locations, requirement evidence,
+  and behavioral evidence into its own normalized shape, but does not yet
+  produce the exact `VerificationInventory`, test inventory, and deployment
+  inventory shapes those commands consume. Producing them additionally requires
+  the test manifest, executed test results, dependency graph, and native runner
+  output that SH-F007 and the SH-F008 runner supply. Until that mapping and the
+  `cli/main.ts` wiring exist, `hollow check`, `hollow test`, and `hollow deploy`
   still fail closed without a caller-supplied inventory.
 - This requirement must not be treated as verified until every approved
   criterion is mapped, red, implemented, and independently checked.
