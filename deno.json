@@ -1,4 +1,18 @@
 {
+  "name": "@sleepy-hollow/framework",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./routing": "./core/routing/mod.ts",
+    "./validation": "./core/validation/mod.ts",
+    "./kv": "./core/kv/mod.ts",
+    "./security": "./core/security/mod.ts",
+    "./config": "./core/config/mod.ts",
+    "./services": "./core/services/mod.ts",
+    "./testing": "./core/testing/mod.ts",
+    "./capture": "./core/capture/mod.ts",
+    "./cli": "./cli/main.ts"
+  },
   "imports": {
     "@std/yaml": "jsr:@std/yaml@1.1.2",
     "zod": "npm:zod@4.4.3"
@@ -58,6 +72,9 @@
     "verify:capture": "deno fmt --check core/capture/*.ts && deno lint core/capture/*.ts && deno task check:capture && deno task test:capture",
     "verify:evidence": "deno fmt --check cli/evidence/*.ts && deno lint cli/evidence/*.ts && deno task check:evidence && deno task test:evidence",
     "verify:deploy": "deno fmt --check cli/deploy/*.ts && deno lint cli/deploy/*.ts && deno task check:deploy && deno task test:deploy",
-    "verify:framework": "deno task verify:routing && deno task verify:validation && deno task verify:kv && deno task verify:security && deno task verify:config && deno task verify:testing && deno task verify:generate && deno task verify:services"
+    "verify:framework": "deno task verify:routing && deno task verify:validation && deno task verify:kv && deno task verify:security && deno task verify:config && deno task verify:testing && deno task verify:generate && deno task verify:services",
+    "check:packaging": "deno check packaging/mod.ts packaging/packaging_test.ts",
+    "test:packaging": "deno test --allow-read packaging/packaging_test.ts",
+    "verify:packaging": "deno fmt --check packaging/*.ts && deno lint packaging/*.ts && deno task check:packaging && deno task test:packaging"
   }
 }

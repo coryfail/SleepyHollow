@@ -6,6 +6,7 @@ import { selection } from "./selection.ts";
 import { traceability } from "./traceability.ts";
 import type {
   BaselineCheck,
+  CriterionTestDescriptor,
   CriterionTestRegistry,
   CriterionTestSpec,
   ProblemDetails,
@@ -37,7 +38,7 @@ export function criterionTest(
     readonly requirements: readonly RequirementEvidence[];
     readonly register?: (definition: Deno.TestDefinition) => void;
   },
-) {
+): CriterionTestDescriptor {
   return createRegistry(options).criterionTest(spec);
 }
 

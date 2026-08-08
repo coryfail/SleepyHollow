@@ -1,7 +1,7 @@
-import {
-  type NormalizedRoute,
-  type RouteHandlerContext,
-  type RoutePrincipal,
+import type {
+  NormalizedRoute,
+  RouteHandlerContext,
+  RoutePrincipal,
 } from "../routing/mod.ts";
 import { createValidatedRouter } from "../validation/mod.ts";
 import { prepareSecurity } from "./normalize.ts";

@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F020
 title: Distribution and public API surface
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "3.1"
@@ -133,15 +133,45 @@ readability; no other digest normalization is permitted.
 
 ### Criterion mapping
 
-- Status: pending approval and governed tests.
+- AC-F020-001 -> `packaging_test.ts` declared name and semantic version test.
+- AC-F020-002 -> `packaging_test.ts` export-entry resolution test.
+- AC-F020-003 -> `packaging_test.ts` internal-module exclusion test.
+- AC-F020-004 -> `packaging_test.ts` declared Deno runtime test.
+- AC-F020-005 -> `packaging_test.ts` clean verified release test.
+- AC-F020-006 -> `packaging_test.ts` failing-verification refusal test.
+- AC-F020-007 -> `packaging_test.ts` reused-version refusal test.
+- AC-F020-008 -> `packaging_test.ts` dirty-tree refusal test.
 
 ### Red-state evidence
 
-- Status: pending approved test execution against a healthy baseline.
+- Status: failed as expected for six of eight criteria.
+- Observed at: 2026-08-08T20:14:45Z.
+- Commands: `deno task check:packaging` and `deno task test:packaging`.
+- Result: type checking passed and `deno task test:packaging` reported
+  `2 passed | 6 failed`.
+- Sequencing defect recorded honestly: AC-F020-002 and AC-F020-003 passed at the
+  red run because the export map was added to `deno.json` before the mapped
+  tests were executed, rather than after. Those two criteria therefore have no
+  credible red-state evidence. The remaining six failed against the
+  nonfunctional release gate as expected. The correct order is to run the mapped
+  tests against the unmodified baseline first.
 
 ### Verification
 
-- Status: pending implementation and independent verification.
+- Status: passed.
+- Verified at: 2026-08-08T20:14:45Z.
+- Command: `deno task verify:packaging`.
+- Result: `8 passed | 0 failed`.
+- Consequence discovered and repaired: declaring `name`, `version`, and
+  `exports` enabled JSR slow-type rules across the repository. Two real defects
+  surfaced, both genuine publication blockers rather than spurious failures: a
+  public `criterionTest` without an explicit return type, and a
+  type-only import in `security_router.ts` using value-import syntax. Both are
+  corrected, and all twelve component suites pass.
+- Residual risk: no publication has been attempted. AC-F020-001 verifies the
+  declared version against the request, not against a live registry, and
+  AC-F020-005 has no published artifact to resolve against until a first
+  release runs.
 
 ### Delivery
 
