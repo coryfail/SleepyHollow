@@ -927,6 +927,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 | SH-F015 | `cli/dev/requirements.md` | Local development server |
 | SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
 | SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD workflow skill |
+| SH-F018 | `cli/evidence/requirements.md` | Repository evidence loading for check, test, and deploy |
 
 ## 16. MVP acceptance criteria
 
