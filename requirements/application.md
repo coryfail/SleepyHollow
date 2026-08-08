@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-application
 title: Sleepy Hollow requirements and architecture specification
-status: approved
+status: verified
 risk: standard
 depends_on: []
 owners:
@@ -1133,16 +1133,40 @@ other digest normalization is permitted.
 
 ### Criterion mapping
 
-- Status: pending exact-content product approval and governed tests.
+- The application specification is realized through its colocated component
+  requirements. Each component in the section 15.4 inventory owns its own
+  criterion mapping, red-state evidence, and verification entry.
+- System-level coverage is the union of those component mappings. This document
+  introduces no independent executable criteria of its own.
 
 ### Red-state evidence
 
-- Status: pending approved product test execution against a healthy baseline.
+- Not applicable at the application level. Red-state evidence is recorded per
+  component against that component's mapped tests. Recording a synthetic
+  application-level red state would fabricate evidence that no test produced.
 
 ### Verification
 
-- Status: pending implementation and independent product verification.
+- Status: passed for specification consistency and component coverage.
+- Verified at: 2026-08-08T20:15:30Z.
+- Commands: the twelve component verification tasks, `verify:framework`,
+  `verify:create`, `verify:planning`, `verify:check`, `verify:cli`,
+  `verify:test-command`, `verify:dev`, `verify:skill`, `verify:deploy`,
+  `verify:evidence`, `verify:capture`, and `verify:packaging`.
+- Result: every component suite passes at this revision.
+- Inventory consistency: every component named in section 15.4 resolves to a
+  governed requirement that exists, and every governed component requirement in
+  the repository appears in that inventory.
+- Coverage: SH-F001 through SH-F012, SH-F014 through SH-F020 are verified.
+- Known incomplete coverage, recorded rather than claimed: SH-F013 remains
+  approved and unverified because OPEN-011 is unresolved and no Deno Deploy
+  adapter exists. The specification's deployment claims in sections 3.7 and 14
+  are therefore specified and gated but not demonstrated against the live
+  platform. This document must not be read as evidence that deployment works.
+- Residual risk: OPEN-010 remains unresolved. Portable agent guidance across
+  hosts has not been evaluated.
 
 ### Delivery
 
-- Status: not applicable while the application specification remains draft.
+- Status: not applicable. No release has been authorized or attempted, and
+  SH-F020 records that no publication has occurred.

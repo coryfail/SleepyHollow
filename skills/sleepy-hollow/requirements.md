@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F009
 title: Official Sleepy Hollow agent skill
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "3"
@@ -170,6 +170,25 @@ other digest normalization is permitted.
   criteria are not yet closed by a live `hollow check` run.
 - Residual risk: the mapped tests govern the documented workflow and the
   constraints carried in `SKILL.md`. They do not establish that a live agent
+  host follows those constraints during a conversation. No automated control in
+  this repository closes that gap.
+
+### Verification, residual closure
+
+- Status: passed. The blocking residual recorded above is resolved.
+- Verified at: 2026-08-08T20:15:08Z.
+- Command: `deno task verify:skill`, with `deno task verify:evidence` supplying
+  the dependency evidence.
+- Result: `12 passed | 0 failed` for SH-F009 and `15 passed | 0 failed` for
+  SH-F018.
+- Closure of AC-F009-005 and AC-F009-008: both were previously closed only at
+  the orchestration boundary because no evidence loader existed. SH-F018 is now
+  verified and AC-F018-009 demonstrates `hollow check` executing against a
+  generated project through the assembled loader, so the independent
+  verification the skill depends on runs against real projects rather than
+  injected fixtures.
+- Residual risk retained: the mapped tests govern the documented workflow and
+  the constraints carried in `SKILL.md`. They do not establish that a live agent
   host follows those constraints during a conversation. No automated control in
   this repository closes that gap.
 
