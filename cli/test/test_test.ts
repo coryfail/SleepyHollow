@@ -5,8 +5,10 @@ import { join } from "node:path";
 import { createTestApplication } from "../../core/testing/mod.ts";
 import {
   createDenoTestInvocation,
+  planTestRun,
   type RawTestEvent,
   runTestCommand,
+  type TestCommandDiagnostic,
   type TestCommandInventory,
   type TestCommandPlan,
   type TestRunner,
@@ -566,4 +568,61 @@ Deno.test("AC-F016-010 · a missing capture artifact is reported as a diagnostic
     `expected capture diagnostic, saw ${JSON.stringify(diagnostics)}`,
   );
   await Deno.remove(harness.root, { recursive: true });
+});
+
+function emptyInventory(): TestCommandInventory {
+  return {
+    projectRootDisplay: "/project",
+    requirements: [],
+    dependencyGraph: [],
+    routes: [],
+    manifest: { schema: "sleepy-hollow-test-manifest/v1", tests: [] },
+    isolation: [],
+  };
+}
+
+Deno.test("AC-F016-011 · a full-scope run with nothing governed reports success", async () => {
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const code = await runTestCommand(
+    ["--json"],
+    {
+      cwd: "/project",
+      stdout: (v) => stdout.push(v),
+      stderr: (v) => stderr.push(v),
+    },
+    () => emptyInventory(),
+    () => {
+      throw new Error("the runner must not be invoked with no governed tests");
+    },
+  );
+  assert.equal(code, 0, `a new project must exit zero, saw ${stderr[0] ?? ""}`);
+  const result = JSON.parse(stdout[0] ?? "{}");
+  assert.equal(result.ok, true);
+
+  const planned = planTestRun(emptyInventory(), { kind: "full" });
+  assert.ok(
+    !planned.diagnostics.some((item: TestCommandDiagnostic) =>
+      item.severity === "error"
+    ),
+    `a new project must not fail: ${JSON.stringify(planned.diagnostics)}`,
+  );
+  assert.ok(
+    planned.diagnostics.some((item: TestCommandDiagnostic) =>
+      item.code === "SH_TEST_NO_GOVERNED_TESTS"
+    ),
+    "the run must state that nothing governed exists yet",
+  );
+});
+
+Deno.test("AC-F016-012 · a targeted scope matching nothing still fails", () => {
+  const planned = planTestRun(emptyInventory(), {
+    kind: "requirement",
+    requirementId: "EP-DOES-NOT-EXIST",
+  });
+  const failure = planned.diagnostics.find((item: TestCommandDiagnostic) =>
+    item.severity === "error" && item.code === "SH_TEST_SELECTION_EMPTY"
+  );
+  assert.ok(failure, "an unmatched target must fail");
+  assert.match(JSON.stringify(failure), /EP-DOES-NOT-EXIST/);
 });

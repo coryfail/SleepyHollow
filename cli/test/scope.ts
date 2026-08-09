@@ -153,12 +153,28 @@ export function plan(
     ? [...selection!.testIds]
     : sorted(inventory.manifest.tests.map((test) => test.id));
   if (selectedTests.length === 0) {
-    diagnostics.push(diagnostic(
-      "SH_TEST_SELECTION_EMPTY",
-      "error",
-      "The selected scope contains no governed tests.",
-      "Register mapped tests or correct the selected requirement or route.",
-    ));
+    const governedExists = inventory.manifest.tests.length > 0;
+    if (requestedScope.kind === "full" && !governedExists) {
+      diagnostics.push(diagnostic(
+        "SH_TEST_NO_GOVERNED_TESTS",
+        "warning",
+        "This project declares no governed tests yet.",
+        "Approve an endpoint requirement and map its criteria to tests to begin.",
+      ));
+    } else {
+      diagnostics.push(diagnostic(
+        "SH_TEST_SELECTION_EMPTY",
+        "error",
+        `The selected scope contains no governed tests: ${
+          requestedScope.kind === "requirement"
+            ? requestedScope.requirementId
+            : requestedScope.kind === "route"
+            ? `${requestedScope.method} ${requestedScope.path}`
+            : "full scope"
+        }.`,
+        "Register mapped tests or correct the selected requirement or route.",
+      ));
+    }
   }
 
   const isolation = new Map<string, string[]>();

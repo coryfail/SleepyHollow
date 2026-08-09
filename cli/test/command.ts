@@ -171,6 +171,36 @@ export async function execute(
   if (testPlan.diagnostics.some((item) => item.severity === "error")) {
     return emit(failedWithoutRunner(testPlan, inventory), parsed.json, io);
   }
+  if (testPlan.selectedTests.length === 0) {
+    return emit(
+      {
+        schema: "sleepy-hollow-test-result/v1",
+        ok: true,
+        command: "test",
+        requestedScope: testPlan.requestedScope,
+        effectiveScope: testPlan.effectiveScope,
+        selectedRequirements: testPlan.selectedRequirements,
+        selectedTests: testPlan.selectedTests,
+        tests: [],
+        criteria: [],
+        diagnostics: testPlan.diagnostics,
+        summary: {
+          passed: 0,
+          failed: 0,
+          skipped: 0,
+          unmapped: 0,
+          passingCriteria: 0,
+          failingCriteria: 0,
+          skippedCriteria: 0,
+          unmappedCriteria: 0,
+          durationMs: 0,
+        },
+        verificationStateChanged: false,
+      },
+      parsed.json,
+      io,
+    );
+  }
   let runnerResult;
   try {
     runnerResult = await (runner ?? ((selected, source) =>

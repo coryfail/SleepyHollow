@@ -33,6 +33,17 @@ and reporting their acceptance-criterion coverage.
 
 ## Requirements
 
+### Empty selection
+
+A full-scope run in a project that declares no governed tests shall report
+success and state plainly that nothing governed exists yet. A newly created
+project has no criterion-mapped tests, and reporting that as a failed run
+misrepresents a correct starting state as a defect.
+
+A targeted scope that selects no tests shall continue to fail, naming the
+target that matched nothing. Requesting a specific requirement or route and
+silently finding nothing is a real error and shall not be softened.
+
 ### Capture during test execution
 
 `hollow test` shall enable SH-F019 runtime evidence capture for the tests it
@@ -194,6 +205,10 @@ authority that evaluates test evidence with every other required control.
   the reported criterion results for an otherwise identical run.
 - AC-F016-010: A capture persistence failure is reported as a command diagnostic
   rather than discarded.
+- AC-F016-011: A full-scope run in a project with no governed tests returns
+  success and reports that no governed tests exist yet, rather than a failure.
+- AC-F016-012: A targeted scope that selects no tests fails and names the target
+  that matched nothing.
 
 ## Out of scope
 
@@ -239,6 +254,19 @@ other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-09T01:05:56Z.
+- Approved criteria: AC-F016-001 through AC-F016-012.
+- Governed-content digest:
+  `sha256:f1829cbcc91faad99379c647375aeb83e5c06626c460a7cc103ac7a9fb793a66`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the empty-selection split between a full-scope run with nothing governed
+  and a targeted scope that matched nothing, and the exact governed-content
+  digest.
+
+### Superseded approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-08T17:34:18Z.
 - Approved criteria: AC-F016-001 through AC-F016-010.
 - Governed-content digest:
@@ -259,6 +287,35 @@ other digest normalization is permitted.
   SH-F006 and SH-F007 dependencies, resolved OPEN-006 closure, fixed command
   grammar, bounded native Deno runner, TAP result contract, isolation policy,
   evidence-only lifecycle boundary, and exact governed-content digest.
+
+### Verification, empty-selection amendment
+
+- Status: passed for all twelve approved criteria.
+- Verified at: 2026-08-09T01:10:10Z.
+- Command: `deno task verify:test-command`.
+- Result: `12 passed | 0 failed`.
+- Criterion mapping: AC-F016-011 -> full-scope command run against an empty
+  inventory asserting exit zero, a passing result, and that the runner is never
+  invoked; AC-F016-012 -> targeted scope naming an unknown requirement asserting
+  a failing diagnostic that names the target.
+- Two implementation corrections found while making this pass, both recorded
+  because each would have weakened verification if shipped:
+- First, keying the new success path on the effective scope allowed an unknown
+  target to pass, because SH-F016 escalates an unprovable targeted scope to the
+  full suite. A typo'd requirement would have silently succeeded. The condition
+  now keys on the requested scope, so escalation still protects graph safety
+  while a bad target still fails.
+- Second, the general result rule requires at least one passing criterion for a
+  run to be `ok`, which is the rule that prevents an empty run from reading as a
+  pass. Rather than loosen it, the empty-project path constructs its own result
+  explicitly, so the strict rule remains intact for every other run.
+- Test-coverage correction: AC-F016-011 initially exercised only the planner.
+  The approved criterion describes a run, so the test was strengthened to drive
+  the command and assert the runner is not invoked. This is the same
+  under-coverage defect found in SH-F018 during the readiness audit.
+- End-to-end evidence: a freshly created project reports `Test run passed.` with
+  a warning that nothing governed exists yet, while
+  `hollow test --requirement EP-NOPE` reports `Test run failed.`
 
 ### Criterion mapping
 
