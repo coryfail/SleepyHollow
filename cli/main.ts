@@ -22,6 +22,7 @@ import {
 import { DEV_WORKER_ARGUMENT, runDevWorker } from "./dev/mod.ts";
 import { CLI_VERSION, type CliIo, runCommandSurface } from "./dispatcher.ts";
 
+/** Version of the CLI, reported by `hollow --version`. */
 export const VERSION = CLI_VERSION;
 
 function revision(): () => string {
@@ -43,6 +44,18 @@ function projectName(): string {
   }
 }
 
+/**
+ * Runs one CLI invocation against caller-supplied I/O.
+ *
+ * Nothing is read from the process here: the arguments, the working directory,
+ * and the output streams all arrive as parameters, which is what makes the
+ * command surface testable without spawning a subprocess.
+ *
+ * @param args The command and its flags, without the executable name.
+ * @param io The working directory, and where output is written.
+ * @param dependencies Seams to override, such as evidence loaders.
+ * @returns The exit code the process should end with.
+ */
 export function runCli(
   args: readonly string[],
   io: CliIo,
