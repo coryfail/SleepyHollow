@@ -358,6 +358,17 @@ other digest normalization is permitted.
   inventory and supported metadata; it is a verification control rather than a
   sandbox for arbitrary Deno programs.
 
+### Known defect, evidence collection is stubbed upstream
+
+- Status: open. Recorded rather than repaired. Owned by SH-F018 and recorded in
+  full at `cli/evidence/requirements.md`.
+- Symptom here: `hollow check` cannot pass for any project that declares an
+  acceptance criterion, because the SH-F018 loader supplies an empty test
+  manifest. This component's criterion-mapping and red-state diagnostics are
+  therefore reporting on evidence that was never gathered.
+- Observed at: 2026-08-09T16:45Z against `examples/authentication` and
+  `examples/todos`.
+
 ### Delivery
 
 - Status: not applicable; no commit, push, publication, deployment, or external

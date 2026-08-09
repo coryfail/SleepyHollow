@@ -394,6 +394,45 @@ readability; no other digest normalization is permitted.
 - This requirement must not be treated as verified until every approved
   criterion is mapped, red, implemented, and independently checked.
 
+### Known defect, check evidence is not collected
+
+- Status: open. Recorded rather than repaired.
+- Observed at: 2026-08-09T16:45Z, by running `hollow check` against
+  `examples/authentication` and `examples/todos` rather than through unit tests.
+- Symptom: `checkLoader` in `cli/evidence/inventory.ts` returns a test manifest
+  hardcoded to `tests: []`, so no project's tests are ever collected. Every
+  acceptance criterion in every project therefore reports
+  `SH_CHECK_CRITERION_UNMAPPED`, and `hollow check` cannot pass for any project
+  that declares a criterion. The same function stubs `routes` and `isolation`.
+- Second symptom: `redStateValid` is assigned `item.approvalBound`, so
+  `SH_CHECK_RED_STATE_INVALID` reports whether the approval binds rather than
+  whether credible red-state evidence exists. Correcting an unrelated approval
+  notation in `examples/authentication` cleared that diagnostic without any red
+  evidence being examined, which is how the aliasing was noticed.
+- Third symptom: loading evidence for `examples/todos` throws
+  `TypeError: Cannot read properties of undefined (reading 'revision')`, which
+  the command surfaces as `SH_CHECK_EVIDENCE_LOAD_FAILED` with no cause, path,
+  or location even under `--json`.
+- Fourth symptom: `SH_CHECK_ROUTE_DRIFT` reports `GET /hello has no owning
+  approved requirement` although `EP-HELLO` declares `path: /hello` and its
+  approval binds, and names the file as `api/` concatenated with an absolute
+  path.
+- Why this was not visible before: SH-F001's verification recorded `hollow
+  check` reporting `Independent verification passed`, but only against an empty
+  scaffold. A project with no criteria has no criterion to leave unmapped, so
+  the one input ever exercised is the one input that cannot fail this way.
+- Severity: `hollow check` is the framework's independent verification command
+  and the gate `hollow deploy` depends on. Until evidence collection is real, a
+  passing result on an empty project means less than it appears to, and no real
+  project can obtain one at all.
+- Not repaired here because the repair is the implementation of approved
+  evidence collection rather than a bounded defect fix, and it needs
+  requirement review to decide whether SH-F018 and SH-F008 describe behavior
+  that was never built or behavior whose scope must change. That review should
+  precede any code.
+- Acceptance bar for the repair: `hollow check` passes against both
+  `examples/todos` and `examples/authentication`.
+
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.

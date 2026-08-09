@@ -95,7 +95,13 @@ readability; no other digest normalization is permitted.
 - Status: approved.
 - Approver: human-project-owner.
 - Approved at: 2026-08-09T12:23:21Z.
-- Approved criteria: AC-HELLO-001 through AC-HELLO-003.
+- Approved criteria: AC-HELLO-001, AC-HELLO-002, AC-HELLO-003.
+- Notation correction, 2026-08-09: this entry originally read
+  `AC-HELLO-001 through AC-HELLO-003`. SH-F006 requires an approval to name
+  the bounded criteria it approves, and a range names only its endpoints, so
+  `hollow check` correctly reported the approval as not covering
+  AC-HELLO-002. The approved decision, its scope, and the governed-content
+  digest are unchanged; only the expression of the same three criteria is.
 - Governed-content digest:
   `sha256:379cc80c8f1fc8e1d2d9a2665783e0fc5fca724c5eaeebd55a4d8d16f51187f6`.
 - Decision source: Claude conversation; direct response `approve` after review
