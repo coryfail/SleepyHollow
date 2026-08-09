@@ -24,7 +24,7 @@ export interface ReleaseResult {
   readonly ok: boolean;
   readonly name: string;
   readonly version: string;
-  readonly registries: readonly ["jsr", "npm"];
+  readonly registries: readonly ["jsr"];
   readonly runtime: "deno";
   readonly diagnostics: readonly ReleaseDiagnostic[];
 }

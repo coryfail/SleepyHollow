@@ -43,7 +43,7 @@ Deno.test("AC-F020-001 · the repository declares one name and one semantic vers
   }));
   assert.equal(result.name, declared.name);
   assert.equal(result.version, declared.version);
-  assert.deepEqual(result.registries, ["jsr", "npm"]);
+  assert.deepEqual(result.registries, ["jsr"]);
 });
 
 Deno.test("AC-F020-002 · every declared export entry point resolves", async () => {

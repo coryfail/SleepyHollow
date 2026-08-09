@@ -60,7 +60,7 @@ export function release(request: ReleaseRequest): ReleaseResult {
     ok: diagnostics.length === 0,
     name: identity.name,
     version: identity.version,
-    registries: ["jsr", "npm"],
+    registries: ["jsr"],
     runtime: "deno",
     diagnostics,
   };

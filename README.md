@@ -9,7 +9,7 @@ generation, deployment — and one thing that is not ordinary: it records what
 your handlers actually do while their tests run, and refuses to certify behavior
 no test exercised.
 
-> **Status:** in development. Not yet published to JSR or npm. The commands
+> **Status:** in development. Not yet published to JSR. The commands
 > below work from a clone today; the install instructions describe the published
 > package and are not resolvable until the first release.
 

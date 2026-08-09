@@ -30,7 +30,7 @@ makes compatibility impossible to reason about.
 
 - A declared package identity and version.
 - An explicit export map naming the supported entry points.
-- Publication to JSR and to npm.
+- Publication to JSR.
 - Documented installation and project-creation instructions that match the
   published artifacts.
 - A release check that refuses to publish an unverified or inconsistent tree.
@@ -59,13 +59,18 @@ requires a major version.
 
 ### Registries
 
-The package shall publish to JSR as the primary registry for Deno consumers,
-and to npm for reach and name reservation. Both publications shall come from
-the same verified revision and shall declare the same version.
+The package shall publish to JSR, and to no other registry. JSR is the registry
+Deno consumers install from, and it serves every published package through an
+npm-compatible registry as well, so a consumer working through npm tooling can
+install the package without a second publication by this project.
 
-The npm artifact shall not imply support for runtimes the framework does not
+A second artifact on npm would require a build toolchain the project does not
+otherwise need, would have to be held at the same version as the JSR release,
+and would have to be verified on its own. The project declines that cost.
+
+The publication shall not imply support for runtimes the framework does not
 support. The framework targets Deno, and the published metadata and
-documentation shall state that plainly rather than leaving a Node consumer to
+documentation shall state that plainly rather than leaving a consumer to
 discover it through a runtime failure.
 
 ### Release gate
@@ -77,8 +82,7 @@ checks, uncommitted changes, or a version already published.
 ## Acceptance criteria
 
 - AC-F020-001: The repository declares one package name and one semantic
-  version, and the declared version matches the version published to both
-  registries.
+  version, and the declared version matches the version published to JSR.
 - AC-F020-002: The package declares an explicit export map, and every entry
   point it names resolves.
 - AC-F020-003: A module not named in the export map is not reachable as a
@@ -98,6 +102,11 @@ checks, uncommitted changes, or a version already published.
 
 - Supporting Node, Bun, or any runtime other than Deno.
 - A compatibility layer or polyfill for Deno-specific APIs.
+- Publication to npm, and reservation of the package name there. The name is
+  consequently unprotected on that registry.
+- An npm-installable executable. JSR declares no `bin` entry, so the CLI is
+  invoked as `deno run -A jsr:<package>/cli` and is not reachable through
+  `npx`.
 - Automated version selection, changelog generation, or release notes.
 - Publishing the SGAD workflow skill, which SH-F017 owns.
 - Deployment of applications built with the framework, which SH-F013 owns.
@@ -108,10 +117,11 @@ SH-F001 generates projects that import the published package, so the export map
 must satisfy what a generated project imports. SH-F011 owns the CLI entry point
 the package exposes as a binary.
 
-The framework depends on Deno KV, Deno Deploy, and Deno runtime APIs. npm
-publication is a distribution and naming channel for Deno consumers who install
-through npm specifiers. It is not a claim of Node support, and this requirement
-does not introduce one.
+The framework depends on Deno KV, Deno Deploy, and Deno runtime APIs. Reach to
+consumers installing through npm tooling comes from JSR's npm-compatible
+registry, which serves the JSR publication rather than a separate artifact.
+That is not a claim of Node support, and this requirement does not introduce
+one.
 
 ## Governance record
 
@@ -119,6 +129,71 @@ The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line
 ending. The status field is a lifecycle projection for routing and human
 readability; no other digest normalization is permitted.
+
+### Amendment: JSR-only distribution
+
+- Status: approved. The approval recorded under "Approval" below binds the
+  prior governed content, not this document; the binding approval for the
+  current content is recorded under "Approval, JSR-only amendment".
+- Raised at: 2026-08-09.
+- Change: npm is dropped entirely. The component publishes to JSR alone.
+  JSR's npm-compatible registry already serves the JSR publication to npm
+  tooling, so a duplicate artifact buys reach the project already has.
+  AC-F020-001 narrows from "both registries" to JSR.
+- Costs this decision accepts, recorded as out of scope rather than left
+  implicit: the package name is unprotected on npm and may be taken by someone
+  else, and the CLI is not reachable through `npx`.
+- Evidence for the change: `deno bundle --declaration` emits subpath
+  declarations that import unshipped source paths, and a `tsc` emit requires
+  reconstructing Deno's global and `node:` typings outside `deno check`. The
+  npm artifact was therefore not obtainable without a second toolchain to
+  maintain and verify.
+- Consequent implementation, authorized by the approval recorded below: the
+  `registries` tuple in `packaging/types.ts` and `packaging/release.ts`
+  declared `["jsr", "npm"]`, and the AC-F020-001 test in `packaging_test.ts`
+  asserted it. Both follow the amendment rather than precede it.
+
+### Approval, JSR-only amendment
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T18:51:45Z.
+- Approved criteria: AC-F020-001 through AC-F020-008, with AC-F020-001 narrowed
+  to JSR.
+- Governed-content digest:
+  `sha256:884426b459e705b4aefc7c0ee83aa76dc1c221085785648c13ae00f203c61134`.
+- Decision source: owner review; direct response `Approve` after review of the
+  drafted amendment, the two accepted costs recorded as out of scope, the named
+  consequent code changes, and the exact governed-content digest.
+
+### Red-state evidence, JSR-only amendment
+
+- Status: failed as expected for the one affected criterion.
+- Observed at: 2026-08-09, between 18:51:45Z and 18:53:22Z, after the approval
+  above and before any implementation change.
+- Command: `deno task test:packaging`.
+- Result: `9 passed | 1 failed`. AC-F020-001 failed with actual
+  `["jsr", "npm"]` against expected `["jsr"]`. The mapped test was narrowed
+  first and run against the unmodified implementation, so the failure is
+  credible red state rather than a test written after the fact.
+- Scope of the red run: the remaining seven criteria were unaffected by this
+  amendment and are not claimed to have fresh red-state evidence.
+
+### Verification, JSR-only amendment
+
+- Status: passed.
+- Verified at: 2026-08-09T18:53:22Z.
+- Commands: `deno task verify:packaging`, `deno task check:governance`, and the
+  canonical `npm run test:repository` from `website/`.
+- Result: `10 passed | 0 failed`; governed digests bind for 29 requirements;
+  the independent repository verifier reported `9 passed | 0 failed`.
+- Change made: the `registries` tuple narrowed to `["jsr"]` in
+  `packaging/types.ts` and `packaging/release.ts`, and the README status line
+  no longer claims a pending npm publication.
+- Residual risk: no publication has occurred, so AC-F020-001 continues to
+  verify the declared version against the release request rather than against a
+  live registry listing. The package name is unclaimed on npm by decision, and
+  a third party may take it.
 
 ### Approval
 
