@@ -25,7 +25,8 @@
       "generated",
       "**/*_test.ts",
       "**/testdata",
-      "**/requirements.md"
+      "**/requirements.md",
+      "examples"
     ]
   },
   "imports": {
@@ -90,6 +91,8 @@
     "verify:framework": "deno task verify:routing && deno task verify:validation && deno task verify:kv && deno task verify:security && deno task verify:config && deno task verify:testing && deno task verify:generate && deno task verify:services",
     "check:packaging": "deno check packaging/mod.ts packaging/packaging_test.ts",
     "test:packaging": "deno test --allow-read packaging/packaging_test.ts",
-    "verify:packaging": "deno fmt --check packaging/*.ts && deno lint packaging/*.ts && deno task check:packaging && deno task test:packaging"
+    "verify:packaging": "deno fmt --check packaging/*.ts && deno lint packaging/*.ts && deno task check:packaging && deno task test:packaging",
+    "test:example": "cd examples/todos && deno task test",
+    "verify:example": "cd examples/todos && deno task verify"
   }
 }

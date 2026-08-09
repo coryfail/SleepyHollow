@@ -354,7 +354,7 @@ function checkHandler(
       }),
     );
     const parsed = JSON.parse(
-      (code === 0 ? stdout[0] : stderr[0]) ?? "{}",
+      stdout[0] ?? stderr[0] ?? "{}",
     ) as Record<string, unknown>;
     const projectRoot = typeof parsed.projectRoot === "string" &&
         isAbsolute(parsed.projectRoot)
@@ -544,7 +544,7 @@ function testHandler(
       runner,
     );
     const parsed = JSON.parse(
-      (code === 0 ? stdout[0] : stderr[0]) ?? "{}",
+      stdout[0] ?? stderr[0] ?? "{}",
     ) as Record<string, unknown>;
     const diagnostics = Array.isArray(parsed.diagnostics)
       ? parsed.diagnostics.map((value) => {
