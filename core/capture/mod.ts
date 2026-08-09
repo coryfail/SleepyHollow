@@ -1,3 +1,13 @@
+/**
+ * Capture: recording what a run actually did, as evidence.
+ *
+ * A capture session wraps repositories, routes, and criterion tests to record
+ * the requests, responses, and storage effects a verification run produced.
+ * The persisted session is the evidence `hollow check` reads, so a claim that
+ * a criterion passes is backed by an observation rather than an assertion.
+ *
+ * @module
+ */
 import type { NormalizedRoute } from "../routing/mod.ts";
 import { repository } from "./repository.ts";
 import { route } from "./route.ts";

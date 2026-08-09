@@ -1,3 +1,13 @@
+/**
+ * Service decomposition: architecture, workspace scaffolding, and boundaries.
+ *
+ * An architecture names the services, what each one owns, and how they may
+ * reach one another. Boundary verification checks source against that
+ * declaration, so a service reading storage it does not own is caught as a
+ * violation rather than discovered later as coupling.
+ *
+ * @module
+ */
 import { normalizeArchitecture } from "./architecture.ts";
 import { openOwned, verifyBoundaries } from "./boundary.ts";
 import { scaffoldWorkspaces } from "./scaffold.ts";

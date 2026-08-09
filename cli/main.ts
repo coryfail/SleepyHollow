@@ -1,3 +1,18 @@
+/**
+ * The `hollow` command line, and its programmatic entry point.
+ *
+ * Run it without installing anything:
+ *
+ * ```bash
+ * deno run -A jsr:@sleepy-hollow/framework/cli create my-api
+ * ```
+ *
+ * JSR declares no binary, so the CLI is invoked through `deno run` and is not
+ * reachable through `npx`. {@linkcode runCli} exposes the same command surface
+ * to a caller that supplies its own I/O, which is how the CLI is tested.
+ *
+ * @module
+ */
 import { type CliDependencies, createCliHandlers } from "./adapters.ts";
 import {
   createCheckInventoryLoader,

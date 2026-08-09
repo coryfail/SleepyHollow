@@ -1,3 +1,13 @@
+/**
+ * Configuration, structured logging, and operational endpoints.
+ *
+ * Configuration is declared per runtime mode and resolved once at startup, so
+ * a missing or malformed value stops the process instead of surfacing as a
+ * failure on the first request that needs it. Liveness and readiness routes
+ * are built from the same declaration.
+ *
+ * @module
+ */
 export { defineConfiguration, resolveConfiguration } from "./configuration.ts";
 export { createJsonLogger } from "./logger.ts";
 export { createOperationalRoutes } from "./operational.ts";

@@ -1,3 +1,13 @@
+/**
+ * Test utilities that bind tests to acceptance criteria.
+ *
+ * A criterion test carries the identifier of the criterion it verifies, which
+ * makes traceability a property of the test suite rather than a document kept
+ * beside it. The same registry produces the manifest, the traceability report,
+ * and the red-state classification that gate a change.
+ *
+ * @module
+ */
 import { problem, testApplication } from "./application.ts";
 import { createRegistry, manifest } from "./criterion.ts";
 export { TestingError } from "./error.ts";
