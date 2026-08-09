@@ -14,6 +14,16 @@ hollow <command> [options]
 Every command accepts `--json` for machine-readable output on one line. Use
 `hollow help <command>` for command-specific usage.
 
+The CLI ships in the framework package. Install it as `hollow`:
+
+```bash
+deno install -A --global --name hollow jsr:@sleepy-hollow/framework/cli
+```
+
+Without installing, substitute `deno run -A jsr:@sleepy-hollow/framework/cli`
+for `hollow` in every command below. There is no `npx` equivalent, because JSR
+declares no binary entry.
+
 ## hollow create
 
 ```bash

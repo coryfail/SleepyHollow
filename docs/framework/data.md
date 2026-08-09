@@ -6,7 +6,8 @@ raw key manipulation.
 ## Defining a resource
 
 ```ts
-import { defineKvResource, z } from "@sleepy-hollow/framework/kv";
+import { defineKvResource } from "@sleepy-hollow/framework/kv";
+import { z } from "@sleepy-hollow/framework/validation";
 
 export const bookmarks = defineKvResource({
   name: "bookmarks",

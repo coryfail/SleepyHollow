@@ -5,6 +5,19 @@
 Deno 2.x. Sleepy Hollow uses Deno KV, Deno runtime APIs, and Deno Deploy, and
 does not run on Node or Bun.
 
+## Install the CLI
+
+The framework and its CLI are one package,
+[`@sleepy-hollow/framework`](https://jsr.io/@sleepy-hollow/framework) on JSR.
+Install the CLI as `hollow`:
+
+```bash
+deno install -A --global --name hollow jsr:@sleepy-hollow/framework/cli
+```
+
+Every `hollow` command below can also be run without installing, by substituting
+`deno run -A jsr:@sleepy-hollow/framework/cli` for `hollow`.
+
 ## Create a project
 
 ```bash

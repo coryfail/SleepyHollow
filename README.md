@@ -116,15 +116,27 @@ Hollow runtime or CLI dependency.
 Sleepy Hollow targets Deno. It uses Deno KV, Deno runtime APIs, and Deno Deploy.
 It does not support Node or Bun.
 
+Add the framework to a project:
+
 ```bash
 deno add jsr:@sleepy-hollow/framework
 ```
 
-The CLI ships in the same package:
+The CLI ships in the same package. Install it as `hollow`, which is how the
+documentation refers to it:
+
+```bash
+deno install -A --global --name hollow jsr:@sleepy-hollow/framework/cli
+```
+
+Or run it without installing anything:
 
 ```bash
 deno run -A jsr:@sleepy-hollow/framework/cli create my-api
 ```
+
+JSR declares no binary entry, so there is no `npx` equivalent. The CLI is
+reached through Deno or not at all.
 
 ## Deploying
 
