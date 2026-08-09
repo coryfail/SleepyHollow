@@ -1,11 +1,15 @@
 import { openKvTestContext } from "../kv/mod.ts";
+import type { NormalizedRoute } from "../routing/mod.ts";
+import { composeProjectSecurity } from "../security/mod.ts";
 import { testingDiagnostic, TestingError } from "./error.ts";
 import type {
   JsonTestResponse,
   ProblemDetails,
   ProblemExpectation,
+  TestApplication,
   TestApplicationContext,
   TestApplicationOptions,
+  TestApplicationSecurityOptions,
 } from "./types.ts";
 
 function equal(left: unknown, right: unknown): boolean {
@@ -101,6 +105,34 @@ export async function problem(
   return body as ProblemDetails;
 }
 
+function required<Principal, Credentials>(
+  options: TestApplicationOptions<Principal, Credentials>,
+): Required<Pick<TestApplicationOptions<Principal, Credentials>, "create">> {
+  if (options.create === undefined) {
+    throw new TestingError([testingDiagnostic(
+      "SH_TEST_APPLICATION_SOURCE_REQUIRED",
+      "A test application needs either an application factory or a route inventory.",
+      "Supply create or routes.",
+    )]);
+  }
+  return { create: options.create };
+}
+
+async function secured(
+  routes: readonly NormalizedRoute[],
+  security: TestApplicationSecurityOptions | undefined,
+): Promise<TestApplication> {
+  const router = await composeProjectSecurity(routes, {
+    mode: "test",
+    root: security?.root ?? ".",
+    ...(security?.securityModule === undefined
+      ? {}
+      : { securityModule: security.securityModule }),
+    ...(security?.load === undefined ? {} : { load: security.load }),
+  });
+  return { fetch: (request) => router.fetch(request) };
+}
+
 export async function testApplication<Principal, Credentials>(
   options: TestApplicationOptions<Principal, Credentials>,
 ): Promise<TestApplicationContext> {
@@ -116,15 +148,17 @@ export async function testApplication<Principal, Credentials>(
     }
   };
   try {
-    const application = await options.create({
-      kv: kvContext.kv,
-      principal: options.principal === undefined
-        ? undefined
-        : structuredClone(options.principal),
-      credentials: options.credentials === undefined
-        ? undefined
-        : structuredClone(options.credentials),
-    });
+    const application = options.routes === undefined
+      ? await required(options).create({
+        kv: kvContext.kv,
+        principal: options.principal === undefined
+          ? undefined
+          : structuredClone(options.principal),
+        credentials: options.credentials === undefined
+          ? undefined
+          : structuredClone(options.credentials),
+      })
+      : await secured(options.routes, options.security);
     await options.seed?.({ kv: kvContext.kv, application });
     const origin = new URL(options.origin ?? "http://sleepy-hollow.test");
     const fetchApplication = async (

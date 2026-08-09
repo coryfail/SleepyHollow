@@ -95,6 +95,23 @@ export interface SecurityOptions {
   readonly requestId?: () => string;
 }
 
+export interface SecurityDeclaration {
+  readonly providers?: Readonly<Record<string, AuthProvider>>;
+  readonly rateLimits?: Readonly<Record<string, RateLimitPolicy>>;
+  readonly cors?: CorsConfiguration;
+}
+
+export interface ProjectSecurityOptions {
+  readonly mode: SecurityMode;
+  readonly root: string;
+  readonly securityModule?: string;
+  readonly load?: (specifier: string) => Promise<unknown>;
+  readonly onDiagnostic?: (
+    diagnostic: SecurityDiagnostic | ValidationDiagnostic,
+  ) => void;
+  readonly requestId?: () => string;
+}
+
 export interface NormalizedSecurityRoute {
   readonly method: string;
   readonly path: string;

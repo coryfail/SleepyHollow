@@ -35,7 +35,7 @@ const problem = z.object({ title: z.string(), status: z.number() }).strict();
 export default defineRoute({
   GET: {
     schemas: { params, responses: { 200: bookmark, 404: problem } },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Return one bookmark" },
     handler: ({ params }) =>
       Response.json({ id: params.id, url: "https://example.com" }),
@@ -43,7 +43,7 @@ export default defineRoute({
 
   DELETE: {
     schemas: { params, responses: { 204: null, 404: problem } },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Delete one bookmark" },
     handler: () => new Response(null, { status: 204 }),
   },

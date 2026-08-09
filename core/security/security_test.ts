@@ -7,8 +7,10 @@ import type {
   RouteOperation,
 } from "../routing/mod.ts";
 import {
+  composeProjectSecurity,
   createMemoryRateLimiter,
   createSecurityRouter,
+  defineSecurity,
   redactSecurityData,
   type RouteSecurity,
   SecurityConfigurationError,
@@ -71,6 +73,21 @@ const json = async (response: Response) =>
   await response.json() as Record<string, unknown>;
 const request = (headers: HeadersInit = {}) =>
   new Request("https://api.test/vault/sleepy", { headers });
+
+async function rejection(
+  attempt: () => Promise<unknown>,
+): Promise<SecurityConfigurationError> {
+  try {
+    await attempt();
+  } catch (error) {
+    assert.ok(
+      error instanceof SecurityConfigurationError,
+      `expected SecurityConfigurationError, received ${error}`,
+    );
+    return error;
+  }
+  throw new assert.AssertionError({ message: "composition did not fail" });
+}
 
 Deno.test("AC-F005-001 · explicit none exposes null without invoking a provider", async () => {
   let providerCalls = 0;
@@ -697,4 +714,111 @@ Deno.test("AC-F005-011 · all responses carry secure headers and safe request ID
     fallbackResponse.headers.get("x-request-id") ?? "",
     /^[A-Za-z0-9._:-]{1,128}$/,
   );
+});
+
+Deno.test("AC-F005-012 · a declared security module supplies frozen composition inputs", async () => {
+  const declaration = defineSecurity({
+    providers: {
+      "project-auth": {
+        challenge: "Bearer realm=project",
+        authenticate: (incoming: Request) =>
+          Promise.resolve(
+            incoming.headers.get("authorization") === "Bearer good"
+              ? { id: "principal-1", type: "project-user" }
+              : null,
+          ),
+      },
+    },
+    rateLimits: {
+      "standard-api": {
+        limit: 5,
+        windowMs: 1_000,
+        key: () => "fixed",
+        limiter: createMemoryRateLimiter({ maxKeys: 4, clock: () => 0 }),
+      },
+    },
+    cors: { mode: "deny" as const },
+  });
+
+  assert.equal(Object.isFrozen(declaration), true);
+  assert.throws(() => {
+    (declaration as { cors: unknown }).cors = { mode: "allow" };
+  });
+
+  let loaded = "";
+  const app = await composeProjectSecurity([
+    route(
+      required({ rateLimit: "standard-api" }),
+      () => Response.json({ ok: true }),
+      requiredResponses({ 429: problemSchema, 503: problemSchema }),
+    ),
+  ], {
+    mode: "test",
+    root: "/projects/vault",
+    securityModule: "security.ts",
+    load: (specifier) => {
+      loaded = specifier;
+      return Promise.resolve({ default: declaration });
+    },
+  });
+
+  assert.match(loaded, /security\.ts$/);
+  assert.equal((await app.fetch(request())).status, 401);
+  assert.equal(
+    (await app.fetch(request({ authorization: "Bearer good" }))).status,
+    200,
+  );
+  assert.equal(app.routes[0].provider, "project-auth");
+  assert.equal(app.routes[0].rateLimitPolicy, "standard-api");
+  assert.equal(app.routes[0].corsMode, "deny");
+});
+
+Deno.test("AC-F005-013 · an absent module composes and an unresolvable one fails", async () => {
+  const open = await composeProjectSecurity([
+    route(none(), () => Response.json({ ok: true })),
+  ], { mode: "test", root: "/projects/vault" });
+
+  assert.equal((await open.fetch(request())).status, 200);
+  assert.equal(open.routes[0].authentication, "none");
+
+  const failure = await rejection(() =>
+    composeProjectSecurity([
+      route(none(), () => Response.json({ ok: true })),
+    ], {
+      mode: "test",
+      root: "/projects/vault",
+      securityModule: "security/missing.ts",
+      load: () => Promise.reject(new Error("module not found")),
+    })
+  );
+
+  assert.equal(failure.diagnostics.length > 0, true);
+  const reported = failure.diagnostics
+    .map((entry) => `${entry.summary} ${entry.source ?? ""}`)
+    .join(" ");
+  assert.match(reported, /security\/missing\.ts/);
+});
+
+Deno.test("AC-F005-014 · a required route without a resolvable provider fails at composition", async () => {
+  let handlerCalls = 0;
+  const failure = await rejection(() =>
+    composeProjectSecurity([
+      route(required(), () => {
+        handlerCalls += 1;
+        return Response.json({ ok: true });
+      }, requiredResponses()),
+    ], {
+      mode: "test",
+      root: "/projects/vault",
+      securityModule: "security.ts",
+      load: () => Promise.resolve({ default: defineSecurity({}) }),
+    })
+  );
+
+  assert.equal(handlerCalls, 0);
+  const reported = failure.diagnostics
+    .map((entry) => `${entry.summary} ${entry.route ?? ""}`)
+    .join(" ");
+  assert.match(reported, /project-auth/);
+  assert.match(reported, /GET \/vault\/:itemId/);
 });

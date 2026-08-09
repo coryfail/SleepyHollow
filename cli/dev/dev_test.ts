@@ -7,7 +7,9 @@ import {
   type DevWatcher,
   type PreparedDevRuntime,
   runDevCommand,
+  runDevWorker,
 } from "./mod.ts";
+import { loadRuntime } from "./worker.ts";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -440,4 +442,163 @@ Deno.test("AC-F015-007 · human and NDJSON lifecycle output remain equivalent an
     !human.join("\n").includes("production-token-value"),
     "human output leaked a credential",
   );
+});
+
+const FRAMEWORK = new URL("../../core", import.meta.url).href;
+
+async function securedProject(
+  securityModule: string | undefined,
+  moduleSource?: string,
+): Promise<string> {
+  const root = await Deno.makeTempDir();
+  const marker = `${root}/handler-entered`;
+  await Deno.mkdir(`${root}/api/vault`, { recursive: true });
+  await Deno.writeTextFile(
+    `${root}/sleepyhollow.config.ts`,
+    `export default { apiDirectory: "api"${
+      securityModule === undefined
+        ? ""
+        : `, securityModule: ${JSON.stringify(securityModule)}`
+    } };\n`,
+  );
+  await Deno.writeTextFile(
+    `${root}/api/vault/route.ts`,
+    `import { z } from "${FRAMEWORK}/validation/mod.ts";\n\n` +
+      "export default {\n" +
+      "  GET: {\n" +
+      "    schemas: {\n" +
+      "      responses: {\n" +
+      "        200: z.strictObject({ ok: z.boolean() }),\n" +
+      "        401: z.strictObject({\n" +
+      "          type: z.string(),\n" +
+      "          title: z.string(),\n" +
+      "          status: z.number(),\n" +
+      "          instance: z.string(),\n" +
+      "        }),\n" +
+      "      },\n" +
+      "    },\n" +
+      "    security: {\n" +
+      "      authentication: {\n" +
+      '        mode: "required",\n' +
+      '        provider: "project-auth",\n' +
+      '        requirementId: "AC-APP-014",\n' +
+      "      },\n" +
+      "    },\n" +
+      '    contract: { summary: "Read the vault" },\n' +
+      "    handler: () => {\n" +
+      `      Deno.writeTextFileSync(${JSON.stringify(marker)}, "entered");\n` +
+      "      return Response.json({ ok: true });\n" +
+      "    },\n" +
+      "  },\n" +
+      "};\n",
+  );
+  if (securityModule !== undefined && moduleSource !== undefined) {
+    await Deno.mkdir(
+      `${root}/${securityModule}`.replace(/\/[^/]+$/, ""),
+      { recursive: true },
+    );
+    await Deno.writeTextFile(`${root}/${securityModule}`, moduleSource);
+  }
+  return root;
+}
+
+async function entered(root: string): Promise<boolean> {
+  try {
+    await Deno.stat(`${root}/handler-entered`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+Deno.test("AC-F015-008 · a protected route rejects an unauthenticated local request", async () => {
+  const root = await securedProject(
+    "security.ts",
+    `import { defineSecurity } from "${FRAMEWORK}/security/mod.ts";\n\n` +
+      "export default defineSecurity({\n" +
+      "  providers: {\n" +
+      '    "project-auth": {\n' +
+      '      challenge: "Bearer realm=project",\n' +
+      "      authenticate: (request) =>\n" +
+      "        Promise.resolve(\n" +
+      '          request.headers.get("authorization") === "Bearer good"\n' +
+      '            ? { id: "user-1", type: "project-user" }\n' +
+      "            : null,\n" +
+      "        ),\n" +
+      "    },\n" +
+      "  },\n" +
+      "});\n",
+  );
+
+  const { runtime } = await loadRuntime(root);
+  const controller = new AbortController();
+  const port = unusedPort();
+  const server = Deno.serve({
+    hostname: "127.0.0.1",
+    port,
+    signal: controller.signal,
+    onListen: () => undefined,
+  }, (request) => runtime.fetch(request));
+
+  try {
+    const rejected = await fetch(`http://127.0.0.1:${port}/vault`);
+    await rejected.body?.cancel();
+    assert(
+      rejected.status === 401,
+      `expected 401, received ${rejected.status}`,
+    );
+    assert(
+      rejected.headers.get("www-authenticate") === "Bearer realm=project",
+      "the provider challenge must be returned",
+    );
+    assert(
+      !(await entered(root)),
+      "the handler must not run for an unauthenticated request",
+    );
+
+    const accepted = await fetch(`http://127.0.0.1:${port}/vault`, {
+      headers: { authorization: "Bearer good" },
+    });
+    await accepted.body?.cancel();
+    assert(
+      accepted.status === 200,
+      `expected 200, received ${accepted.status}`,
+    );
+  } finally {
+    controller.abort();
+    await server.finished;
+  }
+});
+
+Deno.test("AC-F015-009 · an uncomposable security declaration fails startup", async () => {
+  const unresolvable = await securedProject("security/missing.ts");
+  const malformed = await securedProject(
+    "security.ts",
+    "export default { providers: 42 };\n",
+  );
+
+  for (const root of [unresolvable, malformed]) {
+    const errors: string[] = [];
+    const original = console.error;
+    console.error = (line: unknown) => errors.push(String(line));
+    let status: number;
+    try {
+      status = await runDevWorker([
+        "validate",
+        root,
+        "127.0.0.1",
+        String(unusedPort()),
+      ]);
+    } finally {
+      console.error = original;
+    }
+
+    assert(status !== 0, `${root} must fail startup`);
+    const reported = errors.join(" ");
+    assert(
+      !reported.includes('"ready":true'),
+      "no active event may be emitted",
+    );
+    assert(reported.includes("diagnostics"), "the cause must be reported");
+  }
 });

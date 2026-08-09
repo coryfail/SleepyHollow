@@ -71,7 +71,7 @@ export default defineRoute({
       },
       responses: { 201: created, 422: problem },
     },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Create a bookmark" },
     handler: ({ body }) => Response.json({ url: body.url }, { status: 201 }),
   },
@@ -88,7 +88,8 @@ Five things are mandatory and none of them have a silent default:
 - **Response schemas** for every status the route can return, including
   failures. A bodyless status is declared as literal `null`, as in
   `responses: { 204: null }`.
-- **`authentication`**, explicitly `"none"` or `"required"`.
+- **`authentication`**, explicitly `{ mode: "none" }`, or `{ mode: "required" }`
+  with the `provider` name and governing `requirementId`.
 
 These are enforced when the runtime starts, so a route that violates them fails
 to boot rather than failing on a request.

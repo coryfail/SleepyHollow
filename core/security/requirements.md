@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F005
 title: Security and authorization boundaries
-status: draft
+status: approved
 risk: high
 source_sections:
   - "7"
@@ -210,6 +210,15 @@ mutate provider wiring after composition.
   API keys, or another single authentication model for every project.
 - AC-F005-011: Successful and rejected responses carry secure API headers and a
   validated or generated request ID without reflecting secret request material.
+- AC-F005-012: A module named by `securityModule` whose default export is
+  produced by `defineSecurity` supplies the providers, rate limits, and CORS
+  used to compose the runtime, and the returned declaration is frozen.
+- AC-F005-013: A project naming no `securityModule` composes successfully when
+  every route declares `authentication: "none"`, and a named module that cannot
+  be resolved fails composition with the named path.
+- AC-F005-014: A route declaring a required authentication mode with no
+  resolvable provider fails when the runtime is composed, naming the route and
+  the missing provider, rather than failing on the first request.
 
 ## Out of scope
 
@@ -238,6 +247,20 @@ The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line
 ending. The status field is a lifecycle projection for routing and human
 readability; no other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T02:14:08Z.
+- Approved criteria: AC-F005-001 through AC-F005-014.
+- Governed-content digest:
+  `sha256:0150867cffe2398f2b598c71874ab5efc325a332ce54da1e87fe6a3352f6fd90`.
+- Decision source: Claude conversation; direct response `Approved` after review
+  of the project security declaration, the explicit `securityModule` naming that
+  replaces convention-based discovery, composition-time failure for a required
+  route with no resolvable provider, the three amended criteria, and the exact
+  governed-content digest.
 
 ### Approval
 
@@ -274,15 +297,62 @@ readability; no other digest normalization is permitted.
 - AC-F005-010 -> `security_test.ts` neutral public API surface test.
 - AC-F005-011 -> `security_test.ts` successful and rejected secure-header and
   request-ID test.
-- AC-F005-010: A module named by `securityModule` whose default export is
-  produced by `defineSecurity` supplies the providers, rate limits, and CORS
-  used to compose the runtime, and the returned declaration is frozen.
-- AC-F005-011: A project naming no `securityModule` composes successfully when
-  every route declares `authentication: "none"`, and a named module that cannot
-  be resolved fails composition with the named path.
-- AC-F005-012: A route declaring a required authentication mode with no
-  resolvable provider fails when the runtime is composed, naming the route and
-  the missing provider, rather than failing on the first request.
+- AC-F005-012 -> `security_test.ts` declared security module composition and
+  frozen declaration test.
+- AC-F005-013 -> `security_test.ts` absent and unresolvable module test.
+- AC-F005-014 -> `security_test.ts` composition-time unresolved provider test.
+
+### Red-state evidence, security composition amendment
+
+- Status: failed as expected.
+- Observed at: 2026-08-09T02:19:00Z.
+- Base revision: `acf8dce4f89517ac22fecbda637199899ff5cbad` plus the approved
+  SH-F005 amendment, the three mapped tests, and the typed
+  `defineSecurity`/`composeProjectSecurity` seam in
+  `core/security/declaration.ts`.
+- Commands: `deno task check:security` and `deno task test:security` using Deno
+  `2.9.5` on macOS arm64.
+- Runtime-test digest:
+  `sha256:3ff24e0075eed47ef4be020d4da809ae3e712b0007ba60de7b0ae297e52c2c65`.
+- Dependency-lock digest:
+  `sha256:b7b0409bba98389242b2fb187b839350a508cc96e21e06b038e04ae0b053d340`.
+- Result: type checking passed; security passed 11/14 with six nested steps.
+  AC-F005-012, AC-F005-013, and AC-F005-014 failed and the eleven previously
+  verified criteria continued to pass.
+- Expected failure: each new criterion reached the healthy Deno runner and
+  failed only through the explicit `SH_SECURITY_NOT_IMPLEMENTED` seam.
+  AC-F005-012 and AC-F005-013 failed at the seam itself; AC-F005-014 reached the
+  seam's error and failed its content assertion because the seam names no route
+  or provider. No compilation, dependency, permission, or unrelated regression
+  failure obscured the missing approved behavior.
+
+### Verification, security composition amendment
+
+- Status: passed.
+- Verified at: 2026-08-09T11:07:55Z.
+- Approved requirement digest:
+  `sha256:0150867cffe2398f2b598c71874ab5efc325a332ce54da1e87fe6a3352f6fd90`.
+- Current runtime-test digest:
+  `sha256:3ff24e0075eed47ef4be020d4da809ae3e712b0007ba60de7b0ae297e52c2c65`.
+- Command: `deno task verify:security` using Deno `2.9.5` on macOS arm64.
+- Result: formatting, linting, and type checking passed; security passed 14/14
+  with six nested steps. No prior criterion regressed.
+- Verified behavior adds `defineSecurity`, which freezes the declaration and its
+  provider and rate-limit records, and `composeProjectSecurity`, which resolves
+  a project-relative `securityModule`, rejects an absolute or escaping path,
+  reports an unresolvable module by the name the project declared, validates the
+  default export's provider, rate-limit, and CORS shapes, and delegates to
+  `createSecurityRouter` so a required route with no resolvable provider fails
+  at composition rather than on the first request.
+- Residual boundary: the module is resolved by dynamic import through an
+  injectable loader. Whether a project's security module itself is well designed
+  remains an application concern, unchanged by this amendment.
+- Independent verifier state: `test:structure` 16/16 and `test:links` 1/1
+  passed; `test:repository` passed 7/9. AC-REPO-001 fails on the example
+  project's endpoint requirements, a defect that predates this amendment and is
+  unrelated to it, and AC-REPO-010 reports uncommitted SH-F007 draft drift. The
+  `verified` status projection is therefore withheld until the canonical
+  repository verifier is green; this component's own gate passed in full.
 
 ### Red-state evidence
 

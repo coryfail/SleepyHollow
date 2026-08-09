@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { z } from "zod";
 
+import type { NormalizedRoute, RouteOperation } from "../routing/mod.ts";
+import { defineSecurity, type RouteSecurity } from "../security/mod.ts";
 import {
   classifyRedState,
   createCriterionRegistry,
@@ -380,4 +383,103 @@ Deno.test("AC-F007-010 · verification eligibility requires every criterion to p
     ],
   });
   assert.equal(complete.eligibleForVerification, true);
+});
+
+const okSchema = z.strictObject({ ok: z.boolean() });
+const problemSchema = z.strictObject({
+  type: z.string(),
+  title: z.string(),
+  status: z.number(),
+  instance: z.string(),
+});
+
+function securedRoute(
+  security: RouteSecurity,
+  handler: () => Response,
+  responses: Readonly<Record<number, z.ZodType | null>> = { 200: okSchema },
+): NormalizedRoute {
+  return {
+    method: "GET",
+    path: "/bookmarks",
+    source: "api/bookmarks/route.ts",
+    parameterNames: [],
+    operation: {
+      schemas: { responses },
+      security,
+      contract: { summary: "List bookmarks" },
+      handler: handler as RouteOperation["handler"],
+    },
+  };
+}
+
+Deno.test("AC-F007-011 · a protected route rejects an uncredentialed test request", async () => {
+  let handlerCalls = 0;
+  const context = await createTestApplication({
+    routes: [
+      securedRoute({
+        authentication: {
+          mode: "required",
+          provider: "project-auth",
+          requirementId: "AC-APP-014",
+        },
+      }, () => {
+        handlerCalls += 1;
+        return Response.json({ ok: true });
+      }, { 200: okSchema, 401: problemSchema }),
+    ],
+    security: {
+      root: "/projects/bookmarks",
+      securityModule: "security.ts",
+      load: () =>
+        Promise.resolve({
+          default: defineSecurity({
+            providers: {
+              "project-auth": {
+                challenge: "Bearer realm=project",
+                authenticate: (request: Request) =>
+                  Promise.resolve(
+                    request.headers.get("authorization") === "Bearer good"
+                      ? { id: "user-1", type: "project-user" }
+                      : null,
+                  ),
+              },
+            },
+          }),
+        }),
+    },
+  });
+
+  const rejected = await context.fetch("/bookmarks");
+  await context.assertProblem(rejected, { status: 401 });
+  assert.equal(
+    rejected.headers.get("www-authenticate"),
+    "Bearer realm=project",
+  );
+  assert.equal(handlerCalls, 0);
+
+  const accepted = await context.fetch("/bookmarks", {
+    headers: { authorization: "Bearer good" },
+  });
+  assert.equal(accepted.status, 200);
+  assert.equal(handlerCalls, 1);
+  await context.close();
+});
+
+Deno.test("AC-F007-012 · an undeclared security module serves open routes unchanged", async () => {
+  let handlerCalls = 0;
+  const context = await createTestApplication({
+    routes: [
+      securedRoute({ authentication: { mode: "none" } }, () => {
+        handlerCalls += 1;
+        return Response.json({ ok: true });
+      }),
+    ],
+    security: { root: "/projects/bookmarks" },
+  });
+
+  const response = await context.fetch("/bookmarks");
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true });
+  assert.equal(handlerCalls, 1);
+  await context.close();
 });

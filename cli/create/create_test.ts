@@ -202,3 +202,47 @@ Deno.test("AC-F001-011 · the generated test task produces a capture artifact", 
     assert.equal(artifact.schema, "sleepy-hollow-capture/v1");
     assert.ok(typeof artifact.revision === "string");
   }));
+
+Deno.test("AC-F001-012 · the typed configuration accepts an optional security module", () =>
+  temporary(async (directory) => {
+    await createProject({ name: "declared", directory });
+    const root = join(directory, "declared");
+
+    const contract = await Deno.readTextFile(
+      join(root, ".sleepyhollow", "project.ts"),
+    );
+    assert.match(contract, /readonly securityModule\?: string;/);
+
+    const scaffolded = await Deno.readTextFile(
+      join(root, "sleepyhollow.config.ts"),
+    );
+    assert.doesNotMatch(
+      scaffolded,
+      /securityModule/,
+      "an empty scaffold has no route to protect and must declare none",
+    );
+
+    const check = async (label: string) => {
+      const output = await new Deno.Command(Deno.execPath(), {
+        args: ["task", "check"],
+        cwd: root,
+        stdout: "piped",
+        stderr: "piped",
+      }).output();
+      assert.equal(
+        output.code,
+        0,
+        `${label}: ${new TextDecoder().decode(output.stderr)}`,
+      );
+    };
+
+    await check("absent");
+    await Deno.writeTextFile(
+      join(root, "sleepyhollow.config.ts"),
+      scaffolded.replace(
+        /generatedDirectory: "generated",/,
+        'generatedDirectory: "generated",\n    securityModule: "security.ts",',
+      ),
+    );
+    await check("present");
+  }));

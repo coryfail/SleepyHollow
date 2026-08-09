@@ -1,3 +1,5 @@
+import type { NormalizedRoute } from "../routing/mod.ts";
+
 export type TestResultStatus = "passed" | "failed" | "skipped";
 
 export interface ApprovedCriterion {
@@ -135,10 +137,18 @@ export interface TestApplication {
   fetch(request: Request): Response | Promise<Response>;
 }
 
+export interface TestApplicationSecurityOptions {
+  readonly root: string;
+  readonly securityModule?: string;
+  readonly load?: (specifier: string) => Promise<unknown>;
+}
+
 export interface TestApplicationOptions<Principal, Credentials> {
-  readonly create: (
+  readonly create?: (
     context: TestApplicationFactoryContext<Principal, Credentials>,
   ) => TestApplication | Promise<TestApplication>;
+  readonly routes?: readonly NormalizedRoute[];
+  readonly security?: TestApplicationSecurityOptions;
   readonly principal?: Principal;
   readonly credentials?: Credentials;
   readonly seed?: (context: {

@@ -26,7 +26,7 @@ const problem = (title: string, status: number) =>
 export default defineRoute({
   GET: {
     schemas: { params, responses: { 200: todoShape, 404: problemShape } },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Read one todo" },
     handler: async ({ params }) => {
       const repository = await todoRepository();
@@ -42,7 +42,7 @@ export default defineRoute({
       body: { schema: patchBody, maxBytes: 4096 },
       responses: { 200: todoShape, 404: problemShape, 409: problemShape },
     },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Update one todo" },
     handler: async ({ params, body }) => {
       const repository = await todoRepository();
@@ -65,7 +65,7 @@ export default defineRoute({
 
   DELETE: {
     schemas: { params, responses: { 204: null, 404: problemShape } },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Delete one todo" },
     handler: async ({ params }) => {
       const repository = await todoRepository();

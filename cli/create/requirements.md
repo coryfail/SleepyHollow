@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "3.1"
@@ -10,6 +10,7 @@ source_sections:
   - "15.1"
 depends_on:
   - SH-F019
+  - SH-F005
 open_decisions: []
 owners:
   - Sleepy Hollow maintainers
@@ -38,10 +39,11 @@ It shall validate the project name and destination before writing, avoid hidden
 destructive changes, and provide actionable failures. The generated application
 shall not contain example endpoints presented as approved product behavior.
 
-The scaffold shall make the intended locations for `requirements/application.md`,
-endpoint-local requirements, runtime configuration, API routes, models, tests,
-and generated artifacts evident. It shall include concise guidance for activating
-or installing the official skill in supported agent environments.
+The scaffold shall make the intended locations for
+`requirements/application.md`, endpoint-local requirements, runtime
+configuration, API routes, models, tests, and generated artifacts evident. It
+shall include concise guidance for activating or installing the official skill
+in supported agent environments.
 
 ### Capture-aware test setup
 
@@ -54,10 +56,23 @@ Without this, a newly created project yields no capture artifact, and its first
 `hollow check` fails closed for missing evidence rather than for any defect in
 the project.
 
+### Declared security module
+
+The typed project configuration shall carry an optional `securityModule` value
+naming the project-relative module that declares the project's authentication
+providers, rate-limit policies, and CORS configuration under SH-F005. The
+scaffold shall create no such module and shall declare no value, because a new
+project has no endpoint and therefore no route to protect.
+
+The field belongs here because this configuration is the only artifact every
+project has before it has behavior, and SH-F005 requires the declaration to be
+explicit rather than discovered by scanning. A project cannot name its security
+module if the typed configuration has nowhere to name it.
+
 ## Acceptance criteria
 
-- AC-F001-001: Given a valid name and writable empty destination, `hollow create`
-  creates the project and exits successfully.
+- AC-F001-001: Given a valid name and writable empty destination,
+  `hollow create` creates the project and exits successfully.
 - AC-F001-002: A newly created project passes its documented type-check and
   framework validation commands before any endpoint is added.
 - AC-F001-003: The scaffold contains a typed SleepyHollow configuration, an API
@@ -70,11 +85,18 @@ the project.
   explicitly documented option authorizes each overwrite.
 - AC-F001-007: `hollow create --json` returns a stable result containing the
   project path, created files, next actions, and any diagnostics.
-- AC-F001-008: Repeating the command against the created destination fails safely
-  and preserves the existing project.
-- AC-F001-009: Following the supported installation procedure makes the
-  `hollow` CLI available and reports its installed version without requiring a
-  source checkout.
+- AC-F001-008: Repeating the command against the created destination fails
+  safely and preserves the existing project.
+- AC-F001-009: Following the supported installation procedure makes the `hollow`
+  CLI available and reports its installed version without requiring a source
+  checkout.
+- AC-F001-010: A generated project includes test setup that creates a capture
+  session and persists its artifact to the declared generated location.
+- AC-F001-011: Running the generated project's own test task produces a capture
+  artifact at the declared generated location.
+- AC-F001-012: The generated typed project configuration accepts an optional
+  `securityModule` value and type-checks both with it present and with it
+  absent, and the scaffold declares none.
 
 ## Out of scope
 
@@ -89,10 +111,24 @@ implementation. That choice must not change the observable scaffold contract.
 
 ## Governance record
 
-The governed-content digest covers the exact UTF-8 bytes before this heading after
-omitting the single top-level frontmatter `status:` line and its line ending. The
-status field is a lifecycle projection for routing and human readability; no
-other digest normalization is permitted.
+The governed-content digest covers the exact UTF-8 bytes before this heading
+after omitting the single top-level frontmatter `status:` line and its line
+ending. The status field is a lifecycle projection for routing and human
+readability; no other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T02:14:08Z.
+- Approved criteria: AC-F001-001 through AC-F001-012.
+- Governed-content digest:
+  `sha256:f8887e434d3062cc2d5e20dd4076aa8fa2d64fbc5d3f77ac455f00fb171dc59e`.
+- Decision source: Claude conversation; direct response `Approved` after review
+  of the optional `securityModule` value in the typed project configuration, the
+  scaffold declaring none because a new project has no route to protect, the
+  added SH-F005 dependency, the relocation of AC-F001-010 and AC-F001-011 into
+  governed content, and the exact governed-content digest.
 
 ### Approval
 
@@ -103,7 +139,8 @@ other digest normalization is permitted.
 - Governed-content digest:
   `sha256:e060e03477a9e6d1c4f2e23205e16f7a0082d4ca3eb04d9ee5e19e8ffd3cd7f8`.
 - Decision source: Claude conversation; direct response `Approve` after review
-  of the capture-aware test setup amendment and the exact governed-content digest.
+  of the capture-aware test setup amendment and the exact governed-content
+  digest.
 
 ### Approval
 
@@ -128,8 +165,8 @@ other digest normalization is permitted.
   `generated/capture.json` was produced by the project's own test run rather
   than authored by a fixture.
 - Scaffold decision recorded: the generated capture setup is self-contained
-  rather than importing the framework, because no package is published yet and
-  a scaffold that imports an unpublished specifier cannot resolve. Once SH-F020
+  rather than importing the framework, because no package is published yet and a
+  scaffold that imports an unpublished specifier cannot resolve. Once SH-F020
   publishes, the scaffold should import the SH-F019 helpers instead of carrying
   its own copy.
 - Test correction: AC-F001-010 initially asserted the specific framework import
@@ -155,10 +192,50 @@ other digest normalization is permitted.
 - AC-F001-007 -> `create_test.ts` stable JSON result and diagnostic test.
 - AC-F001-008 -> `create_test.ts` repeat-attempt preservation test.
 - AC-F001-009 -> `create_test.ts` compiled standalone CLI version test.
-- AC-F001-010: A generated project includes test setup that creates a capture
-  session and persists its artifact to the declared generated location.
-- AC-F001-011: Running the generated project's own test task produces a capture
-  artifact at the declared generated location.
+- AC-F001-010 -> `create_test.ts` scaffolded capture-session setup test.
+- AC-F001-011 -> `create_test.ts` generated-project capture-artifact test.
+- AC-F001-012 -> `create_test.ts` optional security-module configuration test.
+
+### Red-state evidence, security-module amendment
+
+- Status: failed as expected.
+- Observed at: 2026-08-09T02:20:30Z.
+- Base revision: `acf8dce4f89517ac22fecbda637199899ff5cbad` plus the approved
+  SH-F001 amendment and its one mapped test.
+- Commands: `deno task check:create` and `deno task test:create` using Deno
+  `2.9.5` on macOS arm64.
+- Runtime-test digest:
+  `sha256:a4514618ac0d99fa212844fc5c48406b0970a71c9424ba4ddf3eb7ca53958a3c`.
+- Dependency-lock digest:
+  `sha256:b7b0409bba98389242b2fb187b839350a508cc96e21e06b038e04ae0b053d340`.
+- Result: type checking passed; creation passed 11/12. AC-F001-012 failed and
+  the eleven previously verified criteria continued to pass.
+- Expected failure: the generated `.sleepyhollow/project.ts` contract declares
+  no `securityModule` member, so the criterion failed on the missing field
+  rather than on any scaffold, permission, or subprocess failure. The scaffold
+  and type-check assertions were never reached.
+
+### Verification, security-module amendment
+
+- Status: passed.
+- Verified at: 2026-08-09T11:07:55Z.
+- Approved requirement digest:
+  `sha256:f8887e434d3062cc2d5e20dd4076aa8fa2d64fbc5d3f77ac455f00fb171dc59e`.
+- Current runtime-test digest:
+  `sha256:a4514618ac0d99fa212844fc5c48406b0970a71c9424ba4ddf3eb7ca53958a3c`.
+- Command: `deno task verify:create` using Deno `2.9.5` on macOS arm64.
+- Result: formatting, linting, and type checking passed; creation passed 12/12.
+  No prior criterion regressed.
+- Verified behavior: the generated `.sleepyhollow/project.ts` contract declares
+  `readonly securityModule?: string`, the scaffolded configuration declares no
+  value, and the generated project's own `deno task check` passes both with the
+  value absent and with it present.
+- Independent verifier state: `test:structure` 16/16 and `test:links` 1/1
+  passed; `test:repository` passed 7/9. AC-REPO-001 fails on the example
+  project's endpoint requirements, a defect that predates this amendment and is
+  unrelated to it, and AC-REPO-010 reports uncommitted SH-F007 draft drift. The
+  `verified` status projection is therefore withheld until the canonical
+  repository verifier is green; this component's own gate passed in full.
 
 ### Red-state evidence
 
@@ -195,19 +272,18 @@ other digest normalization is permitted.
 - Product implementation manifest:
   `working-tree:sha256:de690a4fe42299b5a1ea5d1c6c52a539b5909340d0b3e90a20ee3c07597d6c20`
   across 57 sorted framework and project-creation source, fixture, test,
-  configuration, dependency-lock, repository-control, and CI files. Each
-  record is `<relative-path>\0<file-sha256>\n` before hashing the sorted stream.
+  configuration, dependency-lock, repository-control, and CI files. Each record
+  is `<relative-path>\0<file-sha256>\n` before hashing the sorted stream.
 - Current runtime-test digest:
   `sha256:c07b575faafaf8013f01a18832194e5fdc2cdefcf8ef39094dba7b1c8d3706d5`.
 - Dependency-lock digest:
   `sha256:8405839670a88a985b955e1bacd52b08588cf437a854094deddd2612b42355e7`.
 - Commands: `deno task verify:create`, `deno task verify:framework`,
   `git diff --check`, and the canonical `npm run verify` from `website/`.
-- Results: creation passed 9/9; the generated scaffold independently passed
-  its documented format, lint, type, test, and structure verifier; and the
-  compiled standalone binary reported `hollow 0.1.0`. Framework formatting,
-  linting, type checking, and all 48 component tests with thirteen nested steps
-  passed.
+- Results: creation passed 9/9; the generated scaffold independently passed its
+  documented format, lint, type, test, and structure verifier; and the compiled
+  standalone binary reported `hollow 0.1.0`. Framework formatting, linting, type
+  checking, and all 48 component tests with thirteen nested steps passed.
 - Independent repository results: structural 16/16, links 1/1, repository
   consistency 9/9, React 8/8, TypeScript/build, and Playwright/Axe 66/66 across
   Chromium, Firefox, and WebKit passed. The repository-consistency test digest
@@ -215,9 +291,9 @@ other digest normalization is permitted.
   `sha256:a909a928e37ea21a2f7af88604948f97fc9afbf162d4eef24c73929fa96215d6`.
 - Verified behavior includes atomic staging and rename, strict safe-name and
   existing-destination refusal, deterministic files, a typed empty
-  configuration, canonical planning locations, official-skill guidance,
-  stable JSON success/failure surfaces, repeat preservation, and a self-
-  contained compiled CLI artifact. No example endpoint is generated.
+  configuration, canonical planning locations, official-skill guidance, stable
+  JSON success/failure surfaces, repeat preservation, and a self- contained
+  compiled CLI artifact. No example endpoint is generated.
 - Residual boundary: no package registry publication or end-user installer was
   delivered; the verified distribution artifact is the Deno-compiled standalone
   executable. No commit, push, publication, deployment, or other delivery was

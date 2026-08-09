@@ -3,11 +3,12 @@ import { pathToFileURL } from "node:url";
 
 import { resolveConfiguration } from "../../core/config/mod.ts";
 import { discoverRoutes } from "../../core/routing/mod.ts";
-import { createValidatedRouter } from "../../core/validation/mod.ts";
+import { composeProjectSecurity } from "../../core/security/mod.ts";
 import { DevCommandError, type DevDiagnostic } from "./types.ts";
 
 interface WorkerProject {
   readonly apiDirectory?: string;
+  readonly securityModule?: string;
   readonly configuration?: Parameters<typeof resolveConfiguration>[0];
 }
 
@@ -86,7 +87,7 @@ function safeDiagnostic(
   }];
 }
 
-async function loadRuntime(projectRoot: string) {
+export async function loadRuntime(projectRoot: string) {
   const root = await Deno.realPath(resolve(projectRoot));
   const configPath = resolve(root, "sleepyhollow.config.ts");
   if (!contained(root, configPath)) {
@@ -140,7 +141,13 @@ async function loadRuntime(projectRoot: string) {
     });
   }
   const routes = await discoverRoutes(realApiRoot);
-  const runtime = createValidatedRouter(routes);
+  const runtime = await composeProjectSecurity(routes, {
+    mode: "development",
+    root,
+    ...(project.securityModule === undefined
+      ? {}
+      : { securityModule: project.securityModule }),
+  });
   return { runtime, routeCount: runtime.routes.length };
 }
 

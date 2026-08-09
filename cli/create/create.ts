@@ -13,7 +13,7 @@ function files(name: string): Readonly<Record<string, string>> {
   return {
     ".gitignore": "generated/*\n!generated/.gitkeep\n",
     ".sleepyhollow/project.ts":
-      `export interface SleepyHollowProject {\n  readonly name: string;\n  readonly apiDirectory: string;\n  readonly requirementsFile: string;\n  readonly generatedDirectory: string;\n}\n\nexport function defineProject<const Project extends SleepyHollowProject>(\n  project: Project,\n): Project {\n  return Object.freeze(project);\n}\n`,
+      `export interface SleepyHollowProject {\n  readonly name: string;\n  readonly apiDirectory: string;\n  readonly requirementsFile: string;\n  readonly generatedDirectory: string;\n  readonly securityModule?: string;\n}\n\nexport function defineProject<const Project extends SleepyHollowProject>(\n  project: Project,\n): Project {\n  return Object.freeze(project);\n}\n`,
     ".sleepyhollow/verify.ts":
       `import config from "../sleepyhollow.config.ts";\n\nconst required = [\n  "api",\n  "generated",\n  "models",\n  "requirements/application.md",\n  "tests",\n];\nfor (const path of required) await Deno.stat(path);\nif (\n  config.apiDirectory !== "api" ||\n  config.requirementsFile !== "requirements/application.md" ||\n  config.generatedDirectory !== "generated"\n) {\n  throw new Error("Invalid Sleepy Hollow project configuration");\n}\nconsole.log("Sleepy Hollow scaffold verified");\n`,
     "README.md":

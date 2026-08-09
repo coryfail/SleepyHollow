@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F015
 title: Local development command
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "12"
@@ -170,6 +170,10 @@ the reported cause and shall not fall back to serving routes unprotected.
   resources.
 - AC-F015-007: Structured mode emits versioned startup, reload, diagnostic, and
   shutdown events without requiring automation to parse human prose.
+- AC-F015-008: A route declaring a required authentication mode rejects an
+  unauthenticated local request rather than invoking its handler.
+- AC-F015-009: A project whose security declaration cannot be composed fails
+  startup with the reported cause and serves no route unprotected.
 
 ## Out of scope
 
@@ -205,6 +209,8 @@ binding.
 | AC-F015-005 | Project, route, configuration, bind, and watcher startup failures proving nonzero status, safe locations, no false active event, and complete partial cleanup.               |
 | AC-F015-006 | SIGINT, SIGTERM, cancellation, and repeated-stop probes proving idempotent ordered watcher/runtime cleanup and resource reuse.                                               |
 | AC-F015-007 | Mixed startup, reload, diagnostic, and shutdown fixtures proving immediate human/NDJSON parity, contiguous sequencing, stable schema, deterministic ordering, and redaction. |
+| AC-F015-008 | A served project fixture declaring a required authentication mode proving an unauthenticated request receives the declared 401 and the handler is never entered.             |
+| AC-F015-009 | An unresolvable and a malformed security declaration proving nonzero startup status, the reported cause, no active event, and no request served.                             |
 
 ## Governance record
 
@@ -212,6 +218,19 @@ The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line
 ending. The status field is a lifecycle projection for routing and human
 readability; no other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T02:14:08Z.
+- Approved criteria: AC-F015-001 through AC-F015-009.
+- Governed-content digest:
+  `sha256:6caaf407cc44e7977b5a87f88879c3bfba32847ebce870057db24721d6b39f98`.
+- Decision source: Claude conversation; direct response `Approved` after review
+  of security composition in the development runtime, startup failure rather
+  than a fallback that serves routes unprotected, the two amended criteria and
+  their evidence-map rows, and the exact governed-content digest.
 
 ### Approval
 
@@ -234,10 +253,35 @@ readability; no other digest normalization is permitted.
   tests in `cli/dev/dev_test.ts`.
 - Governed test digest:
   `sha256:615502b26885394ae4a453636385bba10023a5b6586ddc2b20d8bdecc3f1914f`.
-- AC-F015-008: A route declaring a required authentication mode rejects an
-  unauthenticated local request rather than invoking its handler.
-- AC-F015-009: A project whose security declaration cannot be composed fails
-  startup with the reported cause and serves no route unprotected.
+- AC-F015-008 -> `dev_test.ts` served protected-route rejection test.
+- AC-F015-009 -> `dev_test.ts` uncomposable security declaration startup test.
+
+### Red-state evidence, security composition amendment
+
+- Status: failed as expected, and reproduces the recorded defect below.
+- Observed at: 2026-08-09T02:22:10Z.
+- Base revision: `acf8dce4f89517ac22fecbda637199899ff5cbad` plus the approved
+  SH-F015 amendment and its two mapped tests.
+- Commands: `deno task check:dev` and `deno task test:dev` using Deno `2.9.5` on
+  macOS arm64 with loopback access.
+- Runtime-test digest:
+  `sha256:ef146d67ccb88e7433b4a053295dcb93aad2c494fdbb09f973b958d06b79a424`.
+- Dependency-lock digest:
+  `sha256:b7b0409bba98389242b2fb187b839350a508cc96e21e06b038e04ae0b053d340`.
+- Result: type checking passed; the development command passed 7/9. AC-F015-008
+  and AC-F015-009 failed and the seven previously verified criteria continued to
+  pass.
+- Expected failure: both criteria exercise the real project pipeline rather than
+  an injected runtime. AC-F015-008 bound a real loopback listener over the
+  runtime `loadRuntime` composes and received `200` where the route's declared
+  required authentication demands `401`, which is exactly the defect recorded
+  below. AC-F015-009 ran the real worker against an unresolvable and a malformed
+  security declaration and observed `{"ready":true,"routeCount":1}` with status
+  zero, because `securityModule` is not read at all today.
+- Fixture correction before the evidence above: the first attempt imported a
+  framework directory rather than a module, so AC-F015-008 failed on route
+  discovery and AC-F015-009 passed for that unrelated reason. Both were false
+  signals, the specifier was corrected, and only the corrected run is recorded.
 
 ### Red-state evidence
 
@@ -301,9 +345,44 @@ readability; no other digest normalization is permitted.
   `verify:check`, `verify:cli`, `verify:test-command`, `verify:skill`,
   `verify:deploy`, and `verify:evidence` all passed at the same revision.
 
-### Known defect, development server omits the security layer
+### Verification, security composition amendment
 
-- Status: open. Recorded rather than repaired.
+- Status: passed. The defect recorded below is repaired.
+- Verified at: 2026-08-09T11:07:55Z.
+- Approved requirement digest:
+  `sha256:6caaf407cc44e7977b5a87f88879c3bfba32847ebce870057db24721d6b39f98`.
+- Current runtime-test digest:
+  `sha256:ef146d67ccb88e7433b4a053295dcb93aad2c494fdbb09f973b958d06b79a424`.
+- Command: `deno task verify:dev` using Deno `2.9.5` on macOS arm64 with
+  loopback access.
+- Result: formatting, linting, and type checking passed; the development command
+  passed 9/9. No prior criterion regressed.
+- Verified behavior: `loadRuntime` now composes `composeProjectSecurity` in
+  `development` mode with the project's declared `securityModule` instead of
+  `createValidatedRouter`. A served route declaring required authentication
+  answers an unauthenticated request with `401` and the provider's challenge
+  without entering the handler, the same request with a valid credential
+  succeeds, and an unresolvable or malformed declaration fails startup nonzero
+  with the reported cause and no active event.
+- End-to-end evidence beyond the mapped tests: the real worker served
+  `examples/todos` on loopback with `routeCount: 5`. `GET /todos` returned
+  `200`, `POST /todos` returned `201`, an invalid body still returned `400`, and
+  every response now carried the security headers and request ID that the
+  previous validated-router composition never applied.
+- Regression scope: every component suite except `test:testing` passed at this
+  revision. `test:testing` remains red by intent because the SH-F007 amendment
+  is unapproved; see that requirement's dependency correction.
+- Independent verifier state: `test:structure` 16/16 and `test:links` 1/1
+  passed; `test:repository` passed 7/9. AC-REPO-001 fails on the example
+  project's endpoint requirements, a defect that predates this amendment and is
+  unrelated to it, and AC-REPO-010 reports uncommitted SH-F007 draft drift. The
+  `verified` status projection is therefore withheld until the canonical
+  repository verifier is green; this component's own gate passed in full.
+
+### Repaired defect, development server omits the security layer
+
+- Status: repaired at 2026-08-09T11:07:55Z by the amendment verified above.
+  Retained as history rather than deleted.
 - Observed at: 2026-08-09T01:59:35Z.
 - Symptom: `hollow dev` builds its runtime with `createValidatedRouter` and
   never calls `createSecurityRouter`. A route declaring
@@ -316,12 +395,12 @@ readability; no other digest normalization is permitted.
 - Severity: a developer running the framework locally sees protected routes
   answer unauthenticated requests. That is a misleading local posture even
   though production wiring is a separate concern.
-- Not repaired here because it is a design gap rather than a wiring omission.
-  `SecurityOptions` accepts `providers`, but no project-level surface exists for
-  a project to declare one, so the development command has nothing to supply.
-  Closing this needs an approved requirement for where a project declares its
-  authentication providers, after which the development runtime can compose the
-  security router.
+- Not repaired when first recorded because it was a design gap rather than a
+  wiring omission. `SecurityOptions` accepted `providers`, but no project-level
+  surface existed for a project to declare one, so the development command had
+  nothing to supply. Closing it required an approved requirement for where a
+  project declares its authentication providers. SH-F005 now specifies that
+  surface, SH-F001 carries the declaration, and this component composes it.
 - The `examples/todos` project declares `authentication: "none"` explicitly, so
   it exercises the framework without depending on this gap.
 

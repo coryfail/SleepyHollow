@@ -28,7 +28,7 @@ export default defineRoute({
       body: { schema: createBody, maxBytes: 4096 },
       responses: { 201: todoShape, 422: problemShape },
     },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Create one todo" },
     handler: async ({ body }) => {
       const repository = await todoRepository();
@@ -53,7 +53,7 @@ export default defineRoute({
         }).strict(),
       },
     },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "List todos by done state" },
     handler: async ({ query }) => {
       const repository = await todoRepository();
