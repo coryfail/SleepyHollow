@@ -17,7 +17,7 @@ function files(name: string): Readonly<Record<string, string>> {
     ".sleepyhollow/verify.ts":
       `import config from "../sleepyhollow.config.ts";\n\nconst required = [\n  "api",\n  "generated",\n  "models",\n  "requirements/application.md",\n  "tests",\n];\nfor (const path of required) await Deno.stat(path);\nif (\n  config.apiDirectory !== "api" ||\n  config.requirementsFile !== "requirements/application.md" ||\n  config.generatedDirectory !== "generated"\n) {\n  throw new Error("Invalid Sleepy Hollow project configuration");\n}\nconsole.log("Sleepy Hollow scaffold verified");\n`,
     "README.md":
-      `# ${name}\n\nThis is an empty Sleepy Hollow application scaffold. It contains no generated or approved endpoints.\n\n## Begin planning\n\nActivate or install the official Sleepy Hollow skill in your supported agent environment, then ask it to plan this application. The planning source of truth is \`requirements/application.md\`.\n\n## Verify\n\n\`deno task verify\`\n`,
+      `# ${name}\n\nAn empty Sleepy Hollow application scaffold. It contains no generated or\napproved endpoints yet.\n\n## Begin planning\n\nActivate the official Sleepy Hollow skill in your agent environment, then ask it\nto plan this application. The planning source of truth is\n\`requirements/application.md\`.\n\n## Verify\n\n\`\`\`bash\ndeno task verify\n\`\`\`\n`,
     "tests/capture.ts":
       `const records = {\n  requests: [] as unknown[],\n  dataOperations: [] as unknown[],\n  uncapturedRoutes: [] as unknown[],\n};\n\nexport const CAPTURE_ARTIFACT = "generated/capture.json";\n\nfunction revision(): string {\n  try {\n    return Deno.env.get("SLEEPY_HOLLOW_REVISION") ?? "workspace";\n  } catch {\n    return "workspace";\n  }\n}\n\nexport const session = {\n  runner: "deno test",\n  revision: revision(),\n  artifact() {\n    return {\n      schema: "sleepy-hollow-capture/v1",\n      runner: session.runner,\n      revision: session.revision,\n      ...records,\n    };\n  },\n};\n\nexport async function persist(): Promise<void> {\n  const staging = CAPTURE_ARTIFACT + ".partial";\n  await Deno.writeTextFile(\n    staging,\n    JSON.stringify(session.artifact(), null, 2) + "\\n",\n  );\n  await Deno.rename(staging, CAPTURE_ARTIFACT);\n}\n`,
     "tests/capture_test.ts":
@@ -28,15 +28,12 @@ function files(name: string): Readonly<Record<string, string>> {
         imports: {
           "@sleepy-hollow/framework":
             `jsr:@sleepy-hollow/framework@^${FRAMEWORK_VERSION}`,
-          "@sleepy-hollow/framework/":
-            `jsr:@sleepy-hollow/framework@^${FRAMEWORK_VERSION}/`,
         },
         tasks: {
-          check:
-            "deno check sleepyhollow.config.ts .sleepyhollow/*.ts tests/*.ts",
-          test: "deno test --allow-read --allow-write tests/*.ts",
+          check: "deno check .",
+          test: "deno test --unstable-kv --allow-read --allow-write",
           verify:
-            "deno fmt --check sleepyhollow.config.ts .sleepyhollow/*.ts tests/*.ts && deno lint sleepyhollow.config.ts .sleepyhollow/*.ts tests/*.ts && deno task check && deno task test && deno run --allow-read .sleepyhollow/verify.ts",
+            "deno fmt --check . && deno lint . && deno task check && deno task test && deno run --allow-read .sleepyhollow/verify.ts",
         },
       },
       null,
@@ -45,7 +42,7 @@ function files(name: string): Readonly<Record<string, string>> {
     "generated/.gitkeep": "",
     "models/.gitkeep": "",
     "requirements/application.md":
-      `---\nschema: sleepy-hollow-application/v0.1\ntitle: ${name}\nstatus: draft\n---\n\n# Application requirements\n\nUse the official Sleepy Hollow skill to plan actors, behavior, data, security, operations, and acceptance criteria before generating endpoints.\n`,
+      `---\nschema: sleepy-hollow-application/v0.1\ntitle: ${name}\nstatus: draft\n---\n\n# Application requirements\n\nUse the official Sleepy Hollow skill to plan actors, behavior, data, security,\noperations, and acceptance criteria before generating endpoints.\n`,
     "sleepyhollow.config.ts":
       `import { defineProject } from "./.sleepyhollow/project.ts";\n\nexport default defineProject(\n  {\n    name: "${name}",\n    apiDirectory: "api",\n    requirementsFile: "requirements/application.md",\n    generatedDirectory: "generated",\n  } satisfies import("./.sleepyhollow/project.ts").SleepyHollowProject,\n);\n`,
     "tests/scaffold_test.ts":

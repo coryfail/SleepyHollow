@@ -68,8 +68,24 @@ handler: ({ request, params, query, headers, body, principal }) => { /* ... */ }
 declared. A location without a declared schema is not validated, and reading one
 is reported by `hollow check` as missing coverage.
 
+Note the shapes differ: `params`, `query`, and `headers` take a schema directly,
+while `body` wraps it.
+
+```ts
+schemas: {
+  query: z.object({ limit: z.coerce.number() }),   // direct
+  body: { schema: z.object({ title: z.string() }) }, // wrapped
+}
+```
+
 `principal` is the neutral request principal your project's authentication
-provider produced. The framework does not impose an identity model.
+provider produced — `{ id, type, claims? }`. The framework does not impose an
+identity model.
+
+**Known defect:** `principal` is currently typed as possibly `null` even on a
+route declaring `authentication: { mode: "required" }`, so you need a null check
+or non-null assertion the runtime does not require. The narrowing is intended
+and the type does not yet deliver it.
 
 ## Responses
 

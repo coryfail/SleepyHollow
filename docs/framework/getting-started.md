@@ -62,7 +62,7 @@ import { z } from "@sleepy-hollow/framework/validation";
 export default defineRoute({
   POST: {
     schemas: {
-      body: z.object({ url: z.string().url() }),
+      body: { schema: z.object({ url: z.string().url() }) },
       responses: { 201: "application/json", 422: "application/problem+json" },
     },
     security: { authentication: "none" },
