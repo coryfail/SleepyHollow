@@ -365,6 +365,18 @@ function hardenedResponse(
   });
 }
 
+/**
+ * Wraps a route table so every request passes authentication, authorization,
+ * rate limiting, and CORS before reaching a handler.
+ *
+ * Prefer {@linkcode composeProjectSecurity}, which loads the project's own
+ * security module; use this when supplying providers and policies directly.
+ *
+ * @param routes The discovered route table.
+ * @param options The posture, providers, policies, and CORS configuration.
+ * @returns A router with security applied, and its resolved inventory.
+ * @throws {SecurityConfigurationError} When any route cannot be satisfied.
+ */
 export function createSecurityRouter(
   routes: readonly NormalizedRoute[],
   options: SecurityOptions,

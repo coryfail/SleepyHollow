@@ -6,6 +6,17 @@ import type {
 
 const RATE_KEY = /^[A-Za-z0-9._:-]{1,256}$/;
 
+/**
+ * Builds a rate limiter that counts within one process.
+ *
+ * Its scope is `process`, so a deployment running several instances enforces
+ * the limit per instance rather than across the fleet. Tracked keys are capped
+ * by `maxKeys`, so a flood of distinct keys cannot exhaust memory.
+ *
+ * @param options The key ceiling, and optionally the clock.
+ * @returns An in-process limiter.
+ * @throws {TypeError} When `maxKeys` is not a positive integer.
+ */
 export function createMemoryRateLimiter(
   options: MemoryRateLimiterOptions,
 ): RateLimiter {

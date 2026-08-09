@@ -5,6 +5,17 @@ function normalizedField(value: PropertyKey): string {
   return String(value).replace(/[^a-z0-9]/gi, "");
 }
 
+/**
+ * Strips credentials and other sensitive fields from a value before it is
+ * logged or reported.
+ *
+ * Traversal is bounded and cycle-safe: it truncates beyond a fixed depth and
+ * will not loop on a self-referencing object, so redacting untrusted input
+ * cannot hang the process.
+ *
+ * @param value Any value bound for a log line or a diagnostic.
+ * @returns A copy with sensitive fields replaced.
+ */
 export function redactSecurityData(value: unknown): unknown {
   const active = new WeakSet<object>();
 

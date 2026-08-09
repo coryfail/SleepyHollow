@@ -31,6 +31,17 @@ function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/**
+ * Declares the security a project shares across its routes: its providers,
+ * its rate limit policies, and its cross-origin policy.
+ *
+ * The declaration is validated here, so a malformed provider is caught at
+ * startup rather than on the first request that would have used it.
+ *
+ * @param declaration The shared providers, policies, and CORS configuration.
+ * @returns The same declaration, typed as given.
+ * @throws {SecurityConfigurationError} When the declaration is malformed.
+ */
 export function defineSecurity<const Declaration extends SecurityDeclaration>(
   declaration: Declaration,
 ): Declaration {
@@ -201,6 +212,18 @@ async function declared(
   return validate(value, named);
 }
 
+/**
+ * Builds a secured router by loading the project's own security module.
+ *
+ * Every route's declaration is resolved against what the module provides, so a
+ * route naming a provider or policy that does not exist stops startup rather
+ * than failing open at request time.
+ *
+ * @param routes The discovered route table.
+ * @param options The posture, the project root, and where to load from.
+ * @returns A router with security applied, and its resolved inventory.
+ * @throws {SecurityConfigurationError} When any route cannot be satisfied.
+ */
 export async function composeProjectSecurity(
   routes: readonly NormalizedRoute[],
   options: ProjectSecurityOptions,
