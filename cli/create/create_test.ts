@@ -246,3 +246,52 @@ Deno.test("AC-F001-012 · the typed configuration accepts an optional security m
     );
     await check("present");
   }));
+
+Deno.test("AC-F001-013 · governed requirement content is excluded from formatting", () =>
+  temporary(async (directory) => {
+    await createProject({ name: "governed", directory });
+    const root = join(directory, "governed");
+    const requirement = join(root, "requirements", "application.md");
+
+    // Prose a formatter would certainly rewrap.
+    const original = await Deno.readTextFile(requirement);
+    const unwrapped = original.replace(
+      "# Application requirements",
+      "# Application requirements\n\nThis paragraph is deliberately written well past eighty columns so that any reasonable Markdown formatter would want to rewrap it into shorter lines.",
+    );
+    await Deno.writeTextFile(requirement, unwrapped);
+
+    // A file that is not governed and must still be formatted.
+    const ordinary = join(root, "models", "sample.ts");
+    await Deno.writeTextFile(
+      ordinary,
+      "export const sample =    {a:1,   b:2};\n",
+    );
+
+    const run = async (args: string[]) =>
+      await new Deno.Command(Deno.execPath(), {
+        args,
+        cwd: root,
+        stdout: "piped",
+        stderr: "piped",
+      }).output();
+
+    const checked = await run(["fmt", "--check"]);
+    assert.equal(
+      new TextDecoder().decode(checked.stderr).includes("application.md"),
+      false,
+      "the formatting check must not flag governed requirement content",
+    );
+
+    await run(["fmt"]);
+    assert.equal(
+      await Deno.readTextFile(requirement),
+      unwrapped,
+      "formatting must leave governed requirement bytes untouched",
+    );
+    assert.notEqual(
+      await Deno.readTextFile(ordinary),
+      "export const sample =    {a:1,   b:2};\n",
+      "formatting must still apply to files the project owns",
+    );
+  }));

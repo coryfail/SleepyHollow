@@ -1,13 +1,18 @@
 # todos
 
-An empty Sleepy Hollow application scaffold. It contains no generated or
-approved endpoints yet.
+A worked Sleepy Hollow application: a todo list with two approved endpoints,
+`/todos` and `/todos/[id]`, covering creation, bounded listing, reading,
+updating, and deletion over Deno KV.
 
-## Begin planning
+Authentication is recorded as an explicit `none`, so this example demonstrates
+routing, validation, data access, and verification. For a route that requires an
+authenticated caller, see the `authentication` example.
 
-Activate the official Sleepy Hollow skill in your agent environment, then ask it
-to plan this application. The planning source of truth is
-`requirements/application.md`.
+## Where the rules live
+
+`requirements/application.md` records the application-wide decisions, and each
+endpoint directory owns its own `requirements.md` with criteria and an approval
+bound to the exact content approved.
 
 ## Verify
 

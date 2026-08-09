@@ -29,6 +29,16 @@ function files(name: string): Readonly<Record<string, string>> {
           "@sleepy-hollow/framework":
             `jsr:@sleepy-hollow/framework@^${FRAMEWORK_VERSION}`,
         },
+        // An approval binds the exact bytes of a requirement, and a formatter
+        // rewraps prose. Without this exclusion the project's own verifier
+        // fails on approved requirements, and the obvious remedy for that
+        // failure silently detaches every approval in the project.
+        fmt: {
+          exclude: [
+            "**/requirements.md",
+            "requirements/application.md",
+          ],
+        },
         tasks: {
           check: "deno check .",
           test: "deno test --unstable-kv --allow-read --allow-write",

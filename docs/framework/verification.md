@@ -1,5 +1,11 @@
 # Verification
 
+> **Do not remove the `fmt.exclude` block from your project's `deno.json`.** An
+> approval binds the exact bytes of a requirement, and a formatter rewraps
+> prose. Without that exclusion, `deno fmt` silently detaches every approval in
+> the project, and nothing tells you afterward. `hollow create` generates it for
+> a reason.
+
 This is the part of Sleepy Hollow that does not exist in other frameworks. It is
 worth understanding before anything else.
 

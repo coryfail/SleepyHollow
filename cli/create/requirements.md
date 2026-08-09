@@ -69,6 +69,29 @@ project has before it has behavior, and SH-F005 requires the declaration to be
 explicit rather than discovered by scanning. A project cannot name its security
 module if the typed configuration has nowhere to name it.
 
+### Governed content is excluded from formatting
+
+The generated project shall exclude requirement Markdown from its formatter, so
+that neither the project's own verifier nor an ordinary formatting command
+reports or rewrites those files.
+
+An approval binds the exact bytes of a requirement. A formatter rewraps prose,
+which changes those bytes and silently detaches the approval from the content it
+authorizes. The scaffold currently runs a formatting check across the whole
+project, so a newly approved requirement makes the project's own verifier fail,
+and the obvious remedy for that failure is the command that destroys the
+binding. A scaffold that leads its user into invalidating their own approvals
+contradicts the guarantee the framework exists to provide.
+
+This has occurred three times in the framework's own repository, each time from
+a formatting command run across a directory rather than from any deliberate
+edit. Prevention belongs in the generated configuration rather than in guidance,
+because the failure is silent and the correction is not obvious afterward.
+
+The exclusion covers governed requirement Markdown only. Every other file the
+project owns remains formatted, and the project's verifier continues to enforce
+that.
+
 ## Acceptance criteria
 
 - AC-F001-001: Given a valid name and writable empty destination,
@@ -97,6 +120,10 @@ module if the typed configuration has nowhere to name it.
 - AC-F001-012: The generated typed project configuration accepts an optional
   `securityModule` value and type-checks both with it present and with it
   absent, and the scaffold declares none.
+- AC-F001-013: In a generated project holding a requirement whose prose a
+  formatter would rewrap, the project's own verifier reports no formatting
+  failure, and running the project's formatter leaves that requirement's bytes
+  unchanged while still formatting the project's other files.
 
 ## Out of scope
 
@@ -115,6 +142,22 @@ The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line
 ending. The status field is a lifecycle projection for routing and human
 readability; no other digest normalization is permitted.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T16:19:16Z.
+- Approved criteria: AC-F001-001 through AC-F001-013.
+- Governed-content digest:
+  `sha256:67aea67d00c44407c321b61e60c0800f913ab5e1ed2f091194d3cb38f46afe94`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the formatting exclusion for governed content, the reproduction in a
+  freshly generated project, the criterion stated as observable behavior rather
+  than as a configuration key, its second clause requiring other files to remain
+  formatted, and the exact governed-content digest.
+- Supersedes: the 2026-08-09T02:14:08Z approval recorded below. This entry is
+  the governing record and its digest binds the current governed content.
 
 ### Approval
 
@@ -195,6 +238,49 @@ readability; no other digest normalization is permitted.
 - AC-F001-010 -> `create_test.ts` scaffolded capture-session setup test.
 - AC-F001-011 -> `create_test.ts` generated-project capture-artifact test.
 - AC-F001-012 -> `create_test.ts` optional security-module configuration test.
+- AC-F001-013 -> `create_test.ts` governed-content formatting-exclusion test.
+
+### Verification, formatting-exclusion amendment
+
+- Status: passed.
+- Verified at: 2026-08-09T16:20:58Z.
+- Approved requirement digest:
+  `sha256:67aea67d00c44407c321b61e60c0800f913ab5e1ed2f091194d3cb38f46afe94`.
+- Current runtime-test digest:
+  `sha256:6250296117581dfe3603f3ea45c8bcb8b9b7f160f18f9903c84425c0cef93164`.
+- Command: `deno task verify:create` using Deno `2.9.5` on macOS arm64.
+- Result: formatting, linting, and type checking passed; creation passed 13/13.
+  No prior criterion regressed.
+- Verified behavior: the generated `deno.json` excludes requirement Markdown
+  from formatting. A generated project holding a requirement a formatter would
+  rewrap reports no formatting failure, running the project's formatter leaves
+  that requirement's bytes unchanged, and an ordinary source file the project
+  owns is still formatted.
+- Independent verifier state: the canonical `npm run verify` from `website/`
+  passed in full at 2026-08-09T16:20:58Z: structural 16/16, links 1/1,
+  repository consistency 9/9, React 8/8, TypeScript and production build, and
+  Playwright/Axe 66/66 across Chromium, Firefox, and WebKit. Both examples
+  verified and all 29 governed digests bind.
+- End-to-end evidence: `hollow create demo`, then a deliberately over-long
+  paragraph added to the generated `requirements/application.md`. Before the
+  amendment the project's own `deno task verify` failed with `Found 1 not
+  formatted file` and `deno fmt` changed that file's digest from
+  `sha256:357f1ae8...` to `sha256:16fec501...`. After the amendment the same
+  project's verify passes with nothing flagged and the digest is unchanged.
+
+### Red-state evidence, formatting-exclusion amendment
+
+- Status: failed as expected.
+- Observed at: 2026-08-09T16:19Z.
+- Base revision: `a5dadbd` plus the approved amendment and its mapped test.
+- Commands: `deno task check:create` and `deno task test:create` using Deno
+  `2.9.5` on macOS arm64.
+- Result: type checking passed; creation passed 12/13. AC-F001-013 failed and
+  the twelve previously verified criteria continued to pass.
+- Expected failure: the generated project's formatting check flagged
+  `requirements/application.md`, so the criterion failed on its first assertion
+  rather than through any scaffold, permission, or subprocess failure. The
+  bytes-unchanged and other-files-still-formatted assertions were never reached.
 
 ### Red-state evidence, security-module amendment
 
