@@ -104,6 +104,9 @@
     "verify:packaging": "deno fmt --check packaging/*.ts && deno lint packaging/*.ts && deno task check:packaging && deno task test:packaging",
     "check:governance": "deno run --quiet --allow-read --allow-run=git scripts/check-governed-digests.ts",
     "test:example": "cd examples/todos && deno task test",
-    "verify:example": "cd examples/todos && deno task verify"
+    "verify:example": "cd examples/todos && deno task verify",
+    "test:example-auth": "cd examples/authentication && deno task test",
+    "verify:example-auth": "cd examples/authentication && deno task verify",
+    "verify:examples": "deno task verify:example && deno task verify:example-auth"
   }
 }
