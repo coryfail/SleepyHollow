@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: sgad-methodology
 title: Specification-Governed Agentic Development methodology
-status: draft
+status: verified
 risk: standard
 depends_on: []
 owners:
@@ -117,8 +117,33 @@ other digest normalization is permitted.
 
 ### Approval
 
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:57783395c036abbf2377fb811e4c7956ce72aa87bba928d2685ed10be568ea03`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the canonical SGAD methodology documentation and the exact governed-content digest.
+
+### Approval
+
 - Status: pending exact-content approval.
 - Approver, time, criteria, digest, and decision source: pending.
+
+### Verification, current content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the repository-consistency suite covering the canonical methodology documents.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 

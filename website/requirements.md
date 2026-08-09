@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-website
 title: Sleepy Hollow public website
-status: approved
+status: verified
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -201,12 +201,51 @@ other digest normalization is permitted.
 
 ### Approval
 
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:e94af44b188d2ea6fedd19003d0612385a72babf483c9b89627efcb2a8614ed9`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:e94af44b188d2ea6fedd19003d0612385a72babf483c9b89627efcb2a8614ed9`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
+
+### Approval
+
 | Requirement revision | Approved criteria | Digest | Approver | Approved at | Decision |
 |---|---|---|---|---|---|
 | Historical single-page website | AC-WEB-001–019 | `sha256:299742bd6eca92fd51118a13649094ede3224031f2a42081c16df5cf15fdf29f` | human-project-owner | 2026-08-06T14:57:58Z | “Perfect, let's continue still using SGAD” |
 | Sleepy Hollow framework page | AC-HOME-001–010 | `sha256:20af56fff2d4b0786637895b333a94a75d38c98efd8b11c1d44ebb0ebbaa343e` | human-project-owner | 2026-08-06T16:27:58Z | Keep the home page product-focused and move the methodology to its own page |
 | SGAD page with short install | AC-WEB-SGAD-001–012 | `sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170` | human-project-owner | 2026-08-06T19:19:08Z | Publish the standalone skill with the short agent-skills command |
 | Two-page website and delivery scope | AC-SITE-001–011 | `sha256:57d0e449cae7d4bc2e5fc6397ac9641f9255fd16b3417368e68b043a3a34075e` | human-project-owner | 2026-08-06T17:20:18Z | Commit, push, and publish the verified website at `https://sleepyhollow.io` |
+
+### Verification, current content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the website link, repository-consistency, and two-page structure suites.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 

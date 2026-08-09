@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-application
 title: Sleepy Hollow requirements and architecture specification
-status: draft
+status: verified
 risk: standard
 depends_on: []
 owners:
@@ -11,9 +11,9 @@ owners:
 
 # Sleepy Hollow Requirements and Architecture Specification
 
-**Version:** 0.4.0
+**Version:** 0.5.0
 
-**Date:** August 6, 2026
+**Date:** August 8, 2026
 
 ## 1. Executive summary
 
@@ -93,6 +93,7 @@ The user should receive:
 4. **Approval is granular.** A user can approve and build one endpoint without approving the entire implementation backlog.
 5. **TDD is the implementation pattern.** Approved acceptance criteria become failing tests before implementation begins.
 6. **Verification is independent.** The skill cannot declare its own output correct without framework checks and passing tests.
+6a. **Verification rests on observed behavior.** The framework records what handlers actually read and perform while their mapped tests run, so verification checks evidence rather than author claims. Behavior no test exercises is reported as uncaptured and is never certified.
 7. **The kernel stays small.** A narrow, predictable API is easier for humans and agents to use correctly.
 8. **Secure behavior should be difficult to forget.** Validation and basic protections are framework defaults.
 9. **Authentication is application-defined.** The planning workflow selects the right approach for each application.
@@ -927,6 +928,22 @@ Standalone executables and additional cloud adapters are deferred until the init
 | SH-F015 | `cli/dev/requirements.md` | Local development server |
 | SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
 | SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD workflow skill |
+| SH-F018 | `cli/evidence/requirements.md` | Repository evidence loading for check, test, and deploy |
+| SH-F019 | `core/capture/requirements.md` | Runtime evidence capture during test execution |
+| SH-F020 | `packaging/requirements.md` | Distribution and public API surface |
+
+### 15.5 Distribution
+
+Sleepy Hollow is distributed as one package with a declared name, semantic
+version, and explicit export map. Only exported entry points are public API.
+
+It publishes to JSR as the primary registry for Deno consumers and to npm for
+reach, both from the same verified revision at the same version. The framework
+targets Deno and depends on Deno KV, Deno runtime APIs, and Deno Deploy. npm
+publication is a distribution channel for Deno consumers, not a claim of Node
+support, and the published metadata states this plainly.
+
+Publication requires that verification pass for the revision being published.
 
 ## 16. MVP acceptance criteria
 
@@ -967,13 +984,13 @@ The first release is complete when all of the following are demonstrated:
 
 ### Phase 1: Minimal framework kernel
 
-- Project creation
 - File-based routing
 - Schemas and validation
 - Deno KV primitives
 - Errors and basic security
 - Test utilities
 - Human-readable and JSON diagnostics
+- Project creation
 
 ### Phase 2: Requirements and verification
 
@@ -1049,17 +1066,18 @@ The following decisions require prototypes or focused evaluation before their ex
 
 | ID | Decision | Evaluation goal |
 |---|---|---|
-| OPEN-001 | Route module API | Smallest explicit API an agent uses reliably |
-| OPEN-002 | Schema library | Strong TypeScript inference, runtime validation, and OpenAPI generation |
-| OPEN-003 | Deno KV index encoding | Correct uniqueness, pagination, and atomic behavior |
-| OPEN-004 | Requirement parser | Stable Markdown and frontmatter without creating a proprietary authoring format |
-| OPEN-005 | Criterion-to-test metadata | Transparent mapping that works with Deno's test runner |
-| OPEN-006 | Endpoint-local verification | Fast targeted checks without missing shared regressions |
-| OPEN-007 | Auth-provider interface | Flexible enough for projects without becoming an auth framework |
-| OPEN-008 | Rate limiting | Useful local behavior and credible Deno Deploy behavior |
-| OPEN-009 | Generated client shape | Minimal dependencies and easy frontend or service consumption |
+| OPEN-001 | Route module API | Proposed resolution in SH-F002: one default `defineRoute` method-map export per endpoint directory, with the filesystem as the sole path source |
+| OPEN-002 | Schema library | Proposed resolution in SH-F003: pinned Zod 4 schemas with fail-closed JSON Schema/OpenAPI normalization from the same runtime definitions |
+| OPEN-003 | Deno KV index encoding | Proposed resolution in SH-F004: native tuple keys, pointer indexes, versionstamp checks, and native opaque cursors behind bounded declared-index queries |
+| OPEN-004 | Requirement parser | Proposed resolution in SH-F006: strict YAML 1.2 core frontmatter plus ordinary Markdown headings and stable acceptance-criterion list items, with deterministic source diagnostics and no proprietary authoring syntax |
+| OPEN-005 | Criterion-to-test metadata | Proposed resolution in SH-F007: a transparent `criterionTest` wrapper registers native Deno tests with stable test, requirement, and criterion IDs while exposing the same frozen metadata for manifests and reports |
+| OPEN-006 | Endpoint-local verification | Proposed resolution in SH-F007: targeted checks close transitively over both requirement dependencies and dependents, then escalate to the full relevant suite whenever ownership or graph safety is uncertain |
+| OPEN-007 | Auth-provider interface | Proposed resolution in SH-F005: named project providers return a validated neutral principal, while routes explicitly declare none or required authentication and optional guards |
+| OPEN-008 | Rate limiting | Proposed resolution in SH-F005: bounded process-local fixed windows for test/development and a pluggable shared-scope adapter requirement for protected production routes |
+| OPEN-009 | Generated client shape | Proposed resolution in SH-F010: one dependency-free Web Standards TypeScript module with required base URL, injectable fetch and neutral authentication hook, optional fail-closed response validation, and no persistence or framework-runtime access |
 | OPEN-010 | Skill portability | Rich Codex skill plus useful Claude and generic-agent guidance |
 | OPEN-011 | Deno Deploy integration | Fast setup with safe credential handling and reliable smoke tests |
+| OPEN-012 | Discoverable project locations | Resolved in SH-F018: the SH-F001 project configuration is the sole source of discoverable locations, scoped per service through SH-F014 |
 
 ## 20. Definition of done for an endpoint
 
@@ -1099,21 +1117,56 @@ other digest normalization is permitted.
 
 ### Approval
 
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T17:34:18Z.
+- Approved criteria: the complete specification.
+- Governed-content digest:
+  `sha256:481b68b853cd8b5fb45aa829066a3a666f7556bed9b76f254ea087aa7d31e076`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the reconciled component inventory, the observed-evidence verification model, and the distribution model, and the exact governed-content digest.
+
+### Superseded approval
+
 - Status: pending exact-content product approval.
 - Approver, time, approved criteria, digest, and decision source: pending.
 
 ### Criterion mapping
 
-- Status: pending exact-content product approval and governed tests.
+- The application specification is realized through its colocated component
+  requirements. Each component in the section 15.4 inventory owns its own
+  criterion mapping, red-state evidence, and verification entry.
+- System-level coverage is the union of those component mappings. This document
+  introduces no independent executable criteria of its own.
 
 ### Red-state evidence
 
-- Status: pending approved product test execution against a healthy baseline.
+- Not applicable at the application level. Red-state evidence is recorded per
+  component against that component's mapped tests. Recording a synthetic
+  application-level red state would fabricate evidence that no test produced.
 
 ### Verification
 
-- Status: pending implementation and independent product verification.
+- Status: passed for specification consistency and component coverage.
+- Verified at: 2026-08-08T20:15:30Z.
+- Commands: the twelve component verification tasks, `verify:framework`,
+  `verify:create`, `verify:planning`, `verify:check`, `verify:cli`,
+  `verify:test-command`, `verify:dev`, `verify:skill`, `verify:deploy`,
+  `verify:evidence`, `verify:capture`, and `verify:packaging`.
+- Result: every component suite passes at this revision.
+- Inventory consistency: every component named in section 15.4 resolves to a
+  governed requirement that exists, and every governed component requirement in
+  the repository appears in that inventory.
+- Coverage: SH-F001 through SH-F012, SH-F014 through SH-F020 are verified.
+- Known incomplete coverage, recorded rather than claimed: SH-F013 remains
+  approved and unverified because OPEN-011 is unresolved and no Deno Deploy
+  adapter exists. The specification's deployment claims in sections 3.7 and 14
+  are therefore specified and gated but not demonstrated against the live
+  platform. This document must not be read as evidence that deployment works.
+- Residual risk: OPEN-010 remains unresolved. Portable agent guidance across
+  hosts has not been evaluated.
 
 ### Delivery
 
-- Status: not applicable while the application specification remains draft.
+- Status: not applicable. No release has been authorized or attempted, and
+  SH-F020 records that no publication has occurred.

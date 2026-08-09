@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: website-sleepy-hollow-page
 title: Sleepy Hollow framework landing page
-status: approved
+status: verified
 risk: standard
 depends_on:
   - sleepy-hollow-website
@@ -116,12 +116,51 @@ other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:7e659ea8953b0442ac7f79aa514a8ef32dbb7b283900dc3db08b0788c67344da`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:7e659ea8953b0442ac7f79aa514a8ef32dbb7b283900dc3db08b0788c67344da`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-06T16:27:58Z.
 - Approved criteria: AC-HOME-001 through AC-HOME-010.
 - Historical exact-content digest:
   `sha256:20af56fff2d4b0786637895b333a94a75d38c98efd8b11c1d44ebb0ebbaa343e`.
 - Decision: keep the page product-focused and move the full methodology to its
   own page.
+
+### Verification, current content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the website link, repository-consistency, and two-page structure suites.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 

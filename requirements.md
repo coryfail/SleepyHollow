@@ -338,6 +338,85 @@ verification described above.
 - Reverification: repository consistency 9/9 and the complete canonical verifier
   passed with the same structural, link, React, type, build, and 66/66
   cross-browser results recorded above.
+- Framework-activation revalidation passed at 2026-08-07T13:19:04Z after the
+  human owner approved SH-F001 and SH-F002. The AC-REPO-010 control now preserves
+  untouched draft components while accepting an activated component only when
+  its embedded approval binds the current governed-content digest; this keeps
+  the cleanup's no-silent-authority intent without permanently preventing later
+  product work. The updated consistency-test digest is
+  `sha256:c92de302c31aba542bf9f216f7fbd1163bb06caea8c1ec5d92155c677a813a28`.
+  Repository consistency passed 9/9 and the complete canonical verifier again
+  passed structural 16/16, links 1/1, React 8/8, TypeScript, production build,
+  and Playwright/Axe 66/66 across Chromium, Firefox, and WebKit.
+- Framework-kernel revalidation completed by 2026-08-07T14:03:02Z after exact
+  reapproval of SH-F002 at
+  `sha256:c6ad75a20d7cac55e53ac59334e15072674147fbc340e0da9658470b5abfb0a6`
+  and SH-F003 at
+  `sha256:19ec47355a971203e0b6e85c256eb9df52fb8a17feaf37a13f94975ebef90652`.
+  The current 28-file framework manifest is
+  `working-tree:sha256:941fd4b35f0c4b78b46e2e447381e6572c5547f60a11cab4db784666faf0443f`.
+  `deno task verify:framework` passed routing 9/9 and validation 10/10 with two
+  nested steps each plus formatting, linting, and type checks. The canonical
+  repository verifier passed structural 16/16, links 1/1, repository consistency
+  9/9, React 8/8, TypeScript/build, and Playwright/Axe 66/66 across Chromium,
+  Firefox, and WebKit. No commit, push, or delivery was performed.
+- Deno KV kernel activation passed at 2026-08-07T14:19:24Z after the human owner
+  approved SH-F004 at
+  `sha256:907a8e8cd07974545db0f5a4f01ac91b56d42ea28c1dc4899de511f56cab5a96`.
+  The current 37-file framework manifest is
+  `working-tree:sha256:f7e1e76626c370eefd6b6dd602e4140e6d7bbde16d130e464097a4e9dcedc30f`.
+  `deno task verify:framework` passed routing 9/9, validation 10/10, and KV 9/9
+  plus formatting, linting, and type checks. The canonical repository verifier
+  again passed structural 16/16, links 1/1, repository consistency 9/9, React
+  8/8, TypeScript/build, and Playwright/Axe 66/66 across Chromium, Firefox, and
+  WebKit. No commit, push, or delivery was performed.
+- Security-kernel activation passed at 2026-08-07T14:56:52Z after the human
+  owner approved SH-F005 at
+  `sha256:4eb04f57e6fdc65d3ed42b96f790286b069644daf1fdb4038bca9c5ea22fd017`.
+  The current 45-file framework manifest is
+  `working-tree:sha256:0831c0a1254252c07acc336837f0e8179e6ff7017d7d1b11d12c00f9977f1d53`.
+  `deno task verify:framework` passed routing 9/9, validation 10/10, KV 9/9,
+  and security 11/11 with twelve total nested steps plus formatting, linting,
+  and type checks. The canonical repository verifier again passed structural
+  16/16, links 1/1, repository consistency 9/9, React 8/8, TypeScript/build,
+  and Playwright/Axe 66/66 across Chromium, Firefox, and WebKit. No commit,
+  push, or delivery was performed.
+- Configuration and observability activation passed at
+  2026-08-07T15:11:17Z after the human owner approved SH-F012 at
+  `sha256:0a2408dd0c34e4b35bc5feb00d2ea8cf53a8fdcf269d9912ced09eb9cd471e28`.
+  The current 52-file framework manifest is
+  `working-tree:sha256:1c06425c13ac1a3e320487f8244afab496f1b427b3804bd3728db763fd84a53d`.
+  `deno task verify:framework` passed routing 9/9, validation 10/10, KV 9/9,
+  security 11/11, and configuration 9/9 with thirteen total nested steps plus
+  formatting, linting, and type checks. The canonical repository verifier again
+  passed structural 16/16, links 1/1, repository consistency 9/9, React 8/8,
+  TypeScript/build, and Playwright/Axe 66/66 across Chromium, Firefox, and
+  WebKit. No commit, push, or delivery was performed.
+- Project-creation activation passed at 2026-08-07T15:17:48Z for the previously
+  approved SH-F001 digest
+  `sha256:5d0236364f999f012df2182a85f1d5c3c1c55b6cccbe4e19f21bc8a675e67068`.
+  The current 57-file product manifest is
+  `working-tree:sha256:de690a4fe42299b5a1ea5d1c6c52a539b5909340d0b3e90a20ee3c07597d6c20`.
+  Project creation passed 9/9, its generated scaffold passed its own verifier,
+  and a compiled standalone binary reported `hollow 0.1.0`; the framework and
+  canonical repository gates also passed with the results recorded above. No
+  commit, push, publication, deployment, or other delivery was performed.
+
+- Test correction, endpoint requirement kinds, 2026-08-09T11:41:00Z: the
+  AC-REPO-001/AC-REPO-002 sweep asserted the component frontmatter contract on
+  every discovered `requirements.md`, including the `sgad-endpoint` documents in
+  `examples/todos`, which declare `id`, `path`, `status`, `methods`, and
+  `service` and carry an approval-only governance record. The sweep therefore
+  failed on well-formed endpoint documents, leaving the canonical gate red for a
+  defect in the check rather than in the repository. The sweep now classifies by
+  kind and asserts the contract each kind actually has, and additionally
+  requires a non-empty `methods` list and, for a non-draft endpoint, that the
+  recorded approval digest binds the current governed content. No criterion text
+  changed: AC-REPO-002 already required valid required metadata, which is
+  kind-specific by definition. The endpoint branch is proven live by an
+  assertion that at least one endpoint requirement is covered, and was
+  negative-tested by mutating governed bytes, removing `methods`, and renaming
+  the `Approval` heading, each of which fails the check.
 
 ### Delivery
 
