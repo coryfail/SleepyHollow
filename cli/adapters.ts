@@ -4,10 +4,10 @@ import { pathToFileURL } from "node:url";
 import { discoverRoutes } from "../core/routing/mod.ts";
 import { runCheckCommand, type VerificationInventory } from "./check/mod.ts";
 import {
+  buildDeployPlan,
   createDenoDeployAdapter,
   type DeployAdapter,
   type DeployInventory,
-  exitCodeForDeploy,
   renderHumanDeployResult,
   renderJsonDeployResult,
   resolveDeployToken,
@@ -33,6 +33,7 @@ import {
   type CliCommandHandlers,
   type CliCommandName,
   type CliCommandResponse,
+  type CliCommandResult,
   type CliDiagnostic,
 } from "./dispatcher.ts";
 
@@ -387,67 +388,113 @@ function checkHandler(
   };
 }
 
+function deployPlanDigest(plan: unknown): string {
+  const encoded = new TextEncoder().encode(JSON.stringify(plan));
+  let hash = 2166136261;
+  for (const byte of encoded) {
+    hash ^= byte;
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0");
+}
+
 function deployHandler(
   load: NonNullable<CliDependencies["deployInventoryLoader"]>,
   adapter: DeployAdapter | undefined,
   token: (() => string) | undefined,
 ): CliCommandHandler {
   return async ({ args, cwd }) => {
-    const confirmed = args.includes("--confirm");
+    const index = args.indexOf("--confirm");
+    const provided = index >= 0 ? args[index + 1] : undefined;
+    const preview = args.includes("--preview");
+    let inventory;
     try {
-      const inventory = await load({ projectRoot: cwd });
-      const result = await runDeployment(
-        {
-          inventory,
-          token: (token ?? resolveDeployToken)(),
-          confirmed,
-          ...(confirmed
-            ? { confirmationSource: "operator passed --confirm" }
-            : {}),
-        },
-        adapter ?? createDenoDeployAdapter({}),
-        () => new Date().toISOString(),
-      );
-      return {
-        exitCode: exitCodeForDeploy(result),
-        result: {
-          ok: result.ok,
-          command: "deploy" as const,
-          schema: result.schema,
-          summary: renderHumanDeployResult(result).split("\n")[0] ?? "",
-          diagnostics: result.diagnostics.map((item) => ({
-            code: item.code,
-            severity: item.severity,
-            summary: item.summary,
-            correction: item.correction,
-          })),
-          json: JSON.parse(renderJsonDeployResult(result)) as Record<
-            string,
-            unknown
-          >,
-        },
-      };
+      inventory = await load({ projectRoot: cwd });
     } catch (error) {
-      const summary = error instanceof Error
-        ? error.message
-        : "Deployment could not start.";
+      return deployPrecondition(error);
+    }
+    const built = buildDeployPlan(inventory);
+    const digest = deployPlanDigest(built);
+
+    const run = async (confirmed: boolean): Promise<CliCommandResult> => {
+      let result;
+      try {
+        result = await runDeployment(
+          {
+            inventory,
+            token: (token ?? resolveDeployToken)(),
+            confirmed,
+            ...(confirmed
+              ? { confirmationSource: `operator confirmed plan ${digest}` }
+              : {}),
+          },
+          adapter ?? createDenoDeployAdapter({}),
+          () => new Date().toISOString(),
+        );
+      } catch (error) {
+        return deployPrecondition(error).result;
+      }
       return {
-        exitCode: 1 as const,
+        ok: result.ok,
+        command: "deploy" as const,
+        schema: result.schema,
+        summary: renderHumanDeployResult(result).split("\n")[0] ?? "",
+        diagnostics: result.diagnostics.map((item) => ({
+          code: item.code,
+          severity: item.severity,
+          summary: item.summary,
+          correction: item.correction,
+        })),
+        json: JSON.parse(renderJsonDeployResult(result)) as Record<
+          string,
+          unknown
+        >,
+      };
+    };
+
+    if (preview || built.requiresConfirmation) {
+      const previewed = await run(false);
+      return {
         result: {
-          ok: false,
-          command: "deploy" as const,
-          schema: "sleepy-hollow-deploy-result/v1",
-          summary,
-          diagnostics: [{
-            code: "SH_DEPLOY_PRECONDITION_UNMET",
-            severity: "error" as const,
-            summary,
-            correction:
-              "Resolve the reported condition and rerun hollow deploy.",
-          }],
+          ...previewed,
+          summary: preview
+            ? previewed.summary
+            : `${previewed.summary} Confirm with --confirm ${digest}`,
+        },
+        operation: {
+          intent: preview ? "preview" as const : "apply" as const,
+          confirmationDigest: digest,
+          ...(provided ? { providedConfirmation: provided } : {}),
+          apply: () => run(true),
         },
       };
     }
+    const applied = await run(true);
+    return { exitCode: applied.ok ? 0 as const : 1 as const, result: applied };
+  };
+}
+
+function deployPrecondition(error: unknown): {
+  readonly exitCode: 1;
+  readonly result: CliCommandResult;
+} {
+  const summary = error instanceof Error
+    ? error.message
+    : "Deployment could not start.";
+  return {
+    exitCode: 1,
+    result: {
+      ok: false,
+      command: "deploy",
+      schema: "sleepy-hollow-deploy-result/v1",
+      summary,
+      diagnostics: [{
+        code: "SH_DEPLOY_PRECONDITION_UNMET",
+        severity: "error",
+        summary,
+        correction: "Resolve the reported condition and rerun hollow deploy.",
+      }],
+    },
   };
 }
 

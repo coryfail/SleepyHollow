@@ -240,6 +240,26 @@ other digest normalization is permitted.
   matching the unimplemented SH-F008 evidence-loader boundary. The command
   cannot yet assemble a real project's deployment inventory.
 
+### Verification, confirmation-binding correction
+
+- Status: passed. AC-F013-003 is now satisfied by the designed protocol rather
+  than by a weaker substitute.
+- Verified at: 2026-08-09T01:22:12Z.
+- Commands: `deno task verify:deploy`, `deno task verify:cli`, and
+  `deno task verify:evidence`.
+- Defect found while writing the CLI reference: the deploy handler accepted a
+  bare `--confirm` flag, while the shared CLI advertises `--confirm <digest>`
+  and implements a pending-operation protocol that binds confirmation to a
+  specific plan. The handler bypassed that protocol, so a confirmation was not
+  tied to the plan the operator reviewed and a stale plan could be applied.
+- Correction: the handler now returns a pending operation carrying a digest of
+  the deployment plan. The shared dispatcher refuses application when the
+  supplied confirmation is missing, stale, or mismatched. Observed behavior: a
+  first deployment prints `Confirm with --confirm <digest>` and refuses both an
+  absent confirmation and a wrong digest.
+- This strengthens AC-F013-003. The prior implementation would have accepted
+  confirmation of a plan the operator never saw.
+
 ### Delivery
 
 - Status: not applicable. No deployment has been authorized or attempted, and
