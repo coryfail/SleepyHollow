@@ -18,6 +18,34 @@ type DefinedRoute<
   >;
 };
 
+/**
+ * Declares the operations a route file answers, one per HTTP method.
+ *
+ * The call is an identity function at runtime; its work is done in the type
+ * system, where the schemas you pass become the types of `params`, `query`,
+ * `headers`, and `body` inside each handler, and the declared authentication
+ * mode determines whether `principal` can be `null`.
+ *
+ * ```ts
+ * import { defineRoute } from "@sleepy-hollow/framework/routing";
+ * import { z } from "@sleepy-hollow/framework/validation";
+ *
+ * export default defineRoute({
+ *   GET: {
+ *     schemas: {
+ *       params: z.object({ id: z.string() }).strict(),
+ *       responses: { 200: z.object({ id: z.string() }).strict() },
+ *     },
+ *     security: { authentication: "none" },
+ *     contract: { summary: "Return one widget" },
+ *     handler: ({ params }) => Response.json({ id: params.id }),
+ *   },
+ * });
+ * ```
+ *
+ * @param route The operations this file answers, keyed by HTTP method.
+ * @returns The same declaration, typed so handlers infer their inputs.
+ */
 export function defineRoute<
   const Schemas extends MethodMap,
   const Security extends { readonly [Method in keyof Schemas]: unknown },

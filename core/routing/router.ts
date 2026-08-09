@@ -62,6 +62,23 @@ function problem(
   );
 }
 
+/**
+ * Builds a request handler that dispatches to a discovered route table.
+ *
+ * The returned object exposes `fetch`, so it can be passed to `Deno.serve`
+ * directly. An unmatched path answers 404 and an unmatched method answers 405,
+ * both as problem-details responses.
+ *
+ * ```ts
+ * import { createRouter, discoverRoutes } from "@sleepy-hollow/framework";
+ *
+ * const router = createRouter(await discoverRoutes("./api"));
+ * Deno.serve(router.fetch);
+ * ```
+ *
+ * @param routes The route table, normally from {@linkcode discoverRoutes}.
+ * @returns A handler suitable for `Deno.serve`.
+ */
 export function createRouter(
   routes: readonly NormalizedRoute[],
 ): { fetch(request: Request): Promise<Response> } {

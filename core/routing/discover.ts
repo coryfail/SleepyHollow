@@ -170,6 +170,19 @@ function findConflicts(files: readonly RouteFile[]): RoutingDiagnostic[] {
   );
 }
 
+/**
+ * Walks a directory and derives the route table from the file layout.
+ *
+ * Each `route.ts` becomes one route whose URL path is its position in the
+ * tree, and each method it exports becomes one entry. Faults are collected
+ * across the whole tree and thrown together as a
+ * {@linkcode RouteDiscoveryError}, so one run reports every correction rather
+ * than stopping at the first.
+ *
+ * @param apiRoot Directory to walk, as a path or a `file:` URL.
+ * @returns Every discovered route, one entry per method.
+ * @throws {RouteDiscoveryError} When any route in the tree is malformed.
+ */
 export async function discoverRoutes(
   apiRoot: URL | string,
 ): Promise<readonly NormalizedRoute[]> {
