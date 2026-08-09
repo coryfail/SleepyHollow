@@ -44,6 +44,12 @@ export function problem(
   );
 }
 
+/**
+ * Renders a diagnostic as human-readable lines for a terminal or log.
+ *
+ * @param diagnostic The failure to render.
+ * @returns The rendered text, carrying paths but never submitted values.
+ */
 export function formatValidationDiagnostic(
   diagnostic: ValidationDiagnostic,
 ): string {
@@ -64,6 +70,12 @@ export function formatValidationDiagnostic(
   ].join("\n");
 }
 
+/**
+ * Wraps diagnostics in a versioned envelope for machine consumption.
+ *
+ * @param diagnostics The failures to report.
+ * @returns The diagnostics, tagged with their format version.
+ */
 export function validationDiagnosticResult(
   diagnostics: readonly ValidationDiagnostic[],
 ): {

@@ -23,8 +23,11 @@ interface RawSchemas {
   readonly responses?: Readonly<Record<string, unknown>>;
 }
 
+/** A route paired with its normalized schemas, ready to be enforced. */
 export interface PreparedRoute {
+  /** The route as discovered. */
   readonly source: NormalizedRoute;
+  /** Its schemas, normalized. */
   readonly normalized: NormalizedValidationRoute;
 }
 
@@ -172,6 +175,16 @@ function normalizeBody(
     : undefined;
 }
 
+/**
+ * Normalizes every route's schemas once, at startup.
+ *
+ * Faults are collected across the whole table rather than thrown at the first,
+ * so one run reports every schema that needs correcting.
+ *
+ * @param routes The discovered route table.
+ * @returns Each route paired with its normalized schemas.
+ * @throws {SchemaNormalizationError} When any route's schemas are invalid.
+ */
 export function normalizeRoutes(
   routes: readonly NormalizedRoute[],
 ): readonly PreparedRoute[] {

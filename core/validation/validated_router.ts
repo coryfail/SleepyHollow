@@ -8,6 +8,18 @@ import { type ParsedContext, parseRequest } from "./request.ts";
 import { handlerFailure, validateResponse } from "./response.ts";
 import type { ValidatedRouter, ValidationOptions } from "./types.ts";
 
+/**
+ * Wraps a route table so requests and responses are validated.
+ *
+ * A request that fails its schema is answered with problem details rather than
+ * raised as a fault. A response that fails its schema is a defect in the
+ * service, and is treated as one.
+ *
+ * @param routes The discovered route table.
+ * @param options The posture, and where to report failures.
+ * @returns A validating router, and its resolved schema inventory.
+ * @throws {SchemaNormalizationError} When any route's schemas are invalid.
+ */
 export function createValidatedRouter(
   routes: readonly NormalizedRoute[],
   options: ValidationOptions = {},
