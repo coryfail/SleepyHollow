@@ -18,6 +18,30 @@ Short-lived branches use these naming conventions:
 
 Use lowercase, hyphen-separated descriptions in branch names.
 
+## One-time setup
+
+Enable the repository's hooks:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+The pre-commit hook rejects a commit whose staged `requirements.md` no longer
+matches the approval recorded inside it. An exact-content approval authorizes
+exact bytes, so a change as small as a rewrapped paragraph detaches an
+`approved` or `verified` requirement from the content it claims to authorize.
+That has happened, caused by a formatting command run over a directory.
+`deno.json` excludes requirement Markdown from `deno fmt` to prevent that
+specific cause; the hook is cause-independent and catches any edit.
+
+Run the same check by hand at any time:
+
+```sh
+deno task check:governance
+```
+
+Drafts are exempt, because a draft is expected to change before it is approved.
+
 ## Feature workflow
 
 Create feature branches from an up-to-date `development` branch:

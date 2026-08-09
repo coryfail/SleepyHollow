@@ -26,7 +26,9 @@
       "**/*_test.ts",
       "**/testdata",
       "**/requirements.md",
-      "examples"
+      "examples",
+      "scripts",
+      ".githooks"
     ]
   },
   "imports": {
@@ -100,6 +102,7 @@
     "check:packaging": "deno check packaging/mod.ts packaging/packaging_test.ts",
     "test:packaging": "deno test --allow-read packaging/packaging_test.ts",
     "verify:packaging": "deno fmt --check packaging/*.ts && deno lint packaging/*.ts && deno task check:packaging && deno task test:packaging",
+    "check:governance": "deno run --quiet --allow-read --allow-run=git scripts/check-governed-digests.ts",
     "test:example": "cd examples/todos && deno task test",
     "verify:example": "cd examples/todos && deno task verify"
   }

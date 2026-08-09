@@ -1,0 +1,21 @@
+#!/bin/sh
+# Rejects a commit whose staged governed requirement content no longer matches
+# the approval recorded inside it. Enable with:
+#
+#   git config core.hooksPath .githooks
+#
+set -e
+
+staged=$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '(^|/)requirements\.md$|^requirements/application\.md$' || true)
+
+[ -z "$staged" ] && exit 0
+
+if ! command -v deno >/dev/null 2>&1; then
+  echo "pre-commit: deno not found; skipping the governed-digest check." >&2
+  exit 0
+fi
+
+# shellcheck disable=SC2086
+exec deno run --quiet --allow-read --allow-run=git \
+  scripts/check-governed-digests.ts --staged $staged
