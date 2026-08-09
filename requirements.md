@@ -402,6 +402,22 @@ verification described above.
   canonical repository gates also passed with the results recorded above. No
   commit, push, publication, deployment, or other delivery was performed.
 
+- Test correction, endpoint requirement kinds, 2026-08-09T11:41:00Z: the
+  AC-REPO-001/AC-REPO-002 sweep asserted the component frontmatter contract on
+  every discovered `requirements.md`, including the `sgad-endpoint` documents in
+  `examples/todos`, which declare `id`, `path`, `status`, `methods`, and
+  `service` and carry an approval-only governance record. The sweep therefore
+  failed on well-formed endpoint documents, leaving the canonical gate red for a
+  defect in the check rather than in the repository. The sweep now classifies by
+  kind and asserts the contract each kind actually has, and additionally
+  requires a non-empty `methods` list and, for a non-draft endpoint, that the
+  recorded approval digest binds the current governed content. No criterion text
+  changed: AC-REPO-002 already required valid required metadata, which is
+  kind-specific by definition. The endpoint branch is proven live by an
+  assertion that at least one endpoint requirement is covered, and was
+  negative-tested by mutating governed bytes, removing `methods`, and renaming
+  the `Approval` heading, each of which fails the check.
+
 ### Delivery
 
 - Verification scope initially excluded delivery.

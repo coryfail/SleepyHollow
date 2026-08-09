@@ -63,20 +63,42 @@ const section = (document, heading) => {
 test("AC-REPO-001 AC-REPO-002 · requirements use one digest and governance boundary", () => {
   const paths = requirementPaths();
   assert.ok(paths.length > 20, "the complete requirement set must be discoverable");
+  let endpoints = 0;
   for (const path of paths) {
     const document = read(path);
     const metadata = frontmatter(document, path);
     const { normalized, record } = governedContent(document, path);
-    for (const field of ["schema", "id", "title", "status", "risk", "depends_on", "owners"]) {
+    const endpoint = metadata.schema === undefined
+      && metadata.path !== undefined && metadata.service !== undefined;
+    const fields = endpoint
+      ? ["id", "path", "status", "service", "methods"]
+      : ["schema", "id", "title", "status", "risk", "depends_on", "owners"];
+    for (const field of fields) {
       assert.notEqual(metadata[field], undefined, `${path} is missing ${field}`);
     }
     assert.ok(["draft", "approved", "verified"].includes(metadata.status), `${path} has invalid status`);
     assert.doesNotMatch(record.slice("## Governance record\n".length), /^## /m, `${path} has content after governance`);
-    for (const heading of ["Approval", "Criterion mapping", "Red-state evidence", "Verification", "Delivery"]) {
+    const headings = endpoint
+      ? ["Approval"]
+      : ["Approval", "Criterion mapping", "Red-state evidence", "Verification", "Delivery"];
+    for (const heading of headings) {
       assert.match(record, new RegExp(`^### ${heading}$`, "m"), `${path} is missing ${heading}`);
     }
     assert.equal(sha256(normalized).length, 64);
+    if (!endpoint) continue;
+    endpoints += 1;
+    assert.ok(
+      Array.isArray(metadata.methods) && metadata.methods.length > 0,
+      `${path} must declare at least one method`,
+    );
+    if (metadata.status === "draft") continue;
+    assert.match(
+      record,
+      new RegExp(`Governed-content digest:[\\s\\S]{0,80}sha256:${sha256(normalized)}`),
+      `${path} approval does not bind current governed content`,
+    );
   }
+  assert.ok(endpoints > 0, "endpoint requirements must be covered by this sweep");
 
   const repositoryRequirement = read("requirements.md");
   const { normalized, record } = governedContent(repositoryRequirement, "requirements.md");

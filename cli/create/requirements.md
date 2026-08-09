@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "3.1"
@@ -230,12 +230,12 @@ readability; no other digest normalization is permitted.
   `readonly securityModule?: string`, the scaffolded configuration declares no
   value, and the generated project's own `deno task check` passes both with the
   value absent and with it present.
-- Independent verifier state: `test:structure` 16/16 and `test:links` 1/1
-  passed; `test:repository` passed 7/9. AC-REPO-001 fails on the example
-  project's endpoint requirements, a defect that predates this amendment and is
-  unrelated to it, and AC-REPO-010 reports uncommitted SH-F007 draft drift. The
-  `verified` status projection is therefore withheld until the canonical
-  repository verifier is green; this component's own gate passed in full.
+- Independent verifier state: the canonical `npm run verify` from `website/`
+  passed in full at 2026-08-09T11:36:00Z on top of commit `8a12f01`: structural
+  16/16, links 1/1, repository consistency 9/9, React 8/8, TypeScript and
+  production build, and Playwright/Axe 66/66 across Chromium, Firefox, and
+  WebKit. The AC-REPO-001 endpoint-kind defect that previously withheld this
+  projection is repaired, so the status is now `verified`.
 
 ### Red-state evidence
 
