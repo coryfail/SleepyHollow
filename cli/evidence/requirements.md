@@ -218,7 +218,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F018-001 through AC-F018-015.
 - Governed-content digest:
   `sha256:d2ab29ec6e81591d1fda77dc8af5ab614905ec30af14ff8643efcd9062262dc7`.
-- Decision source: Claude conversation; direct response `Approve both` after
+- Decision source: owner review; direct response `Approve both` after
   review of the capture-sourced behavioral evidence, the uncaptured-route and
   stale-artifact criteria, and the exact governed-content digest.
 
@@ -246,7 +246,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F018-001 through AC-F018-013.
 - Governed-content digest:
   `sha256:c40a9ffdd22ee0368b0467ff98b75986e1a599a8c3ba2bcd14143914dd8c12bf`.
-- Decision source: Claude conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the corrected OPEN-012 resolution, the SH-F001 location source, the bounded
   criteria, and the exact governed-content digest.
 
@@ -274,7 +274,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F018-001 through AC-F018-013.
 - Governed-content digest:
   `sha256:f1c1343413ba11438bda1be28aa0dde456e6bb2119bf0b5eeee9a4850d2aa23a`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the requirement scope, bounded criteria, dependencies, the OPEN-012
   resolution, and the exact governed-content digest.
 - Superseded approval: an earlier revision bound

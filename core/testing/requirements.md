@@ -215,7 +215,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F007-001 through AC-F007-012.
 - Governed-content digest:
   `sha256:ff84946573d0e59f7dce24063ccd447015fdbebe81b5aafa25036a493115a458`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the dependency correction recorded below, the added SH-F002 and SH-F005
   edges and why they are load-bearing for this component's own impact analysis,
   the unchanged criterion text, and the exact governed-content digest.
@@ -228,7 +228,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F007-001 through AC-F007-012.
 - Governed-content digest:
   `sha256:e92261b2d031890efbdf45c5c71f870cc3cf8dbc413ad3028a1c523aaa09a0b9`.
-- Decision source: Claude conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of security composition in the test application, the reasoning that a
   security-bypassing test application produces false passes in the evidence
   `hollow check` relies on, the two amended criteria, and the exact
@@ -247,7 +247,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F007-001 through AC-F007-010.
 - Governed-content digest:
   `sha256:bc2e3f6706875c1cc97a22ef6569e60ee92d4a96da1330521d3ea8a11e0ab327`.
-- Decision source: Codex conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the requirement path, bounded criteria, standard-risk classification,
   satisfied SH-F003, SH-F004, and SH-F006 dependencies, native Deno criterion
   metadata, fail-closed impact analysis, and exact governed-content digest.

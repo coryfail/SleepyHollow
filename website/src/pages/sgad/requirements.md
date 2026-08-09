@@ -142,7 +142,7 @@ other digest normalization is permitted.
 - Approved criteria: the criteria recorded in this requirement.
 - Governed-content digest:
   `sha256:bb13e32a8e656e3bc3ecb67c3136e9c79ec62304136a85d5ab4071c662fc96fb`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the current content after the unbound-approval correction and the exact governed-content digest.
 
 ### Approval, unbound

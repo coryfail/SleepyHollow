@@ -112,7 +112,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F009-001 through AC-F009-012.
 - Governed-content digest:
   `sha256:b0da46ef216f78fd63026af4930064b13a5bdcde5e6374398e20c8359b11ca57`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the requirement scope, bounded criteria, dependencies, open decisions, and
   exact governed-content digest.
 

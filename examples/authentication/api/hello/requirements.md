@@ -104,7 +104,7 @@ readability; no other digest normalization is permitted.
   digest are unchanged; only the expression of the same three criteria is.
 - Governed-content digest:
   `sha256:379cc80c8f1fc8e1d2d9a2665783e0fc5fca724c5eaeebd55a4d8d16f51187f6`.
-- Decision source: Claude conversation; direct response `approve` after review
+- Decision source: owner review; direct response `approve` after review
   of the required authentication mode, the declared 401 contract and challenge,
   the absence of an authorization guard, the indistinguishable rejection of an
   absent and an unrecognized credential, and the exact governed-content digest.

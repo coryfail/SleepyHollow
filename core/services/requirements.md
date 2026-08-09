@@ -204,7 +204,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F014-001 through AC-F014-009.
 - Governed-content digest:
   `sha256:43b5ede2142d00ecc92d9e5bf40b80d50a41df20738f254c151e220d9bbc93a0`.
-- Decision source: Codex conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the requirement path, bounded criteria, standard-risk classification,
   verified SH-F001, SH-F005, SH-F010, and SH-F012 dependencies, supported
   architecture modes, service ownership boundary, generated-client transport,

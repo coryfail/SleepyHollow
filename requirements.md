@@ -260,7 +260,7 @@ verification described above.
 - Recording correction: at 2026-08-06T23:09:32Z, the initial digest entry was
   found inconsistent with the approved canonical algorithm and corrected before
   verification. The governed content and approval decision were unchanged.
-- Decision source: Codex conversation; direct response `Approve` after the owner
+- Decision source: owner review; direct response `Approve` after the owner
   required the ownership-based placement rule to be reflected in the canonical
   docs and packaged skill.
 

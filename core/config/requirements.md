@@ -163,7 +163,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F012-001 through AC-F012-009.
 - Governed-content digest:
   `sha256:0a2408dd0c34e4b35bc5feb00d2ea8cf53a8fdcf269d9912ced09eb9cd471e28`.
-- Decision source: Codex conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the requirement path, bounded criteria, standard-risk classification,
   dependencies, mode-specific Zod configuration, logging, operational-route
   design, and exact governed-content digest.

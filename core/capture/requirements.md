@@ -179,7 +179,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F019-001 through AC-F019-015.
 - Governed-content digest:
   `sha256:9280cab006e7a6faad24a9dedc79a294785387688c2114199f331bd167670dc2`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of artifact persistence, the no-partial-write rule, and automatic criterion binding, and the exact governed-content digest.
 
 ### Superseded approval
@@ -190,7 +190,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F019-001 through AC-F019-012.
 - Governed-content digest:
   `sha256:49cf816dda800703b8f884bdbfd9eeeee7b4be1564ca6d6b50c3dad4754dc014`.
-- Decision source: Claude conversation; direct response `Approve both` after
+- Decision source: owner review; direct response `Approve both` after
   review of the additive wrapping boundary, the observed-evidence model, the
   coverage-honesty rule, the bounded criteria, and the exact governed-content
   digest.

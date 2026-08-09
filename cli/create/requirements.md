@@ -151,7 +151,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F001-001 through AC-F001-013.
 - Governed-content digest:
   `sha256:67aea67d00c44407c321b61e60c0800f913ab5e1ed2f091194d3cb38f46afe94`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the formatting exclusion for governed content, the reproduction in a
   freshly generated project, the criterion stated as observable behavior rather
   than as a configuration key, its second clause requiring other files to remain
@@ -167,7 +167,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F001-001 through AC-F001-012.
 - Governed-content digest:
   `sha256:f8887e434d3062cc2d5e20dd4076aa8fa2d64fbc5d3f77ac455f00fb171dc59e`.
-- Decision source: Claude conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the optional `securityModule` value in the typed project configuration, the
   scaffold declaring none because a new project has no route to protect, the
   added SH-F005 dependency, the relocation of AC-F001-010 and AC-F001-011 into
@@ -181,7 +181,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F001-001 through AC-F001-011.
 - Governed-content digest:
   `sha256:e060e03477a9e6d1c4f2e23205e16f7a0082d4ca3eb04d9ee5e19e8ffd3cd7f8`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the capture-aware test setup amendment and the exact governed-content
   digest.
 
@@ -193,7 +193,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F001-001 through AC-F001-009.
 - Governed-content digest:
   `sha256:5d0236364f999f012df2182a85f1d5c3c1c55b6cccbe4e19f21bc8a675e67068`.
-- Decision source: Codex conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the requirement path, bounded criteria, and exact governed-content digest.
 
 ### Verification, capture-scaffold amendment

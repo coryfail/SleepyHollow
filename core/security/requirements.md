@@ -256,7 +256,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F005-001 through AC-F005-014.
 - Governed-content digest:
   `sha256:0150867cffe2398f2b598c71874ab5efc325a332ce54da1e87fe6a3352f6fd90`.
-- Decision source: Claude conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the project security declaration, the explicit `securityModule` naming that
   replaces convention-based discovery, composition-time failure for a required
   route with no resolvable provider, the three amended criteria, and the exact
@@ -270,7 +270,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F005-001 through AC-F005-011.
 - Governed-content digest:
   `sha256:4eb04f57e6fdc65d3ed42b96f790286b069644daf1fdb4038bca9c5ea22fd017`.
-- Decision source: Codex conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the requirement path, bounded criteria, high-risk classification,
   dependencies, resolved OPEN-007 and OPEN-008 designs, and exact governed-
   content digest.

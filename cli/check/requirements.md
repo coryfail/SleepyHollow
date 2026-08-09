@@ -264,7 +264,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F008-001 through AC-F008-015.
 - Governed-content digest:
   `sha256:4a47c5ea70b224e24502cc74dfb868a4853c395428489879f53a885953b26a62`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of fail-closed verification of observed coverage with a recorded-justification exception, and the exact governed-content digest.
 
 ### Superseded approval
@@ -275,7 +275,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F008-001 through AC-F008-011.
 - Governed-content digest:
   `sha256:f1940f8e137a319adfc66d7e8b2341fba0f3748c6387ff3d24354c72fce606a8`.
-- Decision source: Codex conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the requirement path, bounded criteria, standard-risk classification,
   verified SH-F002 through SH-F007 dependencies, fixed independent check
   registry, fail-closed targeted scope, deterministic result contract, bounded

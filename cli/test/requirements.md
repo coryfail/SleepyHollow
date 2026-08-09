@@ -258,7 +258,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F016-001 through AC-F016-012.
 - Governed-content digest:
   `sha256:f1829cbcc91faad99379c647375aeb83e5c06626c460a7cc103ac7a9fb793a66`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the empty-selection split between a full-scope run with nothing governed
   and a targeted scope that matched nothing, and the exact governed-content
   digest.
@@ -271,7 +271,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F016-001 through AC-F016-010.
 - Governed-content digest:
   `sha256:86067cb8f7f84d73bc3a91f9b72390b05fa3efa20ab44bf4c3d4b78e8b75fb13`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of capture invocation and artifact persistence during test execution, and the exact governed-content digest.
 
 ### Superseded approval
@@ -282,7 +282,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F016-001 through AC-F016-007.
 - Governed-content digest:
   `sha256:71e754f966615cd4cbdee57653610f02aed94e1f85bb39d51909ee026c105d07`.
-- Decision source: Codex conversation; direct response `Approve` after review of
+- Decision source: owner review; direct response `Approve` after review of
   the requirement path, bounded criteria, standard-risk classification, verified
   SH-F006 and SH-F007 dependencies, resolved OPEN-006 closure, fixed command
   grammar, bounded native Deno runner, TAP result contract, isolation policy,

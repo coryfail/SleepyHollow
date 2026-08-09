@@ -227,7 +227,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F015-001 through AC-F015-009.
 - Governed-content digest:
   `sha256:6caaf407cc44e7977b5a87f88879c3bfba32847ebce870057db24721d6b39f98`.
-- Decision source: Claude conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of security composition in the development runtime, startup failure rather
   than a fallback that serves routes unprotected, the two amended criteria and
   their evidence-map rows, and the exact governed-content digest.
@@ -240,7 +240,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F015-001 through AC-F015-007.
 - Governed-content digest:
   `sha256:bd02aceb3ee878b11e5150dd0bfb2663f30ee1f7f0cdd0f41d3c520774d92892`.
-- Decision source: Codex conversation; direct response `Approve` after review of
+- Decision source: owner review; direct response `Approve` after review of
   the requirement path, bounded criteria, standard-risk classification, verified
   SH-F001, SH-F002, and SH-F012 dependencies, loopback-only startup, validated
   fresh-generation restart lifecycle, prior-generation retention, clean

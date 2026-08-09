@@ -144,7 +144,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F003-001 through AC-F003-008.
 - Governed-content digest:
   `sha256:19ec47355a971203e0b6e85c256eb9df52fb8a17feaf37a13f94975ebef90652`.
-- Decision source: Codex conversation; direct response `Approve` after the
+- Decision source: owner review; direct response `Approve` after the
   formatting-only invalidation and both current exact digests were presented.
 - Supersedes: the 2026-08-07T13:40:08Z approval recorded below. This entry is
   the governing record and its digest binds the current governed content.
@@ -157,7 +157,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F003-001 through AC-F003-008.
 - Governed-content digest:
   `sha256:88a39d3ada150d3c5c6396d71cc52b489b256e20a2e1b87e675c9f8b953e8e30`.
-- Decision source: Codex conversation; direct response `Approve` after review of
+- Decision source: owner review; direct response `Approve` after review of
   the requirement path, bounded criteria, schema choice, and exact digest.
 - Invalidation: at 2026-08-07T13:52:19Z, an overbroad Deno formatting command
   changed governed Markdown bytes after approval. No behavioral change was

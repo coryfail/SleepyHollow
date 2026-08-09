@@ -128,7 +128,7 @@ readability; no other digest normalization is permitted.
 - Approved criteria: AC-F020-001 through AC-F020-008.
 - Governed-content digest:
   `sha256:d8c40c170978b879bc55bd6e4a34400d806cf4ef98cb0d3625f49a9d35b3affd`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of package identity, the explicit public export surface, dual-registry publication, and the release gate, and the exact governed-content digest.
 
 ### Criterion mapping

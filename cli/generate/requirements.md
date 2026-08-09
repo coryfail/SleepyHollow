@@ -210,7 +210,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F010-001 through AC-F010-010.
 - Governed-content digest:
   `sha256:32ea3439f482b6fe19e784e258264b7e1ee4ce0a29a64a63669cdce365a8d8d1`.
-- Decision source: Codex conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the requirement path, bounded criteria, standard-risk classification,
   satisfied SH-F002 and SH-F003 dependencies, dependency-free Web Standards
   client design, generated artifact contract, and exact governed-content digest.

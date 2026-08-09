@@ -177,7 +177,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F004-001 through AC-F004-009.
 - Governed-content digest:
   `sha256:907a8e8cd07974545db0f5a4f01ac91b56d42ea28c1dc4899de511f56cab5a96`.
-- Decision source: Codex conversation; direct response `Approved` after review
+- Decision source: owner review; direct response `Approved` after review
   of the requirement path, bounded criteria, risk, dependency, resolved
   OPEN-003 design, and exact governed-content digest.
 

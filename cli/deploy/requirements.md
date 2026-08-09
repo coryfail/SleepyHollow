@@ -146,7 +146,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F013-001 through AC-F013-013.
 - Governed-content digest:
   `sha256:b0b2eedd36108b92c9cc836862ecc975211bc4989788b7e4a84b2e0215eeb21d`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the operator-supplied credential model, the injectable transport boundary,
   the OPEN-011 resolution, and the exact governed-content digest.
 
@@ -158,7 +158,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F013-001 through AC-F013-009.
 - Governed-content digest:
   `sha256:fc354689a9b796f3be3563516920e8f443069a57a8f4a9bd5bd7d774d13996f2`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the requirement scope, bounded criteria, dependencies, open decisions, and
   exact governed-content digest.
 

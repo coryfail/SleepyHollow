@@ -148,7 +148,7 @@ other digest normalization is permitted.
 - Approved criteria: the criteria recorded in this requirement.
 - Governed-content digest:
   `sha256:6fe479cf0963f8068dbe05e476150794cccf0e9960b8730da50d73f77eef1374`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the current content after the unbound-approval correction and the exact governed-content digest.
 
 ### Approval, unbound
@@ -173,7 +173,7 @@ other digest normalization is permitted.
 - Approved criteria: AC-F017-001 through AC-F017-013.
 - Historical requirement digest:
   `sha256:f080aba49ed769339a504cd21be0bfed710b77f2a44071caae910dfb994ce64c`.
-- Decision source: Codex conversation; publish the standalone SGAD workflow
+- Decision source: owner review; publish the standalone SGAD workflow
   skill for framework-independent use.
 
 ### Verification, current content

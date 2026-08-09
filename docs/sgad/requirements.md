@@ -123,7 +123,7 @@ other digest normalization is permitted.
 - Approved criteria: the criteria recorded in this requirement.
 - Governed-content digest:
   `sha256:57783395c036abbf2377fb811e4c7956ce72aa87bba928d2685ed10be568ea03`.
-- Decision source: Claude conversation; direct response `Approve` after review
+- Decision source: owner review; direct response `Approve` after review
   of the canonical SGAD methodology documentation and the exact governed-content digest.
 
 ### Approval
