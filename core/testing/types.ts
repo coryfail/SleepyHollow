@@ -143,12 +143,11 @@ export interface TestApplicationSecurityOptions {
   readonly load?: (specifier: string) => Promise<unknown>;
 }
 
-export interface TestApplicationOptions<Principal, Credentials> {
-  readonly create?: (
-    context: TestApplicationFactoryContext<Principal, Credentials>,
-  ) => TestApplication | Promise<TestApplication>;
-  readonly routes?: readonly NormalizedRoute[];
-  readonly security?: TestApplicationSecurityOptions;
+export type TestApplicationFactory<Principal, Credentials> = (
+  context: TestApplicationFactoryContext<Principal, Credentials>,
+) => TestApplication | Promise<TestApplication>;
+
+export interface TestApplicationFixtures<Principal, Credentials> {
   readonly principal?: Principal;
   readonly credentials?: Credentials;
   readonly seed?: (context: {
@@ -158,6 +157,27 @@ export interface TestApplicationOptions<Principal, Credentials> {
   readonly cleanup?: () => void | Promise<void>;
   readonly origin?: string;
 }
+
+/**
+ * A test application is built either from an application factory or from a
+ * route inventory the framework composes security over, never from neither and
+ * never from both. The union makes the invalid combinations unrepresentable
+ * rather than leaving them to a runtime diagnostic.
+ */
+export type TestApplicationOptions<Principal, Credentials> =
+  & TestApplicationFixtures<Principal, Credentials>
+  & (
+    | {
+      readonly create: TestApplicationFactory<Principal, Credentials>;
+      readonly routes?: undefined;
+      readonly security?: undefined;
+    }
+    | {
+      readonly routes: readonly NormalizedRoute[];
+      readonly security?: TestApplicationSecurityOptions;
+      readonly create?: undefined;
+    }
+  );
 
 export interface JsonRequestOptions<Body> {
   readonly method?: string;

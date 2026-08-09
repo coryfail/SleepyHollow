@@ -8,6 +8,7 @@ import type {
   ProblemExpectation,
   TestApplication,
   TestApplicationContext,
+  TestApplicationFactory,
   TestApplicationOptions,
   TestApplicationSecurityOptions,
 } from "./types.ts";
@@ -105,17 +106,22 @@ export async function problem(
   return body as ProblemDetails;
 }
 
+/**
+ * The options union already makes "neither factory nor routes" a type error.
+ * This guard exists for callers that reach the runtime without that checking,
+ * such as JavaScript or a value cast through `any`.
+ */
 function required<Principal, Credentials>(
-  options: TestApplicationOptions<Principal, Credentials>,
-): Required<Pick<TestApplicationOptions<Principal, Credentials>, "create">> {
-  if (options.create === undefined) {
+  create: TestApplicationFactory<Principal, Credentials> | undefined,
+): TestApplicationFactory<Principal, Credentials> {
+  if (create === undefined) {
     throw new TestingError([testingDiagnostic(
       "SH_TEST_APPLICATION_SOURCE_REQUIRED",
       "A test application needs either an application factory or a route inventory.",
       "Supply create or routes.",
     )]);
   }
-  return { create: options.create };
+  return create;
 }
 
 async function secured(
@@ -149,7 +155,7 @@ export async function testApplication<Principal, Credentials>(
   };
   try {
     const application = options.routes === undefined
-      ? await required(options).create({
+      ? await required(options.create)({
         kv: kvContext.kv,
         principal: options.principal === undefined
           ? undefined
