@@ -30,6 +30,17 @@ function dataError(location: string, message: string): KvDataError {
   return new KvDataError("SH_KV_SCHEMA_INVALID", location, message);
 }
 
+/**
+ * Builds typed access to one resource over an open KV store.
+ *
+ * Every read and write is checked against the resource's schemas, and index
+ * entries are written in the same transaction as the record, so an index
+ * cannot drift from what it points at.
+ *
+ * @param kv An open KV store.
+ * @param definition The resource, from {@linkcode defineKvResource}.
+ * @returns A repository over that resource.
+ */
 export function createKvRepository<
   Name extends string,
   IdSchema extends z.ZodType<StorageKeyPart>,

@@ -9,6 +9,31 @@ import type {
 
 const identifier = /^[A-Za-z][A-Za-z0-9_-]*$/;
 
+/**
+ * Declares a stored resource: its name, its schemas, and its indexes.
+ *
+ * The declaration is validated eagerly, so a malformed resource name or index
+ * stops the process at startup rather than on the first write that uses it.
+ *
+ * ```ts
+ * import { defineKvResource } from "@sleepy-hollow/framework/kv";
+ * import { z } from "@sleepy-hollow/framework/validation";
+ *
+ * const bookmarks = defineKvResource({
+ *   name: "bookmark",
+ *   id: z.string(),
+ *   value: z.object({ url: z.string(), ownerId: z.string() }).strict(),
+ *   indexes: {
+ *     byOwner: { kind: "index", value: (b) => b.ownerId },
+ *     byUrl: { kind: "unique", value: (b) => b.url },
+ *   },
+ * });
+ * ```
+ *
+ * @param definition The resource's name, schemas, and indexes.
+ * @returns The validated definition, for {@linkcode createKvRepository}.
+ * @throws {KvDataError} When the name or an index declaration is malformed.
+ */
 export function defineKvResource<
   const Name extends string,
   IdSchema extends z.ZodType<StorageKeyPart>,
