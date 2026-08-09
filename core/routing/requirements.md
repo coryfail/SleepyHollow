@@ -237,6 +237,36 @@ readability; no other digest normalization is permitted.
   is
   `working-tree:sha256:f7e1e76626c370eefd6b6dd602e4140e6d7bbde16d130e464097a4e9dcedc30f`.
 
+### Known defect, principal narrowing
+
+- Status: open. Recorded rather than repaired.
+- Observed at: 2026-08-09T01:33:10Z.
+- Symptom: a route handler's `principal` is typed `RoutePrincipal | null`
+  regardless of the declared authentication mode. Neither
+  `authentication: { mode: "required" }` nor `{ mode: "none" }` narrows it.
+  Every authenticated handler therefore needs a null check or assertion that the
+  runtime does not require.
+- Approved intent is unaffected: SH-F005 already requires a required mode to
+  expose its neutral principal and AC-F005-001 requires `principal: null` for an
+  explicit `none` decision. Runtime behavior matches that intent. The defect is
+  in the type surface only.
+- Cause: `SecurityPrincipal<Security>` in `core/routing/types.ts` is written with
+  both branches, but `defineRoute` cannot infer its `Security` generic. The
+  generic appears only in indexed-access positions, `Security[Method]`, under a
+  mapped-type constraint over `keyof Schemas`. Inference falls back to the
+  constraint, so neither conditional branch matches. `Schemas` infers correctly
+  because its constraint is a plain `MethodMap`, which is why `body` and `query`
+  narrow while `principal` does not.
+- Repair attempts, all reverted: constraining `Security` to a security-shaped
+  map, replacing its constraint with `MethodMap` plus guarded indexed access,
+  and restructuring the signature to infer one `Route` generic with a mapped
+  parameter type. The third is the most promising direction but needs the
+  optional-method handling worked out properly rather than under time pressure.
+- Classification: bounded implementation defect within already-approved intent.
+  Repairing it requires no amendment and no new approval. It is left open
+  deliberately, with the caveat documented in
+  `docs/framework/routing.md`, rather than shipped as a partial type change.
+
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.
