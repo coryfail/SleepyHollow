@@ -3,6 +3,16 @@ import { pathToFileURL } from "node:url";
 
 import { discoverRoutes } from "../core/routing/mod.ts";
 import { runCheckCommand, type VerificationInventory } from "./check/mod.ts";
+import {
+  createDenoDeployAdapter,
+  type DeployAdapter,
+  type DeployInventory,
+  exitCodeForDeploy,
+  renderHumanDeployResult,
+  renderJsonDeployResult,
+  resolveDeployToken,
+  runDeployment,
+} from "./deploy/mod.ts";
 import { createProject, CreationError } from "./create/mod.ts";
 import { runDevCommand } from "./dev/mod.ts";
 import {
@@ -32,6 +42,11 @@ export interface CliDependencies {
     readonly scope: VerificationInventory["requestedScope"];
   }) => VerificationInventory | Promise<VerificationInventory>;
   readonly testInventoryLoader?: TestInventoryLoader;
+  readonly deployInventoryLoader?: (options: {
+    readonly projectRoot: string;
+  }) => DeployInventory | Promise<DeployInventory>;
+  readonly deployAdapter?: DeployAdapter;
+  readonly deployToken?: () => string;
   readonly testRunner?: TestRunner;
   readonly commands?: Partial<Record<CliCommandName, CliCommandHandler>>;
 }
@@ -372,6 +387,70 @@ function checkHandler(
   };
 }
 
+function deployHandler(
+  load: NonNullable<CliDependencies["deployInventoryLoader"]>,
+  adapter: DeployAdapter | undefined,
+  token: (() => string) | undefined,
+): CliCommandHandler {
+  return async ({ args, cwd }) => {
+    const confirmed = args.includes("--confirm");
+    try {
+      const inventory = await load({ projectRoot: cwd });
+      const result = await runDeployment(
+        {
+          inventory,
+          token: (token ?? resolveDeployToken)(),
+          confirmed,
+          ...(confirmed
+            ? { confirmationSource: "operator passed --confirm" }
+            : {}),
+        },
+        adapter ?? createDenoDeployAdapter({}),
+        () => new Date().toISOString(),
+      );
+      return {
+        exitCode: exitCodeForDeploy(result),
+        result: {
+          ok: result.ok,
+          command: "deploy" as const,
+          schema: result.schema,
+          summary: renderHumanDeployResult(result).split("\n")[0] ?? "",
+          diagnostics: result.diagnostics.map((item) => ({
+            code: item.code,
+            severity: item.severity,
+            summary: item.summary,
+            correction: item.correction,
+          })),
+          json: JSON.parse(renderJsonDeployResult(result)) as Record<
+            string,
+            unknown
+          >,
+        },
+      };
+    } catch (error) {
+      const summary = error instanceof Error
+        ? error.message
+        : "Deployment could not start.";
+      return {
+        exitCode: 1 as const,
+        result: {
+          ok: false,
+          command: "deploy" as const,
+          schema: "sleepy-hollow-deploy-result/v1",
+          summary,
+          diagnostics: [{
+            code: "SH_DEPLOY_PRECONDITION_UNMET",
+            severity: "error" as const,
+            summary,
+            correction:
+              "Resolve the reported condition and rerun hollow deploy.",
+          }],
+        },
+      };
+    }
+  };
+}
+
 function unavailable(command: CliCommandName): CliCommandHandler {
   return ({ args }) => {
     if (args.some((argument) => argument !== "--json")) {
@@ -493,7 +572,13 @@ export function createCliHandlers(
     ),
     check: checkHandler(dependencies.checkInventoryLoader),
     generate,
-    deploy: unavailable("deploy"),
+    deploy: dependencies.deployInventoryLoader
+      ? deployHandler(
+        dependencies.deployInventoryLoader,
+        dependencies.deployAdapter,
+        dependencies.deployToken,
+      )
+      : unavailable("deploy"),
   };
   return Object.fromEntries(CLI_COMMANDS.map((command) => [
     command,

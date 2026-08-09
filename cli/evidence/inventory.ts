@@ -1,6 +1,7 @@
 import type { CheckRoute, VerificationInventory } from "../check/mod.ts";
 import { verifyProject } from "../check/mod.ts";
 import type { DeployInventory } from "../deploy/mod.ts";
+import type { TestCommandInventory } from "../test/mod.ts";
 import type { TestManifest } from "../../core/testing/mod.ts";
 import { capture, routes } from "./behavior.ts";
 import { locations } from "./project.ts";
@@ -135,5 +136,30 @@ export async function deployLoader(
     documentationPath: `${project.generatedDirectory}/docs.html`,
     smokeTests: [],
     firstExternalDeployment: true,
+  };
+}
+
+export async function testLoader(
+  projectRoot: string,
+): Promise<TestCommandInventory> {
+  const project = await locations({ projectRoot });
+  const governed = await requirements(project, { projectRoot });
+  return {
+    projectRootDisplay: projectRoot,
+    requirements: governed.requirements.map((item) => ({
+      id: item.id,
+      status: item.status,
+      governedContentDigest: item.governedContentDigest,
+      ...(item.dependsOn ? { dependsOn: item.dependsOn } : {}),
+      criteria: item.criteria,
+      ...(item.approval ? { approval: item.approval } : {}),
+    })),
+    dependencyGraph: governed.requirements.map((item) => ({
+      id: item.id,
+      dependsOn: item.dependsOn ?? [],
+    })),
+    routes: [],
+    manifest: { schema: "sleepy-hollow-test-manifest/v1", tests: [] },
+    isolation: [],
   };
 }

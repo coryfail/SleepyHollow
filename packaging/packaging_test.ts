@@ -78,7 +78,42 @@ Deno.test("AC-F020-004 · the release result declares the Deno runtime target", 
   assert.equal(gateRelease(request()).runtime, "deno");
 });
 
-Deno.test("AC-F020-005 · a clean verified release is permitted", () => {
+Deno.test("AC-F020-005 · documented installation resolves against the declared package", async () => {
+  const declared = await manifest();
+  const readme = await Deno.readTextFile(
+    new URL("../README.md", import.meta.url),
+  );
+  assert.ok(
+    readme.includes(declared.name ?? "\u0000"),
+    "installation documentation must name the declared package",
+  );
+  const specifiers = [...readme.matchAll(/(?:jsr|npm):(@[\w.-]+\/[\w.-]+)/g)]
+    .map((match) => match[1]);
+  assert.ok(
+    specifiers.length > 0,
+    "documentation must show an install command",
+  );
+  for (const specifier of specifiers) {
+    assert.equal(
+      specifier,
+      declared.name,
+      `documented specifier ${specifier} does not match the declared package`,
+    );
+  }
+  const entries = Object.keys(declared.exports ?? {});
+  for (
+    const sub of [
+      ...readme.matchAll(/(?:jsr|npm):@[\w.-]+\/[\w.-]+(\/[\w-]+)/g),
+    ]
+  ) {
+    assert.ok(
+      entries.includes(`.${sub[1]}`),
+      `documented entry point ${sub[1]} is not in the export map`,
+    );
+  }
+});
+
+Deno.test("release gate · a clean verified release is permitted", () => {
   const result = gateRelease(request());
   assert.equal(result.ok, true);
   assert.deepEqual(result.diagnostics, []);

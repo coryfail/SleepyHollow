@@ -137,7 +137,9 @@ readability; no other digest normalization is permitted.
 - AC-F020-002 -> `packaging_test.ts` export-entry resolution test.
 - AC-F020-003 -> `packaging_test.ts` internal-module exclusion test.
 - AC-F020-004 -> `packaging_test.ts` declared Deno runtime test.
-- AC-F020-005 -> `packaging_test.ts` clean verified release test.
+- AC-F020-005 -> `packaging_test.ts` documented-installation resolution test,
+  asserting the README names the declared package and that every documented
+  specifier and entry point matches the declared name and export map.
 - AC-F020-006 -> `packaging_test.ts` failing-verification refusal test.
 - AC-F020-007 -> `packaging_test.ts` reused-version refusal test.
 - AC-F020-008 -> `packaging_test.ts` dirty-tree refusal test.
@@ -172,6 +174,30 @@ readability; no other digest normalization is permitted.
   declared version against the request, not against a live registry, and
   AC-F020-005 has no published artifact to resolve against until a first
   release runs.
+
+### Verification, criterion-mapping correction
+
+- Status: passed for all eight approved criteria after correcting a mapping
+  defect.
+- Verified at: 2026-08-09T01:01:56Z.
+- Command: `deno task verify:packaging`.
+- Result: `9 passed | 0 failed`, comprising the eight mapped criteria and one
+  supporting release-gate test that claims no criterion.
+- Defect found by readiness audit: AC-F020-005 requires that installation
+  instructions resolve against the published artifacts for the declared
+  version. Its mapped test asserted that a clean verified release is permitted,
+  which does not test that criterion at all. The repository additionally
+  contained no installation instructions, so the criterion could not have been
+  satisfied.
+- Correction: installation and deployment instructions were added to `README.md`
+  naming the declared package, the Deno-only runtime target, and the
+  `DENO_DEPLOY_TOKEN` variable. AC-F020-005 now asserts the documented
+  specifiers match the declared package name and that every documented entry
+  point exists in the export map. The former assertion was retained as a
+  supporting test without a criterion label.
+- Residual risk unchanged: no publication has occurred, so the documented
+  specifier is verified against the declared package rather than against a live
+  registry listing.
 
 ### Delivery
 

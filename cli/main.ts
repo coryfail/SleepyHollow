@@ -1,5 +1,9 @@
 import { type CliDependencies, createCliHandlers } from "./adapters.ts";
-import { createCheckInventoryLoader } from "./evidence/mod.ts";
+import {
+  createCheckInventoryLoader,
+  createDeployInventoryLoader,
+  createTestInventoryLoader,
+} from "./evidence/mod.ts";
 import { DEV_WORKER_ARGUMENT, runDevWorker } from "./dev/mod.ts";
 import { CLI_VERSION, type CliIo, runCommandSurface } from "./dispatcher.ts";
 
@@ -13,6 +17,15 @@ function revision(): () => string {
       return "workspace";
     }
   };
+}
+
+function projectName(): string {
+  try {
+    return Deno.env.get("SLEEPY_HOLLOW_PROJECT") ??
+      Deno.cwd().split("/").filter(Boolean).pop() ?? "sleepy-hollow";
+  } catch {
+    return "sleepy-hollow";
+  }
 }
 
 export function runCli(
@@ -36,6 +49,11 @@ if (import.meta.main) {
     stderr: console.error,
   }, {
     checkInventoryLoader: createCheckInventoryLoader({ revision: revision() }),
+    testInventoryLoader: createTestInventoryLoader(),
+    deployInventoryLoader: createDeployInventoryLoader({
+      revision: revision(),
+      target: { kind: "deno-deploy", project: projectName() },
+    }),
   });
   Deno.exit(code);
 }

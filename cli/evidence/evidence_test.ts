@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 
 import { runCheckCommand } from "../check/mod.ts";
+import { runCli } from "../main.ts";
 import { createProject } from "../create/mod.ts";
 import {
   createCheckInventoryLoader,
@@ -537,7 +538,7 @@ Deno.test("AC-F018-009 · hollow check runs against a real project without a sup
   assert.ok(code === 0 || code === 1);
 });
 
-Deno.test("AC-F018-010 · hollow test runs against a real project without a supplied inventory", async () => {
+Deno.test("AC-F018-010 · hollow test runs against a real project through the CLI", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -545,12 +546,28 @@ Deno.test("AC-F018-010 · hollow test runs against a real project without a supp
     endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
   );
   const loader = createTestInventoryLoader();
-  const loaded = await loader({ projectRoot: root, scope: { kind: "full" } });
-  assert.ok(loaded.requirements.length > 0);
-  assert.equal(loaded.requirements[0].id, "EP-BOOKMARKS-CREATE");
+  const loaded = await loader({ projectRoot: root });
+  assert.equal(loaded.projectRootDisplay, root);
+  assert.deepEqual(loaded.requirements.map((item) => item.id), [
+    "EP-BOOKMARKS-CREATE",
+  ]);
+
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const code = await runCli(["test", "--json"], {
+    cwd: root,
+    stdout: (v) => stdout.push(v),
+    stderr: (v) => stderr.push(v),
+  }, { testInventoryLoader: loader });
+  const emitted = (stdout[0] ?? stderr[0]) ?? "";
+  assert.ok(
+    !emitted.includes("SH_TEST_INVENTORY_LOAD_FAILED"),
+    `the shipped CLI must supply a test inventory loader, saw ${emitted}`,
+  );
+  assert.ok(code === 0 || code === 1);
 });
 
-Deno.test("AC-F018-011 · hollow deploy assembles a plan without a supplied inventory", async () => {
+Deno.test("AC-F018-011 · hollow deploy assembles a plan through the CLI", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -565,7 +582,23 @@ Deno.test("AC-F018-011 · hollow deploy assembles a plan without a supplied inve
   });
   const loaded = await loader({ projectRoot: root });
   assert.equal(loaded.target.project, "bookmarks");
-  assert.equal(loaded.revision, "test-revision");
   assert.equal(loaded.openApiPath, "generated/openapi.json");
-  assert.ok(loaded.verification.schema === "sleepy-hollow-check-result/v1");
+
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const code = await runCli(["deploy", "--json"], {
+    cwd: root,
+    stdout: (v) => stdout.push(v),
+    stderr: (v) => stderr.push(v),
+  }, {
+    deployInventoryLoader: loader,
+    deployToken: () => "ddp_test_token",
+  });
+  const emitted = (stdout[0] ?? stderr[0]) ?? "";
+  assert.ok(
+    !emitted.includes("SH_CLI_FEATURE_UNAVAILABLE"),
+    `the shipped CLI must implement deploy, saw ${emitted}`,
+  );
+  assert.ok(!emitted.includes("ddp_test_token"), "token must not be emitted");
+  assert.ok(code === 0 || code === 1);
 });

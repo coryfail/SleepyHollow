@@ -323,6 +323,31 @@ readability; no other digest normalization is permitted.
   paths before implementation. A criterion test that passes against a
   nonfunctional seam is not red-state evidence.
 
+### Verification, CLI integration correction
+
+- Status: passed for all fifteen approved criteria after correcting a
+  criterion-coverage defect.
+- Verified at: 2026-08-09T01:01:56Z.
+- Command: `deno task verify:evidence`.
+- Result: `15 passed | 0 failed`.
+- Defect found by readiness audit: the entry recorded below claimed all fifteen
+  criteria passed, but AC-F018-010 and AC-F018-011 exercised the loader
+  functions directly rather than the shipped CLI. The Integration requirement
+  states that the entry point shall supply the assembled loaders so
+  `hollow check`, `hollow test`, and `hollow deploy` operate without a
+  caller-supplied inventory. Running the shipped CLI showed `hollow test`
+  failing with `SH_TEST_INVENTORY_LOAD_FAILED` and `hollow deploy` failing with
+  `SH_CLI_FEATURE_UNAVAILABLE`. The mapped tests passed while the requirement
+  was unmet.
+- Correction: a deploy command handler and a conforming test inventory loader
+  were implemented, all three loaders are supplied from `cli/main.ts`, and
+  AC-F018-010 and AC-F018-011 were rewritten to drive `runCli` and assert the
+  absence of the unavailable and load-failure codes. The corrected tests are
+  strictly stronger than the originals.
+- This is the same defect class as the withdrawn SH-F019 persistence claim: a
+  mapped test that under-covers its approved requirement lets a component gate
+  pass while the requirement is unsatisfied.
+
 ### Verification, complete
 
 - Status: passed for all fifteen approved criteria.

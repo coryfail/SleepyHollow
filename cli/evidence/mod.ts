@@ -1,7 +1,12 @@
 export { EvidenceError } from "./evidence_error.ts";
 import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
-import { checkLoader, deployLoader, inventory } from "./inventory.ts";
+import {
+  checkLoader,
+  deployLoader,
+  inventory,
+  testLoader,
+} from "./inventory.ts";
 import type {
   EvidenceCaptureOptions,
   EvidenceLoadOptions,
@@ -48,18 +53,19 @@ export function createCheckInventoryLoader(
 }
 
 export function createTestInventoryLoader() {
-  return async (
-    request: { readonly projectRoot: string; readonly scope?: unknown },
-  ) => {
-    const project = await locations({ projectRoot: request.projectRoot });
-    return await requirements(project, { projectRoot: request.projectRoot });
-  };
+  return (request: { readonly projectRoot: string }) =>
+    testLoader(request.projectRoot);
 }
 
 export function createDeployInventoryLoader(options: {
-  readonly revision: string;
+  readonly revision: string | (() => string);
   readonly target: { readonly kind: "deno-deploy"; readonly project: string };
 }) {
   return (request: { readonly projectRoot: string }) =>
-    deployLoader(request.projectRoot, options);
+    deployLoader(request.projectRoot, {
+      revision: typeof options.revision === "function"
+        ? options.revision()
+        : options.revision,
+      target: options.target,
+    });
 }
