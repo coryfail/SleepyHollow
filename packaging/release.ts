@@ -6,7 +6,9 @@ import type {
 
 const SEMVER = /^\d+\.\d+\.\d+$/;
 
-export function release(request: ReleaseRequest): ReleaseResult {
+export async function release(
+  request: ReleaseRequest,
+): Promise<ReleaseResult> {
   const diagnostics: ReleaseDiagnostic[] = [];
   const { identity } = request;
 
@@ -37,11 +39,25 @@ export function release(request: ReleaseRequest): ReleaseResult {
     });
   }
 
-  if (request.publishedVersions.includes(identity.version)) {
+  // Only the registry knows what it holds, and a published version is
+  // immutable, so the question is asked at release time rather than answered
+  // by the caller. An unanswered question is not permission to publish.
+  const listing = await request.registry(identity.name);
+  if (!listing.ok) {
+    diagnostics.push({
+      code: "SH_RELEASE_REGISTRY_UNAVAILABLE",
+      summary:
+        `The registry did not report which versions of ${identity.name} it holds.`,
+      evidence: [listing.evidence],
+      correction:
+        "Resolve the registry failure and release again; the gate cannot " +
+        "confirm the version is unused.",
+    });
+  } else if (listing.versions.includes(identity.version)) {
     diagnostics.push({
       code: "SH_RELEASE_VERSION_REUSED",
       summary: `Version ${identity.version} is already published.`,
-      evidence: [...request.publishedVersions],
+      evidence: [...listing.versions],
       correction: "Raise the version before releasing again.",
     });
   }

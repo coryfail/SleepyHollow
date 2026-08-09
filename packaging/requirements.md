@@ -79,10 +79,27 @@ Publication shall require that the repository's own verification passes for the
 revision being published. A release shall not proceed from a tree with failing
 checks, uncommitted changes, or a version already published.
 
+The set of already published versions shall be resolved from the registry's own
+listing for the declared package at release time, rather than asserted by the
+caller requesting the release. A caller-supplied list states what the caller
+believes; only the registry knows what it holds, and a JSR version is immutable
+once published, so a release proceeding on a stale belief cannot be undone.
+
+Resolution shall be through a declared transport seam, so the gate's behaviour
+is verifiable without network access and the registry is consulted once, at the
+point of release, rather than by every test run.
+
+A registry that does not answer, or answers in a form the gate cannot read,
+shall refuse the release. An unreachable registry is an unanswered question
+about whether the version is free, and treating an unanswered question as
+permission is what the gate exists to prevent.
+
 ## Acceptance criteria
 
 - AC-F020-001: The repository declares one package name and one semantic
-  version, and the declared version matches the version published to JSR.
+  version, and the declared version is checked against the versions JSR's
+  listing reports for the declared package, resolved through the gate's
+  transport seam rather than supplied by the caller.
 - AC-F020-002: The package declares an explicit export map, and every entry
   point it names resolves.
 - AC-F020-003: A module not named in the export map is not reachable as a
@@ -97,6 +114,9 @@ checks, uncommitted changes, or a version already published.
   refused.
 - AC-F020-008: A release attempt from a tree with uncommitted changes is
   refused.
+- AC-F020-009: A release attempt is refused, with the registry's response
+  reported as evidence, when the registry listing cannot be reached or cannot
+  be read.
 
 ## Out of scope
 
@@ -117,6 +137,12 @@ SH-F001 generates projects that import the published package, so the export map
 must satisfy what a generated project imports. SH-F011 owns the CLI entry point
 the package exposes as a binary.
 
+Resolving published versions assumes JSR exposes a listing for the declared
+package and that the release environment can reach it. The transport seam keeps
+that assumption out of the test suite: the gate's behaviour is verified against
+a supplied transport, and the live query happens only when a release is
+attempted.
+
 The framework depends on Deno KV, Deno Deploy, and Deno runtime APIs. Reach to
 consumers installing through npm tooling comes from JSR's npm-compatible
 registry, which serves the JSR publication rather than a separate artifact.
@@ -129,6 +155,95 @@ The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line
 ending. The status field is a lifecycle projection for routing and human
 readability; no other digest normalization is permitted.
+
+### Amendment: registry-resolved published versions
+
+- Status: approved. This amendment supersedes the prior governed content. The
+  binding approval for the current content is recorded under "Approval,
+  registry-resolution amendment"; the two earlier approvals bind superseded
+  content and are retained as history.
+- Raised at: 2026-08-09.
+- Change: the release gate resolves the published version set from JSR's
+  listing for the declared package, through a declared transport seam, rather
+  than accepting a set asserted by the caller. AC-F020-001 is narrowed to name
+  that resolution. AC-F020-009 is added, requiring refusal when the listing
+  cannot be reached or read.
+- Why now: the package is published, so a live listing exists to check against.
+  The residual risk recorded under "Verification, criterion-mapping correction"
+  and again under "Verification, JSR-only amendment" was that no publication
+  had occurred and the criterion therefore verified the declared version
+  against the release request. That condition no longer holds.
+- Distinction worth recording: AC-F020-001 already required the declared
+  version to match the version published to JSR. The gap was in verification,
+  not in intent, and the narrowed wording makes the obligation observable.
+  AC-F020-009 is genuinely new scope.
+- Cost this decision accepts: the gate now depends on an external service at
+  release time. The transport seam confines that dependency to the release
+  path, so the test suite remains hermetic and runs without network access.
+- Consequent implementation, authorized by the approval recorded below:
+  `ReleaseRequest.publishedVersions` is replaced by a transport seam in
+  `packaging/types.ts`, `packaging/release.ts` gains registry resolution and
+  fail-closed handling, and `packaging_test.ts` supplies a stub transport.
+  All follow the approval rather than precede it.
+
+### Approval, registry-resolution amendment
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T23:15:17Z.
+- Approved criteria: AC-F020-001 through AC-F020-009, with AC-F020-001 narrowed
+  to registry-resolved verification and AC-F020-009 newly added.
+- Governed-content digest:
+  `sha256:6ff4670ff3fe15976fbcad8f337092ed30277d2285e64b357abec6423d174c48`.
+- Decision source: owner review; direct response `Approve` after review of the
+  drafted normative change, the narrowed AC-F020-001, the added AC-F020-009,
+  the accepted external-dependency cost, the named consequent code changes,
+  and the exact governed-content digest.
+
+### Red-state evidence, registry-resolution amendment
+
+- Status: failed as expected for the three affected criteria.
+- Observed at: 2026-08-09, after the approval above and before the behavioural
+  change.
+- Baseline revision: `04b8238`.
+- Command: `deno task test:packaging`.
+- Result: `8 passed | 3 failed`.
+  - AC-F020-001 failed: the gate never called the supplied transport, so the
+    recorded calls were `[]` rather than the declared package name.
+  - AC-F020-007 failed: a version present in the listing was not refused.
+  - AC-F020-009 failed: an unreadable listing was not refused.
+- Why this is credible red state: `deno check` passed on both the module and
+  the test before the run, so all three are missing-behaviour failures rather
+  than compilation errors, and each names the approved behaviour it lacks.
+- Typed-language caveat, recorded honestly: the seam's type surface
+  (`RegistryTransport`, `RegistryListingResult`, and the `registry` field) was
+  introduced before the red run, because a type-checked test cannot reference
+  a type that does not exist, and the resulting failure would have been a
+  broken baseline rather than evidence. No resolution, comparison, or refusal
+  behaviour was implemented before the red run.
+- Scope of the red run: the remaining six criteria were unaffected by this
+  amendment and are not claimed to have fresh red-state evidence.
+
+### Verification, registry-resolution amendment
+
+- Status: passed.
+- Verified at: 2026-08-09T23:18:19Z.
+- Commands: `deno task verify:packaging`, every other component's `verify:*`
+  task, `deno task check:governance`, and the canonical `npm run
+  test:repository` from `website/`.
+- Result: `11 passed | 0 failed` for packaging; all nineteen component suites
+  passed; governed digests bind for 29 requirements; the independent
+  repository verifier reported `9 passed | 0 failed`.
+- Change made: `ReleaseRequest.publishedVersions` was replaced by a
+  `registry` transport in `packaging/types.ts`; `packaging/release.ts` resolves
+  the listing at gate time, refuses a version the listing contains, and refuses
+  with `SH_RELEASE_REGISTRY_UNAVAILABLE` when the listing cannot be read;
+  `gateRelease` and `release` became asynchronous.
+- Residual risk: the repository ships no production transport. The seam is
+  exercised in tests by a supplied stub, and the live query against JSR is
+  performed by `.github/workflows/publish.yml` before `deno publish`. A caller
+  invoking `gateRelease` outside that workflow must supply its own transport,
+  and nothing in this component compels the one it supplies to be truthful.
 
 ### Amendment: JSR-only distribution
 
