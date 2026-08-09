@@ -268,6 +268,22 @@ Deno.test("AC-F007-006 · test applications isolate KV and clean up deterministi
   await first.close();
   await second.close();
   assert.equal(cleanupCount, 1);
+
+  // Setup failure must close every resource it already opened. Supplying
+  // neither an application factory nor a route inventory fails after the KV
+  // context is open but before any application exists. Deno's resource
+  // sanitizer fails this test if that context is not closed on the way out.
+  await assert.rejects(
+    () =>
+      createTestApplication(
+        {} as unknown as Parameters<typeof createTestApplication>[0],
+      ),
+    (error: unknown) =>
+      error instanceof TestingError &&
+      error.diagnostics.some((item) =>
+        item.code === "SH_TEST_APPLICATION_SOURCE_REQUIRED"
+      ),
+  );
 });
 
 Deno.test("AC-F007-007 · typed requests, fixtures, seeding, and Problem Details compose", async () => {

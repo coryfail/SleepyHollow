@@ -140,6 +140,19 @@ readability; no other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-07T13:55:31Z.
+- Approved criteria: AC-F003-001 through AC-F003-008.
+- Governed-content digest:
+  `sha256:19ec47355a971203e0b6e85c256eb9df52fb8a17feaf37a13f94975ebef90652`.
+- Decision source: Codex conversation; direct response `Approve` after the
+  formatting-only invalidation and both current exact digests were presented.
+- Supersedes: the 2026-08-07T13:40:08Z approval recorded below. This entry is
+  the governing record and its digest binds the current governed content.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-07T13:40:08Z.
 - Approved criteria: AC-F003-001 through AC-F003-008.
 - Governed-content digest:
@@ -149,16 +162,9 @@ readability; no other digest normalization is permitted.
 - Invalidation: at 2026-08-07T13:52:19Z, an overbroad Deno formatting command
   changed governed Markdown bytes after approval. No behavioral change was
   intended, but the exact-content approval and red-state evidence no longer bind
-  the current digest. Historical evidence remains preserved below.
-
-- Status: reapproved.
-- Approver: human-project-owner.
-- Approved at: 2026-08-07T13:55:31Z.
-- Approved criteria: AC-F003-001 through AC-F003-008.
-- Governed-content digest:
-  `sha256:19ec47355a971203e0b6e85c256eb9df52fb8a17feaf37a13f94975ebef90652`.
-- Decision source: Codex conversation; direct response `Approve` after the
-  formatting-only invalidation and both current exact digests were presented.
+  the current digest. Historical evidence remains preserved below. Superseded by
+  the 2026-08-07T13:55:31Z approval above; this entry binds content that no
+  longer exists and asserts no authority.
 
 ### Criterion mapping
 

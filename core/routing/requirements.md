@@ -116,6 +116,19 @@ readability; no other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-07T13:55:31Z.
+- Approved criteria: AC-F002-001 through AC-F002-008.
+- Governed-content digest:
+  `sha256:c6ad75a20d7cac55e53ac59334e15072674147fbc340e0da9658470b5abfb0a6`.
+- Decision source: Codex conversation; direct response `Approve` after the
+  formatting-only invalidation and both current exact digests were presented.
+- Supersedes: the 2026-08-07T12:54:43Z approval recorded below. This entry is
+  the governing record and its digest binds the current governed content.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-07T12:54:43Z.
 - Approved criteria: AC-F002-001 through AC-F002-008.
 - Governed-content digest:
@@ -126,15 +139,8 @@ readability; no other digest normalization is permitted.
   changed governed Markdown bytes after approval. No behavioral change was
   intended, but the exact-content approval and downstream verification no longer
   bind the current digest. Historical evidence remains preserved below.
-
-- Status: reapproved.
-- Approver: human-project-owner.
-- Approved at: 2026-08-07T13:55:31Z.
-- Approved criteria: AC-F002-001 through AC-F002-008.
-- Governed-content digest:
-  `sha256:c6ad75a20d7cac55e53ac59334e15072674147fbc340e0da9658470b5abfb0a6`.
-- Decision source: Codex conversation; direct response `Approve` after the
-  formatting-only invalidation and both current exact digests were presented.
+  Superseded by the 2026-08-07T13:55:31Z approval above; this entry binds
+  content that no longer exists and asserts no authority.
 
 ### Criterion mapping
 
