@@ -51,6 +51,15 @@ function safeContext(
   );
 }
 
+/**
+ * Builds a logger that writes one JSON object per line.
+ *
+ * Fields named as sensitive are redacted before serialization, so a secret
+ * passed in context never reaches the sink.
+ *
+ * @param options The mode, the sink, and which fields to redact.
+ * @returns A logger, derivable per request with `withRequest`.
+ */
 export function createJsonLogger(options: JsonLoggerOptions): JsonLogger {
   if (!RUNTIME_MODES.includes(options.mode)) {
     throw new TypeError("Logger mode must be explicit");

@@ -44,6 +44,16 @@ function strictObject(schema: unknown): schema is z.ZodObject {
   }
 }
 
+/**
+ * Declares what configuration each runtime mode requires.
+ *
+ * The definition itself is validated here, so a mode missing a schema or a
+ * sensitive key naming nothing is caught before any value is read.
+ *
+ * @param definition The per-mode schemas, sensitive keys, and env files.
+ * @returns The validated definition, for {@linkcode resolveConfiguration}.
+ * @throws {ConfigurationError} When the definition is malformed.
+ */
 export function defineConfiguration<const Schemas extends ModeSchemas>(
   definition: ConfigurationDefinition<Schemas>,
 ): ConfigurationDefinition<Schemas> {
@@ -156,6 +166,18 @@ function parseEnvFile(text: string, mode: RuntimeMode): Record<string, string> {
   return values;
 }
 
+/**
+ * Resolves configuration for one mode, from env files and the environment.
+ *
+ * Every fault is collected and thrown together, so one startup reports the
+ * whole set of missing or malformed values rather than the first. Env files
+ * are consulted only in the modes the definition names, never in production.
+ *
+ * @param definition The contract, from {@linkcode defineConfiguration}.
+ * @param options The mode to resolve, and where to read values from.
+ * @returns The parsed values, and provenance for each key.
+ * @throws {ConfigurationError} When any required value is missing or invalid.
+ */
 export async function resolveConfiguration<
   const Schemas extends ModeSchemas,
   const M extends RuntimeMode,

@@ -72,6 +72,17 @@ async function runCheck(check: ReadinessCheck): Promise<boolean> {
   }
 }
 
+/**
+ * Builds liveness and readiness routes, ready to add to the route table.
+ *
+ * Liveness answers whether the process is up; readiness probes the declared
+ * dependencies, each under its own timeout, and reports which one failed. A
+ * probe that exceeds its timeout counts as failed rather than hanging.
+ *
+ * @param options The paths to expose, and the dependencies to probe.
+ * @returns Routes to include alongside the discovered ones.
+ * @throws {ConfigurationError} When a path or readiness check is malformed.
+ */
 export function createOperationalRoutes(
   options: OperationalRouteOptions,
 ): readonly NormalizedRoute[] {
