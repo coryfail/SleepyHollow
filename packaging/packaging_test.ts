@@ -155,3 +155,20 @@ Deno.test("AC-F020-008 · a release from a dirty tree is refused", () => {
   assert.ok(diagnostic);
   assert.ok(diagnostic.evidence.includes("cli/main.ts"));
 });
+
+Deno.test("release gate · the scaffolded framework pin matches the declared version", async () => {
+  const declared = await manifest();
+  const source = await Deno.readTextFile(
+    new URL("../cli/create/create.ts", import.meta.url),
+  );
+  const pinned = source.match(/FRAMEWORK_VERSION = "([^"]+)"/)?.[1];
+  assert.equal(
+    pinned,
+    declared.version,
+    "generated projects must pin the declared framework version",
+  );
+  assert.ok(
+    source.includes(declared.name ?? " "),
+    "generated projects must import the declared package name",
+  );
+});

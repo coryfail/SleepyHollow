@@ -13,6 +13,21 @@
     "./capture": "./core/capture/mod.ts",
     "./cli": "./cli/main.ts"
   },
+  "publish": {
+    "exclude": [
+      "website",
+      "docs",
+      ".github",
+      ".claude",
+      "packaging",
+      "requirements",
+      "models",
+      "generated",
+      "**/*_test.ts",
+      "**/testdata",
+      "**/requirements.md"
+    ]
+  },
   "imports": {
     "@std/yaml": "jsr:@std/yaml@1.1.2",
     "zod": "npm:zod@4.4.3"

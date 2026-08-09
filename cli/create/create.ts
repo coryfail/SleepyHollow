@@ -25,6 +25,12 @@ function files(name: string): Readonly<Record<string, string>> {
     "api/.gitkeep": "",
     "deno.json": JSON.stringify(
       {
+        imports: {
+          "@sleepy-hollow/framework":
+            `jsr:@sleepy-hollow/framework@^${FRAMEWORK_VERSION}`,
+          "@sleepy-hollow/framework/":
+            `jsr:@sleepy-hollow/framework@^${FRAMEWORK_VERSION}/`,
+        },
         tasks: {
           check:
             "deno check sleepyhollow.config.ts .sleepyhollow/*.ts tests/*.ts",
@@ -65,6 +71,8 @@ async function pathExists(path: string): Promise<boolean> {
     throw error;
   }
 }
+
+export const FRAMEWORK_VERSION = "0.1.0";
 
 export async function createProject(
   options: CreateProjectOptions,
