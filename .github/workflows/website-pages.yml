@@ -66,6 +66,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify governed approvals bind their content
+        working-directory: .
+        run: deno task check:governance
+
       - name: Verify framework
         working-directory: .
         run: deno task verify:framework
