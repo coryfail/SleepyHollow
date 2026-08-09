@@ -576,8 +576,38 @@ Deno.test("AC-F015-009 · an uncomposable security declaration fails startup", a
     "security.ts",
     "export default { providers: 42 };\n",
   );
+  const throwing = await securedProject(
+    "security.ts",
+    'throw new Error("the project\'s own module is broken");\n',
+  );
 
-  for (const root of [unresolvable, malformed]) {
+  // A module the project names must actually live in the project. A lexical
+  // containment check cannot see a symlink, so this points a symlink at a file
+  // outside the project. The outside module is deliberately valid and supplies
+  // the very provider the route requires, so composition would succeed if the
+  // symlink were followed. Only the containment check can fail this fixture,
+  // which is what makes it a test of that check rather than of anything else.
+  const escaping = await securedProject(undefined);
+  const elsewhere = await Deno.makeTempDir();
+  await Deno.writeTextFile(
+    `${elsewhere}/outside.ts`,
+    "export default Object.freeze({\n" +
+      "  providers: Object.freeze({\n" +
+      '    "project-auth": {\n' +
+      '      challenge: "Bearer realm=outside",\n' +
+      "      authenticate: () =>\n" +
+      '        Promise.resolve({ id: "outside", type: "project-user" }),\n' +
+      "    },\n" +
+      "  }),\n" +
+      "});\n",
+  );
+  await Deno.symlink(`${elsewhere}/outside.ts`, `${escaping}/security.ts`);
+  await Deno.writeTextFile(
+    `${escaping}/sleepyhollow.config.ts`,
+    'export default { apiDirectory: "api", securityModule: "security.ts" };\n',
+  );
+
+  for (const root of [unresolvable, malformed, throwing, escaping]) {
     const errors: string[] = [];
     const original = console.error;
     console.error = (line: unknown) => errors.push(String(line));

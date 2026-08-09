@@ -134,15 +134,55 @@ async function declared(
     );
   }
 
+  // A lexical check cannot see a symlink pointing out of the project, so the
+  // real path is resolved and re-checked before the module is imported. This
+  // runs only for a real filesystem import; an injected loader replaces module
+  // resolution entirely and has no path to canonicalize.
+  if (options.load === undefined) {
+    let real: string;
+    try {
+      real = await Deno.realPath(target);
+    } catch {
+      throw failure(
+        "SH_SECURITY_MODULE_UNRESOLVED",
+        `The declared security module ${named} could not be resolved`,
+        "Create the named module or correct securityModule.",
+        named,
+      );
+    }
+    const realRoot = await Deno.realPath(root).catch(() => root);
+    if (real !== realRoot && !real.startsWith(realRoot + sep)) {
+      throw failure(
+        "SH_SECURITY_MODULE_ESCAPE",
+        `The declared security module ${named} resolves outside the project through a symlink`,
+        "Keep the security module and anything it links to inside the project.",
+        named,
+      );
+    }
+  }
+
   const specifier = pathToFileURL(target).href;
   let loaded: unknown;
   try {
     loaded = await (options.load ? options.load(specifier) : import(specifier));
-  } catch {
+  } catch (error) {
+    // Reaching here with a real import means the file exists but failed while
+    // loading. Reporting that as "could not be resolved" sends the reader
+    // looking for a missing file. The error name is safe to name; its message
+    // can carry absolute host paths and source text, so it is not repeated.
+    const failedToLoad = options.load === undefined;
     throw failure(
-      "SH_SECURITY_MODULE_UNRESOLVED",
-      `The declared security module ${named} could not be resolved`,
-      "Create the named module or correct securityModule.",
+      failedToLoad
+        ? "SH_SECURITY_MODULE_FAILED"
+        : "SH_SECURITY_MODULE_UNRESOLVED",
+      failedToLoad
+        ? `The declared security module ${named} threw ${
+          error instanceof Error ? error.name : "an error"
+        } while loading`
+        : `The declared security module ${named} could not be resolved`,
+      failedToLoad
+        ? "Repair the security module so it loads without throwing."
+        : "Create the named module or correct securityModule.",
       named,
     );
   }
