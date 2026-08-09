@@ -2,13 +2,14 @@
 schema: sgad-component/v0.2
 id: SH-F015
 title: Local development command
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "12"
   - "14"
 depends_on:
   - SH-F001
+  - SH-F005
   - SH-F002
   - SH-F012
 open_decisions: []
@@ -40,10 +41,10 @@ The exact first-release grammar is:
 hollow dev [--port <1-65535>] [--json]
 ```
 
-The default port is `8000` and the only first-release bind host is
-`127.0.0.1`. Each option may appear once. Unknown, positional, duplicated,
-missing, non-integer, or out-of-range values return usage status `2` before
-loading project code, opening a watcher, or binding a listener.
+The default port is `8000` and the only first-release bind host is `127.0.0.1`.
+Each option may appear once. Unknown, positional, duplicated, missing,
+non-integer, or out-of-range values return usage status `2` before loading
+project code, opening a watcher, or binding a listener.
 
 The command shall resolve one project-contained `sleepyhollow.config.ts` from
 the invocation directory and use its canonical API directory. The project file,
@@ -66,8 +67,9 @@ environment metadata may identify a key's source but never its value.
 
 The listener is active only after all preparation succeeds and the bind is
 confirmed. The initial active event shall identify the loopback URL, port, mode,
-route count, and generation `1`. Startup failure returns nonzero, emits no active
-event, closes any partially created runtime or watcher, and releases the port.
+route count, and generation `1`. Startup failure returns nonzero, emits no
+active event, closes any partially created runtime or watcher, and releases the
+port.
 
 ### Watched restart lifecycle
 
@@ -93,8 +95,8 @@ supervisor may restore the prior prepared generation when the runtime adapter
 supports it, but shall not claim that restoration succeeded until it is bound.
 
 The watcher and runtime adapters shall accept abort signals. SIGINT, SIGTERM, an
-injected cancellation, or a terminal supervisor failure shall stop accepting
-new work, close the watcher, abort an in-progress preparation, stop the active
+injected cancellation, or a terminal supervisor failure shall stop accepting new
+work, close the watcher, abort an in-progress preparation, stop the active
 runtime exactly once, await resource release, and emit one terminal shutdown
 event. A normal interrupt returns zero; startup, supervisor, cleanup, or
 unexpected watcher failure returns nonzero. Signal handlers and timers shall be
@@ -136,6 +138,22 @@ configuration values, authorization material, request or response bodies,
 absolute host paths, internal stacks, and control characters. The command shall
 not modify requirements, approvals, generated artifacts, or verification state.
 
+### Security composition
+
+The development runtime shall compose the SH-F005 security router rather than
+the validated router alone, using the module the project names through
+`securityModule` when one is declared. A route declaring a required
+authentication mode shall be authenticated locally exactly as it would be
+elsewhere.
+
+Serving a route that declares required authentication without applying
+authentication is a defect, not a development convenience. A developer must not
+see a protected route answer an unauthenticated request locally and conclude the
+route is reachable that way.
+
+A project whose security declaration cannot be composed shall fail startup with
+the reported cause and shall not fall back to serving routes unprotected.
+
 ## Acceptance criteria
 
 - AC-F015-001: Running `hollow dev` in a valid newly created project starts the
@@ -146,8 +164,8 @@ not modify requirements, approvals, generated artifacts, or verification state.
   or restart behavior without requiring an undocumented manual cleanup step.
 - AC-F015-004: An invalid route or configuration change produces an actionable
   diagnostic and is never reported as successfully active.
-- AC-F015-005: Startup failure returns nonzero and identifies the affected route,
-  file, or configuration key.
+- AC-F015-005: Startup failure returns nonzero and identifies the affected
+  route, file, or configuration key.
 - AC-F015-006: An interrupt stops the server cleanly and releases its listening
   resources.
 - AC-F015-007: Structured mode emits versioned startup, reload, diagnostic, and
@@ -178,22 +196,22 @@ binding.
 
 ## Acceptance evidence map
 
-| Criterion | Executable evidence required before implementation |
-| --- | --- |
-| AC-F015-001 | Empty canonical scaffold plus injected real listener probe proving validated startup, loopback URL, route count zero, and generation one. |
-| AC-F015-002 | Development/preview/production schema and environment fixtures proving only development configuration is resolved and no value enters output. |
-| AC-F015-003 | Debounced multi-file change proving one fresh generation, invalidated local imports, ordered replacement, same URL, and no manual cleanup. |
-| AC-F015-004 | Invalid route and configuration changes proving the prior generation stays active, rejection is actionable, and no active event is emitted for the candidate. |
-| AC-F015-005 | Project, route, configuration, bind, and watcher startup failures proving nonzero status, safe locations, no false active event, and complete partial cleanup. |
-| AC-F015-006 | SIGINT, SIGTERM, cancellation, and repeated-stop probes proving idempotent ordered watcher/runtime cleanup and resource reuse. |
+| Criterion   | Executable evidence required before implementation                                                                                                                           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AC-F015-001 | Empty canonical scaffold plus injected real listener probe proving validated startup, loopback URL, route count zero, and generation one.                                    |
+| AC-F015-002 | Development/preview/production schema and environment fixtures proving only development configuration is resolved and no value enters output.                                |
+| AC-F015-003 | Debounced multi-file change proving one fresh generation, invalidated local imports, ordered replacement, same URL, and no manual cleanup.                                   |
+| AC-F015-004 | Invalid route and configuration changes proving the prior generation stays active, rejection is actionable, and no active event is emitted for the candidate.                |
+| AC-F015-005 | Project, route, configuration, bind, and watcher startup failures proving nonzero status, safe locations, no false active event, and complete partial cleanup.               |
+| AC-F015-006 | SIGINT, SIGTERM, cancellation, and repeated-stop probes proving idempotent ordered watcher/runtime cleanup and resource reuse.                                               |
 | AC-F015-007 | Mixed startup, reload, diagnostic, and shutdown fixtures proving immediate human/NDJSON parity, contiguous sequencing, stable schema, deterministic ordering, and redaction. |
 
 ## Governance record
 
-The governed-content digest covers the exact UTF-8 bytes before this heading after
-omitting the single top-level frontmatter `status:` line and its line ending. The
-status field is a lifecycle projection for routing and human readability; no
-other digest normalization is permitted.
+The governed-content digest covers the exact UTF-8 bytes before this heading
+after omitting the single top-level frontmatter `status:` line and its line
+ending. The status field is a lifecycle projection for routing and human
+readability; no other digest normalization is permitted.
 
 ### Approval
 
@@ -204,11 +222,10 @@ other digest normalization is permitted.
 - Governed-content digest:
   `sha256:bd02aceb3ee878b11e5150dd0bfb2663f30ee1f7f0cdd0f41d3c520774d92892`.
 - Decision source: Codex conversation; direct response `Approve` after review of
-  the requirement path, bounded criteria, standard-risk classification,
-  verified SH-F001, SH-F002, and SH-F012 dependencies, loopback-only startup,
-  validated fresh-generation restart lifecycle, prior-generation retention,
-  clean shutdown, immediate human/NDJSON events, and exact governed-content
-  digest.
+  the requirement path, bounded criteria, standard-risk classification, verified
+  SH-F001, SH-F002, and SH-F012 dependencies, loopback-only startup, validated
+  fresh-generation restart lifecycle, prior-generation retention, clean
+  shutdown, immediate human/NDJSON events, and exact governed-content digest.
 
 ### Criterion mapping
 
@@ -217,6 +234,10 @@ other digest normalization is permitted.
   tests in `cli/dev/dev_test.ts`.
 - Governed test digest:
   `sha256:615502b26885394ae4a453636385bba10023a5b6586ddc2b20d8bdecc3f1914f`.
+- AC-F015-008: A route declaring a required authentication mode rejects an
+  unauthenticated local request rather than invoking its handler.
+- AC-F015-009: A project whose security declaration cannot be composed fails
+  startup with the reported cause and serves no route unprotected.
 
 ### Red-state evidence
 
@@ -231,8 +252,8 @@ other digest normalization is permitted.
   `sha256:b7b0409bba98389242b2fb187b839350a508cc96e21e06b038e04ae0b053d340`.
 - `deno task check:dev` passed.
 - `deno task test:dev` ran all seven mapped tests with loopback access; all
-  seven failed only at the explicit `SH_DEV_COMMAND_NOT_IMPLEMENTED` boundary
-  in `cli/dev/mod.ts`, with no fixture, compilation, dependency, permission, or
+  seven failed only at the explicit `SH_DEV_COMMAND_NOT_IMPLEMENTED` boundary in
+  `cli/dev/mod.ts`, with no fixture, compilation, dependency, permission, or
   unrelated infrastructure failure.
 
 ### Verification

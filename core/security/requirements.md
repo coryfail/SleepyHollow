@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F005
 title: Security and authorization boundaries
-status: verified
+status: draft
 risk: high
 source_sections:
   - "7"
@@ -35,8 +35,8 @@ public applications.
 
 Applications may explicitly choose no authentication, project-defined user
 authentication, an external identity provider, API keys, signed bearer tokens,
-service credentials, or another reviewed mechanism. The framework shall not
-ship a mandatory built-in identity model in the first release.
+service credentials, or another reviewed mechanism. The framework shall not ship
+a mandatory built-in identity model in the first release.
 
 OPEN-007 is resolved with this neutral compatibility boundary:
 
@@ -53,8 +53,8 @@ interface AuthProvider {
 }
 ```
 
-A provider returning `null` shall mean that no valid identity was established.
-A principal shall require non-empty `id` and `type` values. Provider exceptions
+A provider returning `null` shall mean that no valid identity was established. A
+principal shall require non-empty `id` and `type` values. Provider exceptions
 and malformed principals shall become safe internal failures and diagnostics;
 they shall not be misreported as attacker-controlled authentication failures or
 expose provider details.
@@ -66,10 +66,10 @@ type RouteSecurity = {
   readonly authentication:
     | { mode: "none" }
     | {
-        mode: "required";
-        provider: "project-auth";
-        requirementId: "AC-APP-014";
-      };
+      mode: "required";
+      provider: "project-auth";
+      requirementId: "AC-APP-014";
+    };
   readonly authorization?: {
     name: "can-read-bookmark";
     requirementId: "AC-APP-015";
@@ -85,9 +85,9 @@ its neutral principal to the authorization guard and handler without changing
 business-logic parameters. Missing or invalid identity shall return safe RFC
 9457 `401` Problem Details plus the provider's declared `WWW-Authenticate`
 challenge. A denied guard shall return safe RFC 9457 `403` Problem Details.
-Authentication, then authorization, shall complete before protected handler
-side effects. A required route shall declare a `401` response schema, and a
-route with an authorization guard shall declare a `403` response schema. A
+Authentication, then authorization, shall complete before protected handler side
+effects. A required route shall declare a `401` response schema, and a route
+with an authorization guard shall declare a `403` response schema. A
 rate-limited route shall declare `429` and fail-closed `503` response schemas.
 Route normalization shall fail with actionable diagnostics when a required
 security response contract is absent.
@@ -115,9 +115,9 @@ Every response, including framework errors, shall receive
 `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, a restrictive
 API `Content-Security-Policy` of `default-src 'none'; frame-ancestors 'none'`,
 and an `X-Request-Id`. A caller-supplied request ID shall be accepted only when
-it matches `[A-Za-z0-9._:-]{1,128}`; otherwise the runtime shall generate a UUID.
-The selected request ID shall be exposed to the handler and returned on the
-response. Problem responses for `401`, `403`, and `429` shall use
+it matches `[A-Za-z0-9._:-]{1,128}`; otherwise the runtime shall generate a
+UUID. The selected request ID shall be exposed to the handler and returned on
+the response. Problem responses for `401`, `403`, and `429` shall use
 `Cache-Control: no-store`.
 
 OPEN-008 is resolved through a pluggable fixed-window boundary. A route names a
@@ -127,33 +127,57 @@ policy whose positive integer `limit` and `windowMs`, key function, and
 `createMemoryRateLimiter({ maxKeys, clock })` shall provide deterministic
 development and test behavior with bounded key cardinality and
 `scope: "process"`. It shall evict expired windows before admitting a new key
-and fail closed when the active-key bound is exhausted. Production shall reject a
-declared route policy backed by a process-scoped limiter because Deno Deploy may
-run isolated application instances concurrently. A production adapter must
+and fail closed when the active-key bound is exhausted. Production shall reject
+a declared route policy backed by a process-scoped limiter because Deno Deploy
+may run isolated application instances concurrently. A production adapter must
 declare `scope: "shared"`; the framework shall not pretend that process memory
 is a global quota.
 
 Rate limiting shall run before authentication and handler side effects. An
 allowed decision shall continue and expose remaining/reset metadata internally.
-A rejected decision shall return RFC 9457 `429` Problem Details,
-`Retry-After` as an integer number of seconds, and `Cache-Control: no-store`.
-The framework shall not emit the evolving IETF `RateLimit` fields as stable
-contract fields in this release. A declared limiter failure shall fail closed
-with safe RFC 9457 `503` Problem Details, no-store behavior, and an internal
-diagnostic rather than silently disabling the policy. Rate limiting is an
-application quota control, not a denial-of-service guarantee.
+A rejected decision shall return RFC 9457 `429` Problem Details, `Retry-After`
+as an integer number of seconds, and `Cache-Control: no-store`. The framework
+shall not emit the evolving IETF `RateLimit` fields as stable contract fields in
+this release. A declared limiter failure shall fail closed with safe RFC 9457
+`503` Problem Details, no-store behavior, and an internal diagnostic rather than
+silently disabling the policy. Rate limiting is an application quota control,
+not a denial-of-service guarantee.
 
 `redactSecurityData(value)` shall recursively replace values whose field names
-identify authorization, cookies, tokens, secrets, passwords, sessions, API
-keys, or credentials. It shall be cycle-safe, shall not serialize request bodies
-or complete request headers by default, and shall preserve safe structural
-context for diagnostics. Framework-generated authentication, authorization,
-rate-limit, CORS, and provider diagnostics shall use stable codes and safe
-corrections without raw credentials or rejected secret values.
+identify authorization, cookies, tokens, secrets, passwords, sessions, API keys,
+or credentials. It shall be cycle-safe, shall not serialize request bodies or
+complete request headers by default, and shall preserve safe structural context
+for diagnostics. Framework-generated authentication, authorization, rate-limit,
+CORS, and provider diagnostics shall use stable codes and safe corrections
+without raw credentials or rejected secret values.
 
 Body limits remain owned by SH-F003, and bounded/index-compatible data access
 remains owned by SH-F004. This component shall expose those protections in
 verification metadata rather than reimplementing them.
+
+### Project security declaration
+
+A project shall declare its authentication providers, rate-limit policies, and
+CORS configuration in one module whose default export is produced by
+`defineSecurity`, and shall name that module explicitly through a
+`securityModule` value in its SH-F001 project configuration.
+
+Discovery is explicit rather than conventional. The application specification
+rejects hiding application behavior in implicit scanning or magic activation,
+and whether an API is protected must not depend on a file silently appearing or
+disappearing. Routes are discovered from the filesystem because the filesystem
+is the routing table; security wiring has no such justification.
+
+A project that names no `securityModule` declares no providers. A project that
+names one which cannot be resolved fails composition rather than continuing
+without it. That is a valid state for an application whose routes all declare
+`authentication: "none"`, and it is a failure for any route declaring a required
+mode, because a required route without a resolvable provider cannot authenticate
+anyone. The failure shall be reported when the runtime is composed rather than
+on the first request.
+
+`defineSecurity` shall freeze and return its declaration so a caller cannot
+mutate provider wiring after composition.
 
 ## Acceptance criteria
 
@@ -210,10 +234,10 @@ security boundary.
 
 ## Governance record
 
-The governed-content digest covers the exact UTF-8 bytes before this heading after
-omitting the single top-level frontmatter `status:` line and its line ending. The
-status field is a lifecycle projection for routing and human readability; no
-other digest normalization is permitted.
+The governed-content digest covers the exact UTF-8 bytes before this heading
+after omitting the single top-level frontmatter `status:` line and its line
+ending. The status field is a lifecycle projection for routing and human
+readability; no other digest normalization is permitted.
 
 ### Approval
 
@@ -237,8 +261,8 @@ other digest normalization is permitted.
 - AC-F005-003 -> `security_test.ts` missing-identity Problem Details and
   challenge test.
 - AC-F005-004 -> `security_test.ts` denied-authorization Problem Details test.
-- AC-F005-005 -> `security_test.ts` rate-limit, authentication,
-  authorization, and handler ordering test.
+- AC-F005-005 -> `security_test.ts` rate-limit, authentication, authorization,
+  and handler ordering test.
 - AC-F005-006 -> `security_test.ts` production startup and exact-origin CORS
   test.
 - AC-F005-007 -> `security_test.ts` nested, cyclic, request, and diagnostic
@@ -250,6 +274,15 @@ other digest normalization is permitted.
 - AC-F005-010 -> `security_test.ts` neutral public API surface test.
 - AC-F005-011 -> `security_test.ts` successful and rejected secure-header and
   request-ID test.
+- AC-F005-010: A module named by `securityModule` whose default export is
+  produced by `defineSecurity` supplies the providers, rate limits, and CORS
+  used to compose the runtime, and the returned declaration is frozen.
+- AC-F005-011: A project naming no `securityModule` composes successfully when
+  every route declares `authentication: "none"`, and a named module that cannot
+  be resolved fails composition with the named path.
+- AC-F005-012: A route declaring a required authentication mode with no
+  resolvable provider fails when the runtime is composed, naming the route and
+  the missing provider, rather than failing on the first request.
 
 ### Red-state evidence
 
@@ -257,8 +290,8 @@ other digest normalization is permitted.
 - Observed at: 2026-08-07T14:45:45Z.
 - Base revision: `71b3e4debe8e924b6c9d61d5cc663a5690de98be` plus the approved
   SH-F005 requirement, mapped security tests, typed nonfunctional seam, pinned
-  dependency lock, Deno configuration, and previously verified framework
-  working tree.
+  dependency lock, Deno configuration, and previously verified framework working
+  tree.
 - Commands: `deno task check:security`, `deno task test:routing`,
   `deno task test:validation`, and `deno task test:security` using Deno `2.9.5`
   on macOS arm64.
@@ -271,15 +304,15 @@ other digest normalization is permitted.
 - Result: security type checking passed, verified routing passed 9/9 with two
   nested steps, verified validation passed 10/10 with two nested steps, and
   security passed 0/11 with three nested CORS steps.
-- Expected failure: every security criterion reached the healthy Deno runner
-  and failed only through the explicit `SH_SECURITY_NOT_IMPLEMENTED` seams in
-  `createSecurityRouter`, `createMemoryRateLimiter`, or
-  `redactSecurityData`; no dependency, assertion-runner, permission, or
-  unrelated regression failure obscured the missing approved behavior.
+- Expected failure: every security criterion reached the healthy Deno runner and
+  failed only through the explicit `SH_SECURITY_NOT_IMPLEMENTED` seams in
+  `createSecurityRouter`, `createMemoryRateLimiter`, or `redactSecurityData`; no
+  dependency, assertion-runner, permission, or unrelated regression failure
+  obscured the missing approved behavior.
 - Test-evolution note: the runtime suite was strengthened before final
   verification with process-scope production, fail-closed adapter, raw API-key,
-  malformed runtime configuration, malformed principal, and request-ID
-  generator checks. At 2026-08-07T14:52:15Z, the strengthened suite digest
+  malformed runtime configuration, malformed principal, and request-ID generator
+  checks. At 2026-08-07T14:52:15Z, the strengthened suite digest
   `sha256:b0d0db98fc0ec88b020e7b9cbe244321eec8625c52d81e77b0aa42ef8cd80e7c`
   produced a focused adversarial red state: 8/11 criteria passed, while
   AC-F005-006, AC-F005-008, and AC-F005-011 failed on four missing protections.
@@ -306,8 +339,8 @@ other digest normalization is permitted.
 - Framework implementation manifest:
   `working-tree:sha256:0831c0a1254252c07acc336837f0e8179e6ff7017d7d1b11d12c00f9977f1d53`
   across 45 sorted routing, validation, KV, and security source, fixture, test,
-  configuration, dependency-lock, repository-control, and CI files. Each
-  record is `<relative-path>\0<file-sha256>\n` before hashing the sorted stream.
+  configuration, dependency-lock, repository-control, and CI files. Each record
+  is `<relative-path>\0<file-sha256>\n` before hashing the sorted stream.
 - Current runtime-test digest:
   `sha256:15cf88ac4978e5124d70fea3000d16bcd6647864a05883c1fdd348fee5afae33`.
 - Current compile-time-test digest:

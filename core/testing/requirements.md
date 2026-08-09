@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F007
 title: Testing and acceptance-criterion traceability
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "3.6"
@@ -42,10 +42,10 @@ red-green TDD loop and explicit criterion mapping.
 
 ### Criterion tests and traceability
 
-Tests shall be generated only for requirements with a valid approval record bound
-to the current governed-content digest and bounded criteria. A `draft`
-requirement, an approval for stale content, or an approval that omits a requested
-criterion shall fail before a test file is proposed.
+Tests shall be generated only for requirements with a valid approval record
+bound to the current governed-content digest and bounded criteria. A `draft`
+requirement, an approval for stale content, or an approval that omits a
+requested criterion shall fail before a test file is proposed.
 
 OPEN-005 is resolved by a transparent `criterionTest` wrapper over `Deno.test`.
 Each generated acceptance test shall declare a globally stable test ID, one
@@ -106,17 +106,17 @@ context, pass that KV together with optional project-defined principal or
 credential fixtures to the factory, run an optional async seed function, and
 return an idempotently disposable context. Setup failure shall close every
 resource already opened; disposal shall close KV and run registered cleanup even
-after a test assertion fails. Contexts shall not share KV state, principal state,
-credentials, or mutable request defaults unless the test explicitly supplies a
-shared fixture.
+after a test assertion fails. Contexts shall not share KV state, principal
+state, credentials, or mutable request defaults unless the test explicitly
+supplies a shared fixture.
 
 The context shall expose its isolated KV handle, the application `fetch`
-function, and a typed JSON request helper that accepts method, path, headers, and
-typed body without opening a listening socket. It shall support project-defined
-principal or credential injection without assuming an identity model. An RFC
-9457 assertion helper shall verify the problem content type, HTTP status,
-required `type`, `title`, and `status` members, optional expected extensions, and
-the absence of a successful response shape.
+function, and a typed JSON request helper that accepts method, path, headers,
+and typed body without opening a listening socket. It shall support
+project-defined principal or credential injection without assuming an identity
+model. An RFC 9457 assertion helper shall verify the problem content type, HTTP
+status, required `type`, `title`, and `status` members, optional expected
+extensions, and the absence of a successful response shape.
 
 The same in-process fetch function shall be usable as an injected transport for
 a generated client. Client tests shall therefore exercise the real test
@@ -139,12 +139,23 @@ unmapped, or cross-cutting configuration cannot be bounded safely. Targeting
 changes only which already-defined tests run; it shall never change test
 metadata, assertions, isolation, or pass criteria.
 
+### Security composition in the test application
+
+The test application shall compose the SH-F005 security router using the
+project's declared `securityModule`, so a request in a test traverses the same
+authentication and authorization path it traverses when served.
+
+A test application that bypasses security lets a mapped criterion test pass
+against a route that would reject the identical request when served. That is a
+false pass, and criterion tests are the evidence `hollow check` relies on, so
+the falsehood propagates into verification.
+
 ## Acceptance criteria
 
 - AC-F007-001: Test generation refuses a `draft` requirement and names the
   approval state preventing generation.
-- AC-F007-002: Every approved acceptance criterion appears in at least one test's
-  name or machine-readable metadata.
+- AC-F007-002: Every approved acceptance criterion appears in at least one
+  test's name or machine-readable metadata.
 - AC-F007-003: Traceability reports criteria with passing tests, failing tests,
   no mapped tests, and tests with no approved criterion.
 - AC-F007-004: The pre-implementation run records failure caused by missing
@@ -177,10 +188,10 @@ supplies approved parsed requirements and dependency metadata.
 
 ## Governance record
 
-The governed-content digest covers the exact UTF-8 bytes before this heading after
-omitting the single top-level frontmatter `status:` line and its line ending. The
-status field is a lifecycle projection for routing and human readability; no
-other digest normalization is permitted.
+The governed-content digest covers the exact UTF-8 bytes before this heading
+after omitting the single top-level frontmatter `status:` line and its line
+ending. The status field is a lifecycle projection for routing and human
+readability; no other digest normalization is permitted.
 
 ### Approval
 
@@ -209,22 +220,27 @@ other digest normalization is permitted.
 - AC-F007-008 -> `testing_test.ts` in-process generated-client transport test.
 - AC-F007-009 -> `testing_test.ts` removed, changed, and weakened manifest test.
 - AC-F007-010 -> `testing_test.ts` complete passing-coverage eligibility test.
+- AC-F007-011: A request through the test application to a route declaring a
+  required authentication mode is rejected without invoking the handler when no
+  credential is supplied.
+- AC-F007-012: A test application composed for a project declaring no
+  `securityModule` serves routes declaring `authentication: "none"` unchanged.
 
 ### Red-state evidence
 
 - Status: failed as expected.
 - Observed at: 2026-08-07T16:06:27Z.
 - Base revision: `71b3e4debe8e924b6c9d61d5cc663a5690de98be` plus the approved
-  SH-F007 requirement, mapped testing-kernel tests, Deno task configuration,
-  and the previously verified working tree.
+  SH-F007 requirement, mapped testing-kernel tests, Deno task configuration, and
+  the previously verified working tree.
 - Commands: `deno task check:testing` and `deno task test:testing` using Deno
   `2.9.5` with in-memory Deno KV on macOS arm64.
 - Test digest:
   `sha256:2fe1a7d52cd564fd7fd6997bc489db5bb26ed652af5be7fbfa13dba416001998`.
 - Dependency-lock digest:
   `sha256:b7b0409bba98389242b2fb187b839350a508cc96e21e06b038e04ae0b053d340`.
-- Result: testing-kernel type checking passed and runtime tests passed 0/10
-  with two targeted traceability and selection steps.
+- Result: testing-kernel type checking passed and runtime tests passed 0/10 with
+  two targeted traceability and selection steps.
 - Expected failure: every testing criterion reached the healthy Deno runner and
   failed only through the explicit `SH_TESTING_NOT_IMPLEMENTED` seams; no KV,
   permission, dependency, assertion-runner, or unrelated regression failure
@@ -242,9 +258,8 @@ other digest normalization is permitted.
   `sha256:2fe1a7d52cd564fd7fd6997bc489db5bb26ed652af5be7fbfa13dba416001998`.
 - Dependency-lock digest:
   `sha256:b7b0409bba98389242b2fb187b839350a508cc96e21e06b038e04ae0b053d340`.
-- Verifier: Deno `2.9.5` format, lint, type, test, and in-memory KV tasks
-  plus the canonical repository and cross-browser website verifier on macOS
-  arm64.
+- Verifier: Deno `2.9.5` format, lint, type, test, and in-memory KV tasks plus
+  the canonical repository and cross-browser website verifier on macOS arm64.
 - Results: testing passed 10/10 with two nested traceability and selection
   checks; the complete framework passed 58/58 with fifteen nested steps;
   planning passed 10/10; project creation passed 9/9; repository governance
