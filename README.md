@@ -9,9 +9,10 @@ generation, deployment — and one thing that is not ordinary: it records what
 your handlers actually do while their tests run, and refuses to certify behavior
 no test exercised.
 
-> **Status:** in development. Not yet published to JSR. The commands
-> below work from a clone today; the install instructions describe the published
-> package and are not resolvable until the first release.
+> **Status:** in development, and published to JSR as
+> [`@sleepy-hollow/framework`](https://jsr.io/@sleepy-hollow/framework). The
+> install instructions below resolve against the published package. The API is
+> pre-1.0 and may change.
 
 ## Why it exists
 
