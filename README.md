@@ -93,6 +93,7 @@ implicit default, because a forgotten default is how endpoints ship unprotected.
 | [Getting started](docs/framework/getting-started.md) | Install, create, first endpoint, verify        |
 | [Routing](docs/framework/routing.md)                 | File-based routes, methods, parameters         |
 | [Data](docs/framework/data.md)                       | Deno KV resources, indexes, bounded queries    |
+| [Security](docs/framework/security.md)               | Route modes, the project security module       |
 | [Verification](docs/framework/verification.md)       | Capture, `hollow check`, what "verified" means |
 | [Deployment](docs/framework/deployment.md)           | `hollow deploy`, your own credentials          |
 | [CLI reference](docs/framework/cli.md)               | Every command and flag                         |

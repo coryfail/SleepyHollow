@@ -116,6 +116,9 @@ route declaring `authentication: { mode: "required" }`, so you need a null check
 or non-null assertion the runtime does not require. The narrowing is intended
 and the type does not yet deliver it.
 
+Declaring the provider that produces a principal is covered in
+[Security](security.md).
+
 ## Responses
 
 Return a standard `Response`. Failures use RFC 9457 problem details:

@@ -211,6 +211,19 @@ readability; no other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-09T11:27:24Z.
+- Approved criteria: AC-F007-001 through AC-F007-012.
+- Governed-content digest:
+  `sha256:ff84946573d0e59f7dce24063ccd447015fdbebe81b5aafa25036a493115a458`.
+- Decision source: Claude conversation; direct response `Approve` after review
+  of the dependency correction recorded below, the added SH-F002 and SH-F005
+  edges and why they are load-bearing for this component's own impact analysis,
+  the unchanged criterion text, and the exact governed-content digest.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-09T02:14:08Z.
 - Approved criteria: AC-F007-001 through AC-F007-012.
 - Governed-content digest:
@@ -220,6 +233,11 @@ readability; no other digest normalization is permitted.
   security-bypassing test application produces false passes in the evidence
   `hollow check` relies on, the two amended criteria, and the exact
   governed-content digest.
+- Invalidation: at 2026-08-09T11:27:24Z this approval was superseded. The
+  content it bound omitted the SH-F002 and SH-F005 dependencies the amendment
+  relies on, so `depends_on` was corrected and the digest changed. This entry
+  binds content that no longer exists and asserts no authority; the
+  reapproval above is the governing record.
 
 ### Approval
 
@@ -233,19 +251,6 @@ readability; no other digest normalization is permitted.
   of the requirement path, bounded criteria, standard-risk classification,
   satisfied SH-F003, SH-F004, and SH-F006 dependencies, native Deno criterion
   metadata, fail-closed impact analysis, and exact governed-content digest.
-
-### Approval, corrected dependencies
-
-- Status: approved.
-- Approver: human-project-owner.
-- Approved at: 2026-08-09T11:27:24Z.
-- Approved criteria: AC-F007-001 through AC-F007-012.
-- Governed-content digest:
-  `sha256:ff84946573d0e59f7dce24063ccd447015fdbebe81b5aafa25036a493115a458`.
-- Decision source: Claude conversation; direct response `Approve` after review
-  of the dependency correction recorded below, the added SH-F002 and SH-F005
-  edges and why they are load-bearing for this component's own impact analysis,
-  the unchanged criterion text, and the exact governed-content digest.
 
 ### Dependency correction
 
