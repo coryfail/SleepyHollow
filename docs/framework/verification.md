@@ -37,12 +37,12 @@ requirements approved and your routes declared.
 
 ## What fails, and why
 
-| Failure | Meaning |
-|---|---|
-| `SH_CHECK_ROUTE_UNOBSERVED` | A route with approved criteria that no test reached. The criterion mapping claims coverage that does not exist. |
-| `SH_CHECK_CAPTURE_UNUSABLE` | The evidence artifact is missing, stale, or unreadable. Verification with no evidence is not verification. |
-| `SH_CHECK_QUERY_UNBOUNDED` | A query ran without a positive bounded limit. |
-| `SH_CHECK_INDEX_INCOMPATIBLE` | A query used an index the resource does not declare. |
+| Failure                       | Meaning                                                                                                         |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `SH_CHECK_ROUTE_UNOBSERVED`   | A route with approved criteria that no test reached. The criterion mapping claims coverage that does not exist. |
+| `SH_CHECK_CAPTURE_UNUSABLE`   | The evidence artifact is missing, stale, or unreadable. Verification with no evidence is not verification.      |
+| `SH_CHECK_QUERY_UNBOUNDED`    | A query ran without a positive bounded limit.                                                                   |
+| `SH_CHECK_INDEX_INCOMPATIBLE` | A query used an index the resource does not declare.                                                            |
 
 The first one is the important one. A test that passes without touching its
 handler is the most common way agent-written tests are worthless, and it is

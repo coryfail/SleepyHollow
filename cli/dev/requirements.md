@@ -280,6 +280,30 @@ other digest normalization is permitted.
   `verify:check`, `verify:cli`, `verify:test-command`, `verify:skill`,
   `verify:deploy`, and `verify:evidence` all passed at the same revision.
 
+### Known defect, development server omits the security layer
+
+- Status: open. Recorded rather than repaired.
+- Observed at: 2026-08-09T01:59:35Z.
+- Symptom: `hollow dev` builds its runtime with `createValidatedRouter` and
+  never calls `createSecurityRouter`. A route declaring
+  `authentication: { mode: "required" }` is therefore served locally with no
+  authentication, and any handler reading `principal` receives null and fails
+  with a 500.
+- Found by running the `examples/todos` project against a live server rather
+  than through handler-level tests, which bypass discovery, validation, and
+  security entirely.
+- Severity: a developer running the framework locally sees protected routes
+  answer unauthenticated requests. That is a misleading local posture even
+  though production wiring is a separate concern.
+- Not repaired here because it is a design gap rather than a wiring omission.
+  `SecurityOptions` accepts `providers`, but no project-level surface exists for
+  a project to declare one, so the development command has nothing to supply.
+  Closing this needs an approved requirement for where a project declares its
+  authentication providers, after which the development runtime can compose the
+  security router.
+- The `examples/todos` project declares `authentication: "none"` explicitly, so
+  it exercises the framework without depending on this gap.
+
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.

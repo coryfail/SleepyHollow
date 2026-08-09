@@ -94,11 +94,11 @@ refused, so you cannot accidentally confirm a plan you did not review. Use
 
 ## Exit codes
 
-| Code | Meaning |
-|---|---|
-| `0` | Succeeded |
-| `1` | Failed with reported diagnostics |
-| `2` | Invalid invocation |
+| Code | Meaning                          |
+| ---- | -------------------------------- |
+| `0`  | Succeeded                        |
+| `1`  | Failed with reported diagnostics |
+| `2`  | Invalid invocation               |
 
 ## Diagnostics
 

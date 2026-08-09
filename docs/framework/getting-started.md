@@ -59,11 +59,17 @@ serves `/bookmarks`.
 import { defineRoute } from "@sleepy-hollow/framework/routing";
 import { z } from "@sleepy-hollow/framework/validation";
 
+const created = z.object({ url: z.string() }).strict();
+const problem = z.object({ title: z.string(), status: z.number() }).strict();
+
 export default defineRoute({
   POST: {
     schemas: {
-      body: { schema: z.object({ url: z.string().url() }) },
-      responses: { 201: "application/json", 422: "application/problem+json" },
+      body: {
+        schema: z.object({ url: z.string().url() }).strict(),
+        maxBytes: 4096,
+      },
+      responses: { 201: created, 422: problem },
     },
     security: { authentication: "none" },
     contract: { summary: "Create a bookmark" },
@@ -72,11 +78,20 @@ export default defineRoute({
 });
 ```
 
-Three things are mandatory and none of them have a silent default:
+Five things are mandatory and none of them have a silent default:
 
-- **Schemas** for every request location the handler reads
-- **Response schemas** for every status the route can return, including failures
-- **`authentication`**, explicitly `"none"` or `"required"`
+- **Zod schemas** for every request location the handler reads. A plain object
+  such as `{ id: "string" }` is rejected at startup.
+- **Object schemas must be `.strict()`**, so unknown fields are refused rather
+  than silently stripped.
+- **A body schema declares `maxBytes`**, the largest payload you accept.
+- **Response schemas** for every status the route can return, including
+  failures. A bodyless status is declared as literal `null`, as in
+  `responses: { 204: null }`.
+- **`authentication`**, explicitly `"none"` or `"required"`.
+
+These are enforced when the runtime starts, so a route that violates them fails
+to boot rather than failing on a request.
 
 ## Writing a test that counts
 
@@ -92,7 +107,7 @@ criterionTest({
   criteria: ["AC-EP-001"],
   name: "rejects a bookmark with no URL",
   sourcePath: "api/bookmarks/route_test.ts",
-  fn: async () => { /* ... */ },
+  fn: async () => {/* ... */},
 }, { requirements });
 ```
 
@@ -101,13 +116,13 @@ evidence that any approved behavior was exercised.
 
 ## What happens if you skip a step
 
-| You did | You get |
-|---|---|
-| Added a route, no test | `hollow check` fails: the route was never observed |
-| Wrote a test that never calls the handler | Same failure — capture saw nothing |
-| Edited an approved requirement | Its approval is no longer bound; verification fails |
-| Ran `hollow check` without testing first | Fails: the evidence artifact is missing |
-| Changed code after testing | Fails: the artifact is stale for this revision |
+| You did                                   | You get                                             |
+| ----------------------------------------- | --------------------------------------------------- |
+| Added a route, no test                    | `hollow check` fails: the route was never observed  |
+| Wrote a test that never calls the handler | Same failure — capture saw nothing                  |
+| Edited an approved requirement            | Its approval is no longer bound; verification fails |
+| Ran `hollow check` without testing first  | Fails: the evidence artifact is missing             |
+| Changed code after testing                | Fails: the artifact is stale for this revision      |
 
 Each of these is a real failure with a named diagnostic and a correction, not a
 warning you can scroll past.

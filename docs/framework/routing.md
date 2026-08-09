@@ -5,12 +5,12 @@ sync and no registration step to forget.
 
 ## Files to paths
 
-| File | Path |
-|---|---|
-| `api/health/route.ts` | `/health` |
-| `api/bookmarks/route.ts` | `/bookmarks` |
+| File                          | Path             |
+| ----------------------------- | ---------------- |
+| `api/health/route.ts`         | `/health`        |
+| `api/bookmarks/route.ts`      | `/bookmarks`     |
 | `api/bookmarks/[id]/route.ts` | `/bookmarks/:id` |
-| `api/users/me/route.ts` | `/users/me` |
+| `api/users/me/route.ts`       | `/users/me`      |
 
 A directory named `[id]` is a parameter. A literal segment always wins over a
 parameter at the same position, so `/users/me` resolves to `users/me` rather
@@ -28,25 +28,31 @@ One default export per file, one entry per method:
 import { defineRoute } from "@sleepy-hollow/framework/routing";
 import { z } from "@sleepy-hollow/framework/validation";
 
+const params = z.object({ id: z.string() }).strict();
+const bookmark = z.object({ id: z.string(), url: z.string() }).strict();
+const problem = z.object({ title: z.string(), status: z.number() }).strict();
+
 export default defineRoute({
   GET: {
-    schemas: {
-      params: { id: "string" },
-      responses: { 200: "application/json", 404: "application/problem+json" },
-    },
+    schemas: { params, responses: { 200: bookmark, 404: problem } },
     security: { authentication: "none" },
     contract: { summary: "Return one bookmark" },
-    handler: ({ params }) => Response.json({ id: params.id }),
+    handler: ({ params }) =>
+      Response.json({ id: params.id, url: "https://example.com" }),
   },
 
   DELETE: {
-    schemas: { params: { id: "string" }, responses: { 204: "application/json" } },
-    security: { authentication: "required" },
+    schemas: { params, responses: { 204: null, 404: problem } },
+    security: { authentication: "none" },
     contract: { summary: "Delete one bookmark" },
     handler: () => new Response(null, { status: 204 }),
   },
 });
 ```
+
+Note `204: null`. A status that returns no body is declared as literal `null`,
+not `z.null()`. Declaring a schema there makes the runtime try to parse an empty
+body and fail the response.
 
 Each method declares four things:
 
@@ -61,7 +67,9 @@ Each method declares four things:
 The handler receives validated values, not raw input:
 
 ```ts
-handler: ({ request, params, query, headers, body, principal }) => { /* ... */ }
+handler: ((
+  { request, params, query, headers, body, principal },
+) => {/* ... */});
 ```
 
 `params`, `query`, `headers`, and `body` are typed from the schemas you
@@ -69,14 +77,35 @@ declared. A location without a declared schema is not validated, and reading one
 is reported by `hollow check` as missing coverage.
 
 Note the shapes differ: `params`, `query`, and `headers` take a schema directly,
-while `body` wraps it.
+while `body` wraps it and must declare `maxBytes`.
 
 ```ts
 schemas: {
-  query: z.object({ limit: z.coerce.number() }),   // direct
-  body: { schema: z.object({ title: z.string() }) }, // wrapped
+  query: z.object({ limit: z.coerce.number() }).strict(),      // direct
+  body: {                                                       // wrapped
+    schema: z.object({ title: z.string() }).strict(),
+    maxBytes: 4096,
+  },
 }
 ```
+
+Every object schema must be `.strict()`. A schema that strips or permits unknown
+fields is rejected when the runtime starts.
+
+### Coercing query values
+
+Query values arrive as strings, so booleans need care:
+
+```ts
+// wrong: Boolean("false") is true, so ?done=false queries done=true
+done: z.coerce.boolean();
+
+// right
+done: z.enum(["true", "false"]).default("false").transform((v) => v === "true");
+```
+
+This one type-checks and passes handler-level tests. Only a real request through
+the router exposes it.
 
 `principal` is the neutral request principal your project's authentication
 provider produced — `{ id, type, claims? }`. The framework does not impose an

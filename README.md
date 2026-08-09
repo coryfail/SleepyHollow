@@ -62,31 +62,40 @@ Routes are files. The directory is the path.
 ```ts
 // api/bookmarks/[id]/route.ts
 import { defineRoute } from "@sleepy-hollow/framework/routing";
+import { z } from "@sleepy-hollow/framework/validation";
+
+const bookmark = z.object({ id: z.string(), url: z.string() }).strict();
 
 export default defineRoute({
   GET: {
-    schemas: { params: { id: "string" }, responses: { 200: "application/json" } },
+    schemas: {
+      params: z.object({ id: z.string() }).strict(),
+      responses: { 200: bookmark },
+    },
     security: { authentication: "none" },
     contract: { summary: "Return one bookmark" },
-    handler: ({ params }) => Response.json({ id: params.id }),
+    handler: ({ params }) =>
+      Response.json({ id: params.id, url: "https://example.com" }),
   },
 });
 ```
 
+Every schema is a Zod schema and every object schema is `.strict()`. The runtime
+rejects anything else at startup rather than at the first bad request.
+
 Every route declares its schemas and its authentication explicitly. There is no
-implicit default, because a forgotten default is how endpoints ship
-unprotected.
+implicit default, because a forgotten default is how endpoints ship unprotected.
 
 ## Documentation
 
-| Guide | What it covers |
-|---|---|
-| [Getting started](docs/framework/getting-started.md) | Install, create, first endpoint, verify |
-| [Routing](docs/framework/routing.md) | File-based routes, methods, parameters |
-| [Data](docs/framework/data.md) | Deno KV resources, indexes, bounded queries |
-| [Verification](docs/framework/verification.md) | Capture, `hollow check`, what "verified" means |
-| [Deployment](docs/framework/deployment.md) | `hollow deploy`, your own credentials |
-| [CLI reference](docs/framework/cli.md) | Every command and flag |
+| Guide                                                | What it covers                                 |
+| ---------------------------------------------------- | ---------------------------------------------- |
+| [Getting started](docs/framework/getting-started.md) | Install, create, first endpoint, verify        |
+| [Routing](docs/framework/routing.md)                 | File-based routes, methods, parameters         |
+| [Data](docs/framework/data.md)                       | Deno KV resources, indexes, bounded queries    |
+| [Verification](docs/framework/verification.md)       | Capture, `hollow check`, what "verified" means |
+| [Deployment](docs/framework/deployment.md)           | `hollow deploy`, your own credentials          |
+| [CLI reference](docs/framework/cli.md)               | Every command and flag                         |
 
 ## SGAD methodology
 
@@ -135,11 +144,11 @@ production releases. See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming,
 release, and hotfix procedures.
 
 Sleepy Hollow develops itself using the process it provides. The application
-specification lives at [requirements/application.md](requirements/application.md),
-and component requirements are colocated with their tests and implementation
-under [`cli/`](cli/), [`core/`](core/), and
-[`skills/`](skills/). Repository-wide behavior is governed by the root
-[requirements.md](requirements.md).
+specification lives at
+[requirements/application.md](requirements/application.md), and component
+requirements are colocated with their tests and implementation under
+[`cli/`](cli/), [`core/`](core/), and [`skills/`](skills/). Repository-wide
+behavior is governed by the root [requirements.md](requirements.md).
 
 ## License
 

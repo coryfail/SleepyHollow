@@ -2,9 +2,9 @@ import { createKvRepository } from "@sleepy-hollow/framework/kv";
 
 import { todos } from "./todo.ts";
 
-export type TodoRepository = ReturnType<typeof buildRepository>;
+export type TodoRepository = ReturnType<typeof build>;
 
-function buildRepository(kv: Deno.Kv) {
+function build(kv: Deno.Kv) {
   return createKvRepository(kv, todos);
 }
 
@@ -17,5 +17,5 @@ export function useTodoRepository(
 }
 
 export async function todoRepository(): Promise<TodoRepository> {
-  return override ?? buildRepository(await Deno.openKv());
+  return override ?? build(await Deno.openKv());
 }

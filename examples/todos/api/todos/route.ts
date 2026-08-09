@@ -3,49 +3,63 @@ import { z } from "@sleepy-hollow/framework/validation";
 
 import { todoRepository } from "../../models/repository.ts";
 
-const createBody = z.object({ title: z.string().min(1).max(200) });
+const todoShape = z.object({
+  id: z.string(),
+  title: z.string(),
+  done: z.boolean(),
+  createdAt: z.string(),
+}).strict();
+
+const problemShape = z.object({ title: z.string(), status: z.number() })
+  .strict();
+
+const createBody = z.object({ title: z.string().min(1).max(200) }).strict();
+
 const listQuery = z.object({
+  done: z.enum(["true", "false"]).default("false").transform((v) =>
+    v === "true"
+  ),
   limit: z.coerce.number().int().min(1).max(100).default(25),
-});
+}).strict();
 
 export default defineRoute({
   POST: {
     schemas: {
-      body: { schema: createBody },
-      responses: { 201: "application/json", 409: "application/problem+json" },
+      body: { schema: createBody, maxBytes: 4096 },
+      responses: { 201: todoShape, 422: problemShape },
     },
-    security: { authentication: { mode: "required" } },
+    security: { authentication: "none" },
     contract: { summary: "Create one todo" },
-    handler: async ({ body, principal }) => {
+    handler: async ({ body }) => {
       const repository = await todoRepository();
       const id = crypto.randomUUID();
       const value = {
         title: body.title,
         done: false,
-        ownerId: principal!.id,
         createdAt: new Date().toISOString(),
       };
-      const created = await repository.create(id, value);
-      if (!created.ok) {
-        return Response.json({
-          title: "Conflict",
-          status: 409,
-          detail: "That todo already exists",
-        }, { status: 409 });
-      }
+      await repository.create(id, value);
       return Response.json({ id, ...value }, { status: 201 });
     },
   },
 
   GET: {
-    schemas: { query: listQuery, responses: { 200: "application/json" } },
-    security: { authentication: { mode: "required" } },
-    contract: { summary: "List the caller's todos" },
-    handler: async ({ query, principal }) => {
+    schemas: {
+      query: listQuery,
+      responses: {
+        200: z.object({
+          items: z.array(todoShape),
+          cursor: z.string().nullable(),
+        }).strict(),
+      },
+    },
+    security: { authentication: "none" },
+    contract: { summary: "List todos by done state" },
+    handler: async ({ query }) => {
       const repository = await todoRepository();
       const page = await repository.list({
-        index: "owner",
-        value: principal!.id,
+        index: "done",
+        value: query.done,
         limit: query.limit,
       });
       return Response.json({

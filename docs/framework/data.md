@@ -39,7 +39,11 @@ const repository = createKvRepository(kv, bookmarks);
 
 await repository.create(id, { url, ownerId, createdAt });
 const entry = await repository.get(id);
-const page = await repository.list({ index: "owner", value: ownerId, limit: 25 });
+const page = await repository.list({
+  index: "owner",
+  value: ownerId,
+  limit: 25,
+});
 ```
 
 Keys are native tuples under a stable prefix. Never build key strings yourself —

@@ -3,7 +3,7 @@
     "@sleepy-hollow/framework/routing": "../../core/routing/mod.ts",
     "@sleepy-hollow/framework/validation": "../../core/validation/mod.ts",
     "@sleepy-hollow/framework/kv": "../../core/kv/mod.ts",
-    "@sleepy-hollow/framework/capture": "../../core/capture/mod.ts",
+    "@sleepy-hollow/framework/testing": "../../core/testing/mod.ts",
     "zod": "npm:zod@4.4.3"
   },
   "tasks": {
