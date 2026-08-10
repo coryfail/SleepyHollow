@@ -18,6 +18,27 @@ deno install -A --global --name hollow jsr:@sleepy-hollow/framework/cli
 Every `hollow` command below can also be run without installing, by substituting
 `deno run -A jsr:@sleepy-hollow/framework/cli` for `hollow`.
 
+## Use with an agent
+
+Sleepy Hollow assumes most of the code will be written by an agent, and ships a
+skill that teaches one how. Install it into your agent environment:
+
+```bash
+npx skills add coryfail/SleepyHollow --skill sleepy-hollow
+```
+
+The skill plans the whole application before writing endpoints, writes a
+requirement beside every route, generates tests and watches them fail before
+implementing, and runs `hollow check` before it claims anything is verified. It
+stops for your approval before implementing behavior, and it cannot approve its
+own work.
+
+The skill is not required. The framework verifies independently of it: `hollow
+check` reads evidence from your test run and reaches the same verdict whether an
+agent, you, or both wrote the code. If you would rather work by hand, everything
+below still applies, and [Writing requirements](writing-requirements.md) covers
+the part the skill would otherwise do for you.
+
 ## Create a project
 
 ```bash
@@ -128,6 +149,11 @@ criterionTest({
 Tests that do not map to a criterion still run. They simply do not produce
 evidence that any approved behavior was exercised.
 
+`EP-BOOKMARKS-CREATE` and `AC-EP-001` are not invented at this point — they come
+from an approved requirement sitting beside the route.
+[Writing requirements](writing-requirements.md) shows how to author and approve
+one.
+
 ## What happens if you skip a step
 
 | You did                                   | You get                                             |
@@ -143,6 +169,7 @@ warning you can scroll past.
 
 ## Next
 
+- [Writing requirements](writing-requirements.md)
 - [Routing](routing.md)
 - [Data](data.md)
 - [Verification](verification.md)

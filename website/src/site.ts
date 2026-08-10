@@ -2,6 +2,7 @@ export const repositoryUrl = "https://github.com/coryfail/SleepyHollow";
 export const sgadGuideUrl = `${repositoryUrl}/tree/main/docs/sgad`;
 export const sgadTemplatesUrl = `${sgadGuideUrl}/templates`;
 export const sgadSkillInstallCommand = "npx skills add coryfail/SleepyHollow --skill sgad-workflow";
+export const frameworkSkillInstallCommand = "npx skills add coryfail/SleepyHollow --skill sleepy-hollow";
 
 export const jsrPackageUrl = "https://jsr.io/@sleepy-hollow/framework";
 export const frameworkInstallCommand = "deno add jsr:@sleepy-hollow/framework";

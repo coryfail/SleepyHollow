@@ -52,9 +52,16 @@ Test run passed.
 Independent verification passed.
 ```
 
-Then describe what you want to an agent with the
-[Sleepy Hollow skill](skills/sleepy-hollow/SKILL.md) installed, or write
-endpoints yourself.
+Then install the [Sleepy Hollow skill](skills/sleepy-hollow/SKILL.md) into your
+agent environment and describe what you want:
+
+```bash
+npx skills add coryfail/SleepyHollow --skill sleepy-hollow
+```
+
+Or write endpoints yourself. The framework verifies independently of the skill,
+and [Writing requirements](docs/framework/writing-requirements.md) covers the
+part the skill would otherwise do for you.
 
 ## An endpoint
 
@@ -92,6 +99,7 @@ implicit default, because a forgotten default is how endpoints ship unprotected.
 | Guide                                                | What it covers                                 |
 | ---------------------------------------------------- | ---------------------------------------------- |
 | [Getting started](docs/framework/getting-started.md) | Install, create, first endpoint, verify        |
+| [Writing requirements](docs/framework/writing-requirements.md) | Authoring and approving what `hollow check` verifies |
 | [Routing](docs/framework/routing.md)                 | File-based routes, methods, parameters         |
 | [Data](docs/framework/data.md)                       | Deno KV resources, indexes, bounded queries    |
 | [Security](docs/framework/security.md)               | Route modes, the project security module       |
