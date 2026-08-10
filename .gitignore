@@ -2,6 +2,8 @@
 .DS_Store
 website/node_modules/
 website/dist/
+website/docs/
+website/generated/
 website/coverage/
 website/playwright-report/
 website/test-results/
