@@ -329,7 +329,15 @@ other digest normalization is permitted.
 - Status: passed for the approved documentation, install, and comprehension
   revision.
 - Verified at: 2026-08-10T00:12:45Z.
-- Base revision: `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`.
+- Base revision: `ba80feae1a35afdd3765b14dbfddd702e1694999`.
+- Revision remap, 2026-08-10: this entry originally cited base revision
+  `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`. A `git filter-branch` over
+  `development` stripped co-author trailers from sixteen commit messages, which
+  rewrote every commit in that range; the same tree is now named by the digest
+  above. The pre-squash history is retained under the tag
+  `evidence/development-pre-squash-0.1.1`, so both the old and new revisions
+  remain resolvable. Only commit messages changed — no tree, no evidence, and
+  no result recorded here was altered.
 - Implementation manifest:
   `working-tree:sha256:a5fd16f591f23d13e31ee96367f48f28c2f01047d86ceeb3a3f175413a8c9f39`
   (diff of `website/` against the base revision, including new untracked
@@ -461,7 +469,7 @@ other digest normalization is permitted.
 
 | Change | Observed result | Material characterization |
 |---|---|---|
-| Documentation, install, and comprehension, 2026-08-09T23:41:00Z | 13 passed, 15 failed; Node.js `v26.0.0`; `node --test tests/site-acceptance.test.mjs` at base `2d97b6cd0c7d655ae58df039cbf647fb47e064b0` | Missing documentation generator, generated guide content and entry documents, `/docs/` and `/api/` routes and their navigation, the published install commands, the route example, the verification claim, the concrete SGAD opening, the guide-source workflow trigger, and the extended criterion mapping. The 13 unrelated structural checks continued to pass, so the failures are absent behavior rather than a broken runner |
+| Documentation, install, and comprehension, 2026-08-09T23:41:00Z | 13 passed, 15 failed; Node.js `v26.0.0`; `node --test tests/site-acceptance.test.mjs` at base `ba80feae1a35afdd3765b14dbfddd702e1694999` | Missing documentation generator, generated guide content and entry documents, `/docs/` and `/api/` routes and their navigation, the published install commands, the route example, the verification claim, the concrete SGAD opening, the guide-source workflow trigger, and the extended criterion mapping. The 13 unrelated structural checks continued to pass, so the failures are absent behavior rather than a broken runner |
 | Historical single-page baseline, 2026-08-06T14:57:58Z | 1 passed, 18 failed; Node.js `v26.0.0` | Missing React/Vite app, canonical copy, design system, browser coverage, workflow, and traceability; the no-collection invariant passed |
 | Two-page split, 2026-08-06T16:29:00Z | 3 passed, 11 failed | Missing SGAD entry, shared navigation, page components, browser coverage, and mappings |
 | Feature-record correction, 2026-08-06T16:52:00Z | 13 passed, 1 failed | Old application-wide example remained |

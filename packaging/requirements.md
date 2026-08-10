@@ -205,7 +205,10 @@ readability; no other digest normalization is permitted.
 - Status: failed as expected for the three affected criteria.
 - Observed at: 2026-08-09, after the approval above and before the behavioural
   change.
-- Baseline revision: `04b8238`.
+- Baseline revision: `6ddb394`, formerly `04b8238`. The commit was renamed by a
+  `git filter-branch` that stripped co-author trailers on 2026-08-10; the tree
+  is unchanged and the pre-squash history is retained under the tag
+  `evidence/development-pre-squash-0.1.1`.
 - Command: `deno task test:packaging`.
 - Result: `8 passed | 3 failed`.
   - AC-F020-001 failed: the gate never called the supplied transport, so the
