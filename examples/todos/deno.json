@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "@sleepy-hollow/framework/routing": "../../core/routing/mod.ts",
+    "@sleepy-hollow/framework/validation": "../../core/validation/mod.ts",
+    "@sleepy-hollow/framework/kv": "../../core/kv/mod.ts",
+    "@sleepy-hollow/framework/testing": "../../core/testing/mod.ts",
+    "zod": "npm:zod@4.4.3"
+  },
+  "tasks": {
+    "check": "deno check .",
+    "test": "deno test --unstable-kv --allow-read --allow-write",
+    "verify": "deno fmt --check . && deno lint . && deno task check && deno task test && deno run --allow-read .sleepyhollow/verify.ts"
+  }
+}

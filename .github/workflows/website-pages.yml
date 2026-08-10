@@ -5,24 +5,32 @@ on:
     branches: [main]
     paths:
       - "website/**"
+      - "docs/framework/**"
       - "docs/sgad/**"
       - "skills/sgad-workflow/**"
+      - "skills/sleepy-hollow/**"
       - "requirements.md"
       - "requirements/**"
       - "models/**"
       - "cli/**"
       - "core/**"
+      - "deno.json"
+      - "deno.lock"
       - ".github/workflows/website-pages.yml"
   pull_request:
     paths:
       - "website/**"
+      - "docs/framework/**"
       - "docs/sgad/**"
       - "skills/sgad-workflow/**"
+      - "skills/sleepy-hollow/**"
       - "requirements.md"
       - "requirements/**"
       - "models/**"
       - "cli/**"
       - "core/**"
+      - "deno.json"
+      - "deno.lock"
       - ".github/workflows/website-pages.yml"
   workflow_dispatch:
 
@@ -50,8 +58,51 @@ jobs:
           cache: npm
           cache-dependency-path: website/package-lock.json
 
+      - name: Use Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.5
+          cache: true
+          cache-hash: ${{ hashFiles('deno.json', 'deno.lock') }}
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Verify governed approvals bind their content
+        working-directory: .
+        run: deno task check:governance
+
+      - name: Verify framework
+        working-directory: .
+        run: deno task verify:framework
+
+      - name: Verify project creation
+        working-directory: .
+        run: deno task verify:create
+
+      - name: Verify API contract generation
+        working-directory: .
+        run: deno task verify:generate
+
+      - name: Verify independent project checking
+        working-directory: .
+        run: deno task verify:check
+
+      - name: Verify CLI dispatch and diagnostics
+        working-directory: .
+        run: deno task verify:cli
+
+      - name: Verify test command
+        working-directory: .
+        run: deno task verify:test-command
+
+      - name: Verify development command
+        working-directory: .
+        run: deno task verify:dev
+
+      - name: Verify planning workflow
+        working-directory: .
+        run: deno task verify:planning
 
       - name: Install browser
         run: npx playwright install --with-deps chromium firefox webkit

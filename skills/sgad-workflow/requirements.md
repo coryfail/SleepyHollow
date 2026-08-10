@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F017
 title: Standalone SGAD workflow skill
-status: approved
+status: verified
 risk: standard
 source_sections:
   - "4.6"
@@ -144,12 +144,51 @@ other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:6fe479cf0963f8068dbe05e476150794cccf0e9960b8730da50d73f77eef1374`.
+- Decision source: owner review; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:6fe479cf0963f8068dbe05e476150794cccf0e9960b8730da50d73f77eef1374`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-06T19:19:08Z.
 - Approved criteria: AC-F017-001 through AC-F017-013.
 - Historical requirement digest:
   `sha256:f080aba49ed769339a504cd21be0bfed710b77f2a44071caae910dfb994ce64c`.
-- Decision source: Codex conversation; publish the standalone SGAD workflow
+- Decision source: owner review; publish the standalone SGAD workflow
   skill for framework-independent use.
+
+### Verification, current content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the repository-consistency suite covering the packaged skill and its references.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 

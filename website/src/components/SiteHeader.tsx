@@ -20,6 +20,12 @@ export default function SiteHeader({ currentPage }: { currentPage: PageId }) {
             Home
           </a>
           <a
+            href={sitePaths.docs}
+            aria-current={currentPage === "docs" ? "page" : undefined}
+          >
+            Docs
+          </a>
+          <a
             href={sitePaths.sgad}
             aria-current={currentPage === "sgad" ? "page" : undefined}
           >

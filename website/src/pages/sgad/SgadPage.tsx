@@ -5,7 +5,26 @@ import {
   sitePaths,
 } from "../../site";
 
-const lifecycle = [
+const inPractice = [
+  [
+    "What a developer writes",
+    "A short file beside the code saying what the software should do, in plain sentences, with the parts nobody has decided yet marked as undecided instead of guessed at.",
+  ],
+  [
+    "What a human approves",
+    "That file, exactly as written. The approval records a fingerprint of the words it approved, so editing them afterwards invalidates it rather than silently carrying the old yes forward.",
+  ],
+  [
+    "What a machine checks",
+    "That each promise in the file has a test, that those tests failed before the code existed and pass after, and that the checks were run against the code as it stands now — not as the agent remembers it.",
+  ],
+  [
+    "What a finished change is",
+    "A set of records that fit together: the approved file, the run that failed for the right reason, the run that passed, the revision that was built, and where it went. Not a message saying it is done.",
+  ],
+] as const;
+
+const stages = [
   ["1.0", "Specify", "Write the behavior people actually want. Keep assumptions and unresolved decisions visible instead of letting an agent fill the gaps."],
   ["2.0", "Approve", "A human reviews the exact behavioral intent and grants bounded authority. Approval covers that content, not whatever seems plausible later."],
   ["3.0", "Write acceptance tests", "Turn every approved acceptance criterion into a check with a stable identity. Requirements point to their tests, and governed tests point back."],
@@ -45,6 +64,27 @@ export default function SgadPage() {
           </div>
         </header>
 
+        <section className="methodology-practice" aria-labelledby="practice-title">
+          <div className="methodology-section-head">
+            <p>Before the vocabulary</p>
+            <h2 id="practice-title">What changes in practice.</h2>
+          </div>
+          <dl className="practice-ledger">
+            {inPractice.map(([term, description]) => (
+              <div key={term}>
+                <dt>{term}</dt>
+                <dd>{description}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="methodology-practice__note">
+            That is the whole idea. The rest of this page names the parts and
+            says how they connect. If you would rather read the full
+            specification, it is{" "}
+            <a href={`${sitePaths.docs}sgad/`}>published on this site</a>.
+          </p>
+        </section>
+
         <section className="methodology-prose" aria-labelledby="authority-title">
           <h2 id="authority-title">Behavioral intent stays human.</h2>
           <p>
@@ -66,7 +106,7 @@ export default function SgadPage() {
             <h2 id="workflow-title">The SGAD lifecycle</h2>
           </div>
           <ol className="lifecycle">
-            {lifecycle.map(([number, title, body]) => (
+            {stages.map(([number, title, body]) => (
               <li key={number}>
                 <span className="lifecycle__number" aria-hidden="true">{number}</span>
                 <div><h3>{title}</h3><p>{body}</p></div>
@@ -147,11 +187,14 @@ export default function SgadPage() {
         </aside>
 
         <nav className="methodology-close" aria-label="Continue with SGAD">
-          <a className="text-action text-action--primary" href={sgadGuideUrl}>
-            Read the SGAD guide <span aria-hidden="true">↗</span>
+          <a className="text-action text-action--primary" href={`${sitePaths.docs}sgad/`}>
+            Read the SGAD guide <span aria-hidden="true">→</span>
           </a>
           <a className="text-action" href={sgadTemplatesUrl}>
             Browse reusable templates <span aria-hidden="true">↗</span>
+          </a>
+          <a className="text-action" href={sgadGuideUrl}>
+            View the sources on GitHub <span aria-hidden="true">↗</span>
           </a>
           <a className="text-action" href={sitePaths.home}>
             Back to Sleepy Hollow <span aria-hidden="true">→</span>

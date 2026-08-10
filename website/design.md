@@ -15,11 +15,20 @@ Halloween decoration (governed by AC-HOME-008).
 
 - Marketing page (`/`): Marquee Hero, typography only (no hero enrichment —
   removed at the project owner's request; a Tier-A CSS atmospheric panel was
-  tried and rejected). Below the hero: a numbered principle card grid, then a
+  tried and rejected). Below the hero: the problem statement, a code panel, an
+  unnumbered capability ledger, a verification panel, the install block, then a
   statement-style closing CTA band.
 - Content page (`/sgad/`): Long Document. Reading-focused methodology
   document, typography only, no enrichment — this is the deliberate structural
   contrast against the marketing page (AC-SITE-005).
+- Documentation (`/docs/`, `/docs/…`): Sidebar Document. A persistent guide
+  list in a 14–16rem column at ≥60rem, collapsing above the article below that.
+  Bodies are generated from the canonical Markdown under `docs/`, so the
+  selectors below are generic on purpose — nothing hand-authors that markup.
+- Generated reference (`/api/`): outside this system. Produced by `deno doc
+  --html`; the Deno toolchain owns its markup and theme. It is labeled as a
+  generated reference wherever it is linked so its different appearance does
+  not read as a broken page.
 
 ## Theme — Midnight (locked, unchanged)
 
@@ -89,9 +98,21 @@ Halloween decoration (governed by AC-HOME-008).
 - Content page (`/sgad/`) MUST NOT use enrichment — the document structure
   and the lifecycle numbering carry it.
 
+## Code and command surfaces
+
+- `.code-block` — bordered `--color-paper-2` panel, mono at `--text-sm`,
+  `overflow-x: auto`, `tabindex="0"` with a labeled region so keyboard users
+  can scroll it. A language chip sits top-right when the fence declares one.
+- `.table-scroll` — the same treatment for generated Markdown tables.
+- `.install-line` — uppercase label above a bordered command panel. Used on the
+  home page, the SGAD page, and the documentation index.
+- No syntax highlighting anywhere. Multi-colour tokens fight the Midnight
+  palette, and adding a highlighter would ship a runtime the pages do not
+  otherwise need.
+
 ## What pages MUST share
 
-- The wordmark, the floating-pill nav (N5), the inline-rule footer (Ft2).
+- The wordmark, the edge-aligned nav bar (N9), the inline-rule footer (Ft2).
 - The Midnight token set — no raw OKLCH/hex in page-specific CSS.
 - The CTA voice (button shape, radius, padding rhythm, hover lift).
 - Section-heading rhythm: small-caps accent-soft eyebrow label above the `h2`.

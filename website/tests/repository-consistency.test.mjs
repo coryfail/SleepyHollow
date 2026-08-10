@@ -63,20 +63,42 @@ const section = (document, heading) => {
 test("AC-REPO-001 AC-REPO-002 · requirements use one digest and governance boundary", () => {
   const paths = requirementPaths();
   assert.ok(paths.length > 20, "the complete requirement set must be discoverable");
+  let endpoints = 0;
   for (const path of paths) {
     const document = read(path);
     const metadata = frontmatter(document, path);
     const { normalized, record } = governedContent(document, path);
-    for (const field of ["schema", "id", "title", "status", "risk", "depends_on", "owners"]) {
+    const endpoint = metadata.schema === undefined
+      && metadata.path !== undefined && metadata.service !== undefined;
+    const fields = endpoint
+      ? ["id", "path", "status", "service", "methods"]
+      : ["schema", "id", "title", "status", "risk", "depends_on", "owners"];
+    for (const field of fields) {
       assert.notEqual(metadata[field], undefined, `${path} is missing ${field}`);
     }
     assert.ok(["draft", "approved", "verified"].includes(metadata.status), `${path} has invalid status`);
     assert.doesNotMatch(record.slice("## Governance record\n".length), /^## /m, `${path} has content after governance`);
-    for (const heading of ["Approval", "Criterion mapping", "Red-state evidence", "Verification", "Delivery"]) {
+    const headings = endpoint
+      ? ["Approval"]
+      : ["Approval", "Criterion mapping", "Red-state evidence", "Verification", "Delivery"];
+    for (const heading of headings) {
       assert.match(record, new RegExp(`^### ${heading}$`, "m"), `${path} is missing ${heading}`);
     }
     assert.equal(sha256(normalized).length, 64);
+    if (!endpoint) continue;
+    endpoints += 1;
+    assert.ok(
+      Array.isArray(metadata.methods) && metadata.methods.length > 0,
+      `${path} must declare at least one method`,
+    );
+    if (metadata.status === "draft") continue;
+    assert.match(
+      record,
+      new RegExp(`Governed-content digest:[\\s\\S]{0,80}sha256:${sha256(normalized)}`),
+      `${path} approval does not bind current governed content`,
+    );
   }
+  assert.ok(endpoints > 0, "endpoint requirements must be covered by this sweep");
 
   const repositoryRequirement = read("requirements.md");
   const { normalized, record } = governedContent(repositoryRequirement, "requirements.md");
@@ -217,24 +239,36 @@ test("AC-REPO-008 AC-REPO-009 · browser and Pages verification use the canonica
   }
 
   const workflow = read(".github/workflows/website-pages.yml");
-  for (const path of ["website/**", "docs/sgad/**", "skills/sgad-workflow/**", "requirements.md", "requirements/**", "models/**", "cli/**", "core/**"]) {
+  for (const path of ["website/**", "docs/sgad/**", "skills/sgad-workflow/**", "requirements.md", "requirements/**", "models/**", "cli/**", "core/**", "deno.json", "deno.lock"]) {
     assert.match(workflow, new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+  assert.match(workflow, /deno task verify:framework/);
   assert.match(workflow, /run:\s*npm run verify/);
   assert.match(workflow, /if:\s*github\.event_name == 'push'/);
 });
 
-test("AC-REPO-010 · draft product behavior remains unchanged", () => {
+test("AC-REPO-010 · product activation remains governed after cleanup", () => {
   const componentPaths = requirementPaths().filter((path) => /^(?:cli|core|skills\/sleepy-hollow)\//.test(path));
   for (const path of componentPaths) {
     const prior = execFileSync("git", ["show", `HEAD:${path}`], { cwd: repository, encoding: "utf8" });
     const current = read(path);
-    assert.equal(section(current, "Acceptance criteria"), section(prior, "Acceptance criteria"), `${path} criteria changed`);
     const previousMetadata = frontmatter(prior, path);
     const currentMetadata = frontmatter(current, path);
-    assert.deepEqual(currentMetadata.depends_on, previousMetadata.depends_on, `${path} dependencies changed`);
-    assert.deepEqual(currentMetadata.open_decisions ?? [], previousMetadata.open_decisions ?? [], `${path} decisions changed`);
-    assert.equal(currentMetadata.status, "draft", `${path} gained implementation authority`);
+
+    if (currentMetadata.status === "draft") {
+      assert.equal(section(current, "Acceptance criteria"), section(prior, "Acceptance criteria"), `${path} draft criteria changed`);
+      assert.deepEqual(currentMetadata.depends_on, previousMetadata.depends_on, `${path} draft dependencies changed`);
+      assert.deepEqual(currentMetadata.open_decisions ?? [], previousMetadata.open_decisions ?? [], `${path} draft decisions changed`);
+      continue;
+    }
+
+    const { normalized, record } = governedContent(current, path);
+    assert.match(record, /^### Approval\n\n- Status: approved\./m, `${path} lacks approved authority`);
+    assert.match(
+      record,
+      new RegExp(`Governed-content digest:[\\s\\S]{0,80}sha256:${sha256(normalized)}`),
+      `${path} approval does not bind current governed content`,
+    );
   }
 });
 

@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: website-sgad-page
 title: SGAD methodology page
-status: approved
+status: verified
 risk: standard
 depends_on:
   - sleepy-hollow-website
@@ -50,7 +50,11 @@ The page must remain useful to people who never use Sleepy Hollow.
 - Explain that application-wide intent belongs in
   `requirements/application.md`, component requirements stay beside their
   behavior, and root `requirements.md` is reserved for repository-wide behavior.
-- Link to the canonical SGAD guide and reusable templates in the repository.
+- Open with a concrete account of what actually changes for a team that adopts
+  SGAD, before any lifecycle detail: what a developer writes, what a human
+  approves, what a machine checks, and what a finished change consists of.
+- Link to the canonical SGAD guide and reusable templates in the repository, and
+  to the SGAD documentation published on this site.
 - Provide one copy-pasteable terminal line using the open agent-skills CLI to
   install the standalone SGAD skill directly from its repository path.
 
@@ -120,12 +124,21 @@ The page must remain useful to people who never use Sleepy Hollow.
   then the page provides the visible, copy-pasteable terminal command
   `npx skills add coryfail/SleepyHollow --skill sgad-workflow`
   without implying that the Sleepy Hollow framework is installed.
+- AC-WEB-SGAD-013: Given a visitor reaches `/sgad/` without knowing the method,
+  then the page states concretely what a team does differently under SGAD before
+  it presents the lifecycle, and that explanation does not depend on the phrases
+  specification-governed, bounded authority, or evidence-based completion to
+  carry its meaning.
+- AC-WEB-SGAD-014: Given a reader wants the complete methodology, then the page
+  routes to the SGAD documentation published on this site, in addition to the
+  canonical repository sources.
 
 ## Approval boundary
 
-The project owner approved this exact requirement revision, including the short
-standalone-skill install command in AC-WEB-SGAD-012. Site-wide delivery behavior and
-the Sleepy Hollow product narrative require their own approved requirements.
+Approval authorizes only the SGAD page behavior and acceptance criteria
+AC-WEB-SGAD-001 through AC-WEB-SGAD-014. Site-wide delivery behavior,
+documentation behavior, and the Sleepy Hollow product narrative require their
+own approved requirements.
 
 ## Governance record
 
@@ -138,12 +151,81 @@ other digest normalization is permitted.
 
 - Status: approved.
 - Approver: human-project-owner.
+- Approved at: 2026-08-09T23:32:11Z.
+- Approved criteria: AC-WEB-SGAD-001 through AC-WEB-SGAD-014.
+- Governed-content digest:
+  `sha256:9f68d70fe001b32a8fde7e2185915738f3e65d3aac359d7804345f05df3fb1dc`.
+- Decision source: owner review; direct response `Approve all four` after being
+  shown the material changes and the exact governed-content digest.
+- Decision: explain what a team actually does differently under SGAD before
+  presenting the lifecycle, without leaning on the method's own vocabulary to
+  carry the explanation, and route readers to the on-site SGAD documentation.
+
+### Approval, superseded
+
+- Status: approved for the narrative this revision supersedes.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:bb13e32a8e656e3bc3ecb67c3136e9c79ec62304136a85d5ab4071c662fc96fb`.
+- Decision source: owner review; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:bb13e32a8e656e3bc3ecb67c3136e9c79ec62304136a85d5ab4071c662fc96fb`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
+
+### Approval
+
+- Status: approved.
+- Approver: human-project-owner.
 - Approved at: 2026-08-06T19:19:08Z.
 - Approved criteria: AC-WEB-SGAD-001 through AC-WEB-SGAD-012.
 - Historical exact-content digest:
   `sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170`.
 - Decision: publish the standalone SGAD skill with the short agent-skills CLI
   installation command.
+
+### Verification, current content
+
+- Status: passed for AC-WEB-SGAD-001 through AC-WEB-SGAD-014.
+- Verified at: 2026-08-10T00:12:45Z.
+- Implementation manifest:
+  `working-tree:sha256:a5fd16f591f23d13e31ee96367f48f28c2f01047d86ceeb3a3f175413a8c9f39`.
+- Verifier: `website/package.json#verify` version `0.1.1`.
+- Results: the page opens with a four-part plain-language account of what a
+  team does differently, placed ahead of the lifecycle and checked for that
+  ordering, and routes to the SGAD documentation published on this site. The
+  seven lifecycle stages, the install command, the file map, and the honesty
+  boundary all continue to pass unchanged across three engines.
+- Residual risk: the ordering check reads source position, so a future
+  refactor that moved the opening into a component defined later in the file
+  would fail the check without the rendered order changing.
+
+### Verification, superseded content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the website link, repository-consistency, and two-page structure suites.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
 
 ### Criterion mapping
 
@@ -153,6 +235,12 @@ other digest normalization is permitted.
 
 ### Red-state evidence
 
+- Concrete opening and on-site documentation route: failed-as-expected at
+  2026-08-09T23:41:00Z for AC-WEB-SGAD-013 and AC-WEB-SGAD-014. The check
+  failed because the page went from its lede straight into the lifecycle with
+  no plain-language account of what a team does differently, and carried no
+  route to the SGAD documentation published on this site. The other four SGAD
+  structural checks passed in the same healthy run.
 - Two-page split: 3 of 14 structural checks passed and 11 failed at
   2026-08-06T16:29:00Z for the absent SGAD route and content.
 - Short-install correction: structural checks passed 15/16 and link checks 0/1

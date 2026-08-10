@@ -4,6 +4,8 @@ import { expect, test } from "@playwright/test";
 const routes = [
   { name: "Sleepy Hollow", path: "/" },
   { name: "SGAD", path: "/sgad/" },
+  { name: "Documentation index", path: "/docs/" },
+  { name: "Routing guide", path: "/docs/routing/" },
 ] as const;
 
 const requiredViewports = [
@@ -22,13 +24,93 @@ test("AC-SITE-002 · the two destinations are separate and mutually navigable", 
   await expect(page.getByRole("link", { name: "SGAD Methodology", exact: true })).toHaveAttribute("aria-current", "page");
 });
 
-test("AC-HOME-001 AC-HOME-005 AC-HOME-010 · home is a product page with no process illustration", async ({ page }) => {
+test("AC-HOME-001 AC-HOME-005 AC-HOME-010 AC-HOME-016 · home leads as an agentic framework with SGAD built in", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText(/agentic-first headless API framework for Deno/i)).toBeVisible();
-  await expect(page.getByText(/in development/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /read how SGAD works/i })).toHaveAttribute("href", "/sgad/");
+  await expect(page.getByText(/agentic-first headless API framework for Deno/i).first()).toBeVisible();
+  await expect(page.getByText(/Specification-Governed Agentic Development/i).first()).toBeVisible();
+  await expect(page.getByText(/in development/i).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /how SGAD works/i }).first()).toHaveAttribute("href", "/sgad/");
   await expect(page.locator(".evidence-trail, svg")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: /Observe expected red/i })).toHaveCount(0);
+});
+
+test("AC-HOME-018 · the compact method loop is at most four steps and sits above the code", async ({ page }) => {
+  await page.goto("/");
+  const steps = page.locator(".home-method__steps > li");
+  const count = await steps.count();
+  expect(count).toBeGreaterThan(0);
+  expect(count).toBeLessThanOrEqual(5);
+  await expect(page.getByRole("heading", { name: /tests come first/i })).toBeVisible();
+
+  const method = await page.locator(".home-method").boundingBox();
+  const code = await page.locator(".home-code").boundingBox();
+  expect(method).not.toBeNull();
+  expect(code).not.toBeNull();
+  expect(method!.y).toBeLessThan(code!.y);
+});
+
+test("AC-HOME-011 AC-HOME-012 AC-HOME-013 AC-HOME-014 · home shows how to install, write, and check a route", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("deno add jsr:@sleepy-hollow/framework", { exact: true })).toBeVisible();
+  await expect(page.getByText(/defineRoute/).first()).toBeVisible();
+  await expect(page.getByText(/hollow check/).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /read the documentation/i })).toHaveAttribute("href", "/docs/");
+});
+
+test("AC-DOCS-001 AC-DOCS-004 AC-DOCS-005 · the documentation index lists and routes to every guide", async ({ page }) => {
+  await page.goto("/docs/");
+  await expect(page.getByRole("heading", { level: 1, name: /documentation/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /API reference/i }).first()).toHaveAttribute("href", "/api/");
+
+  await page.getByRole("link", { name: "Routing", exact: true }).first().click();
+  await expect(page).toHaveURL(/\/docs\/routing\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Routing" })).toBeVisible();
+
+  const current = page.locator(".docs-nav__link[aria-current='page']");
+  await expect(current).toHaveText("Routing");
+  await expect(page.locator(".docs-next")).toBeVisible();
+});
+
+test("AC-SITE-013 · the generated API reference is published and reachable", async ({ page }) => {
+  const failures: string[] = [];
+  page.on("response", (response) => {
+    if (response.status() >= 400) failures.push(response.url());
+  });
+
+  await page.goto("/docs/");
+  await page.getByRole("link", { name: /API reference/i }).first().click();
+  await expect(page).toHaveURL(/\/api\/$/);
+  await expect(page.locator("body")).toContainText(/Sleepy Hollow/i);
+  await expect(page.getByRole("link", { name: /defineRoute/ }).first()).toBeVisible();
+  expect(failures).toEqual([]);
+
+  // The generated reference has no knowledge of the site that links to it, so
+  // without an injected route back it is a dead end for anyone who arrives.
+  await page.getByRole("link", { name: /back to the documentation/i }).click();
+  await expect(page).toHaveURL(/\/docs\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: /documentation/i })).toBeVisible();
+});
+
+test("AC-DOCS-002 AC-DOCS-006 · a guide renders its canonical prose with resolved links", async ({ page }) => {
+  await page.goto("/docs/getting-started/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: /verification/i }).first()).toHaveAttribute("href", /^\/docs\/verification\/$/);
+  await expect(page.locator(".doc-article a[href$='.md']")).toHaveCount(0);
+  await expect(page.locator(".doc-article .code-block").first()).toBeVisible();
+});
+
+test("AC-DOCS-008 · guide code blocks scroll inside their own region at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/docs/routing/");
+  const overflowing = await page.locator(".doc-article .code-block").evaluateAll((blocks) =>
+    blocks.filter((block) => getComputedStyle(block).overflowX !== "auto").length
+  );
+  expect(overflowing).toBe(0);
+  const dimensions = await page.evaluate(() => ({
+    body: document.body.scrollWidth,
+    viewport: document.documentElement.clientWidth,
+  }));
+  expect(dimensions.body).toBeLessThanOrEqual(dimensions.viewport);
 });
 
 test("AC-WEB-SGAD-001 AC-WEB-SGAD-003 AC-WEB-SGAD-006 AC-WEB-SGAD-012 · SGAD is a complete independent methodology page", async ({ page }) => {
@@ -123,6 +205,39 @@ for (const route of routes) {
   }
 }
 
+test("AC-SITE-005 · no section heading pins over the content scrolling beneath it", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  // A sticky intro only works when it has its own column. In a single-column
+  // section it overlaps whatever scrolls under it, which is a real defect the
+  // static screenshots at the top of the page cannot show.
+  const overlaps = await page.evaluate(() => {
+    const found: string[] = [];
+    for (const section of document.querySelectorAll("main > section")) {
+      const intro = section.querySelector(".section-intro");
+      if (!intro) continue;
+      const columns = getComputedStyle(section).gridTemplateColumns.split(" ").length;
+      if (columns > 1) continue;
+      if (getComputedStyle(intro).position === "sticky") {
+        found.push(section.className);
+      }
+    }
+    return found;
+  });
+  expect(overlaps).toEqual([]);
+
+  for (const name of ["home-capabilities"]) {
+    const section = page.locator(`.${name}`);
+    await section.scrollIntoViewIfNeeded();
+    const intro = await section.locator(".section-intro").boundingBox();
+    const content = await section.locator(".framework__ledger").boundingBox();
+    expect(intro).not.toBeNull();
+    expect(content).not.toBeNull();
+    expect(intro!.y + intro!.height).toBeLessThanOrEqual(content!.y + 1);
+  }
+});
+
 test("AC-HOME-001 · the essential product opening fits 1280 by 800", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
@@ -133,7 +248,7 @@ test("AC-HOME-001 · the essential product opening fits 1280 by 800", async ({ p
   }
 });
 
-test("AC-SITE-004 · core content remains available without JavaScript on both pages", async ({ browser }) => {
+test("AC-SITE-004 AC-DOCS-007 · core content remains available without JavaScript on every page", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
 
@@ -144,5 +259,16 @@ test("AC-SITE-004 · core content remains available without JavaScript on both p
   await page.goto("/sgad/");
   await expect(page.getByRole("heading", { level: 1, name: /Specification-Governed/i })).toBeVisible();
   await expect(page.getByText(/You can use it without Sleepy Hollow/i)).toBeVisible();
+
+  await page.goto("/docs/");
+  await expect(page.getByRole("heading", { level: 1, name: /documentation/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Routing", exact: true }).first()).toBeVisible();
+
+  await page.goto("/docs/routing/");
+  await expect(page.getByRole("heading", { level: 1, name: "Routing" })).toBeVisible();
+  // A phrase that sits on one source line: the rendered paragraph keeps the
+  // Markdown's own line breaks, which a regex across them would not match.
+  await expect(page.getByText(/The filesystem is the only source of paths/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Data", exact: true }).first()).toBeVisible();
   await context.close();
 });

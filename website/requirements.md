@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-website
 title: Sleepy Hollow public website
-status: approved
+status: verified
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -15,11 +15,16 @@ owners:
 
 ## Purpose
 
-Create a small public website with two distinct but connected destinations:
+Create a small public website with four distinct but connected destinations:
 
-1. A Sleepy Hollow framework landing page that introduces the planned product,
-   its agentic-first approach, and its relationship to SGAD.
-2. A dedicated Specification-Governed Agentic Development (SGAD) page that
+1. A Sleepy Hollow framework landing page that explains concretely what the
+   framework does, shows what using it looks like, and states how to install it.
+2. A documentation section that publishes the repository's canonical guides as
+   readable pages on the site itself, rather than sending readers to Markdown
+   files on a code host.
+3. A generated API reference derived from the framework's own source
+   documentation comments.
+4. A dedicated Specification-Governed Agentic Development (SGAD) page that
    explains the methodology independently of Sleepy Hollow and gives readers a
    practical way to adopt it.
 
@@ -27,28 +32,46 @@ The split must let readers understand Sleepy Hollow without first reading a
 methodology document while giving SGAD enough room to be useful to people who
 never adopt the framework.
 
+Every destination is judged on comprehension. A reader who does not already know
+this project must be able to say what the framework does, what SGAD is, and what
+either would cost them, after one pass. Copy that names concepts without
+explaining or demonstrating them does not satisfy this requirement, however
+accurate it is.
+
 ## Authorized scope
 
 - Maintain a static React website under `website/`.
 - Publish the Sleepy Hollow page at `https://sleepyhollow.io/`.
 - Publish the SGAD methodology at a stable `/sgad/` path beneath that root.
-- Provide clear navigation between the two pages and to the canonical GitHub
-  repository and SGAD source documents.
+- Publish the repository's canonical guides beneath a stable `/docs/` path,
+  generated at build time from the exact Markdown files under `docs/` in the
+  same revision.
+- Publish a generated API reference beneath a stable `/api/` path, produced by
+  the Deno toolchain from the framework's own source documentation comments.
+- State how to install the published package and CLI, using the real commands
+  for the version that is actually published.
+- Provide clear navigation among the pages and to the canonical GitHub
+  repository, the published package, and SGAD source documents.
 - Share one visual system, accessibility standard, deployment workflow, and
-  evidence model across both pages.
-- Build and publish both pages through GitHub Pages after the verified release
+  evidence model across every hand-authored page.
+- Build and publish the site through GitHub Pages after the verified release
   reaches `main`.
 
 ## Out of scope
 
-- Product documentation, API reference, tutorials, blog content, search, or a
-  documentation portal.
+- Blog content, full-text search, versioned documentation, a documentation
+  content-management system, or a comment or feedback surface.
+- Documentation prose hand-maintained inside `website/`. Guide text has one
+  source of truth under `docs/`; the website renders it and never forks it.
+- Tutorials, guides, or reference material authored to fill out the section
+  rather than to document behavior the framework actually has.
 - Authentication, forms, newsletters, analytics, cookies, tracking, databases,
   remote data access, server-side rendering, or server-side APIs.
-- Product installation claims, runnable demonstrations, fabricated metrics,
-  testimonials, customer logos, or unsupported availability claims.
-- Additional domains, a content-management system, localization, or additional
-  site routes without a separately approved requirement.
+- Runnable demonstrations, fabricated metrics, testimonials, customer logos, or
+  claims of stability, production readiness, or adoption that the repository
+  does not support.
+- Additional domains, localization, or additional top-level site routes without
+  a separately approved requirement.
 - Changing the canonical Sleepy Hollow or SGAD methodology requirements from
   website copy.
 
@@ -57,15 +80,22 @@ never adopt the framework.
 | Feature | Route | Requirement |
 |---|---|---|
 | Sleepy Hollow framework page | `/` | `src/pages/sleepy-hollow/requirements.md` |
+| Documentation section | `/docs/` | `src/pages/docs/requirements.md` |
 | SGAD methodology page | `/sgad/` | `src/pages/sgad/requirements.md` |
 
-Each page is independently valuable and owns its narrative acceptance criteria.
-This file owns only cross-page behavior and shared delivery constraints.
+Each feature is independently valuable and owns its narrative acceptance
+criteria. This file owns only cross-page behavior and shared delivery
+constraints.
+
+The generated API reference at `/api/` has no narrative of its own. It is build
+output governed by this file, not a hand-authored page, and it is exempt from
+the shared visual system because the Deno toolchain controls its markup.
 
 ## Shared experience
 
-- Both pages must unmistakably belong to the same Sleepy Hollow site through
-  shared typography, color tokens, navigation language, and interaction rules.
+- Every hand-authored page must unmistakably belong to the same Sleepy Hollow
+  site through shared typography, color tokens, navigation language, and
+  interaction rules.
 - The pages may use different layouts and information density to match their
   different jobs; visual consistency must not collapse them into duplicate
   templates.
@@ -74,19 +104,29 @@ This file owns only cross-page behavior and shared delivery constraints.
 - The SGAD page must explain that the methodology can be used without Sleepy
   Hollow and provide a clear path back to the framework page.
 - Public copy must distinguish current, planned, and verified behavior.
+- Where a page introduces a term the reader may not know, it must explain the
+  term or show the thing it names. Naming a concept is not explaining it.
+- Where a page describes what the framework does, it must be possible to show
+  the corresponding code, command, or output; where it is not, the claim is too
+  abstract to publish.
 
 ## Routes and static delivery
 
-- The build must emit independent static entry documents for the root framework
-  page and the `/sgad/` methodology page.
-- Direct navigation or refresh at either public URL must succeed on GitHub Pages
+- The build must emit an independent static entry document for the root
+  framework page, the `/sgad/` methodology page, the documentation index, and
+  every published guide.
+- Direct navigation or refresh at any public URL must succeed on GitHub Pages
   without client-side redirect tricks or a domain-root assumption.
 - Internal links and assets must resolve from the custom-domain root without a
   repository-name path prefix.
 - The published artifact must include a `CNAME` record for `sleepyhollow.io`.
-- Core content and destinations on both pages must remain available when
-  JavaScript is disabled.
-- A missing page artifact or linked canonical repository document must fail
+- Core content and destinations on every page must remain available when
+  JavaScript is disabled. On a guide, the core content is the whole guide.
+- Documentation entry documents and the generated API reference are build
+  output. They must be produced by the build and excluded from version control,
+  so a published guide can never disagree with its source file.
+- A missing page artifact, a guide whose source file no longer exists, or a
+  linked canonical repository document that cannot be resolved must fail
   verification before deployment.
 
 ## State, access, and side effects
@@ -136,6 +176,9 @@ This file owns only cross-page behavior and shared delivery constraints.
 
 - Website dependencies remain isolated under `website/`; framework consumers do
   not install them.
+- Markdown rendering happens at build time. The published guide pages must not
+  ship a Markdown parser, syntax highlighter, or documentation runtime to the
+  browser.
 - The static build must work in current stable Chromium, Firefox, and Safari.
 - Automated browser acceptance covers representative Chromium, Firefox, and
   WebKit engines. WebKit coverage is not presented as proof of every Safari
@@ -148,20 +191,21 @@ This file owns only cross-page behavior and shared delivery constraints.
 ## Acceptance criteria
 
 - AC-SITE-001: Given website dependencies are installed, when the production
-  build runs, then it emits deployable static entry documents for both the
-  framework root and `/sgad/` without writing outside the authorized output.
-- AC-SITE-002: Given a visitor is on either page, then the shared navigation
-  identifies the current destination and provides a descriptive, keyboard-
-  operable route to the other page.
-- AC-SITE-003: Given `https://sleepyhollow.io/` or
-  `https://sleepyhollow.io/sgad/` is opened directly or refreshed, then the
-  correct page and all required assets load without a redirect loop, 404
-  response, or repository-name path prefix.
+  build runs, then it emits deployable static entry documents for the framework
+  root, `/sgad/`, the documentation index, and every published guide, without
+  writing outside the authorized output.
+- AC-SITE-002: Given a visitor is on any hand-authored page, then the shared
+  navigation identifies the current destination and provides descriptive,
+  keyboard-operable routes to the site's other destinations.
+- AC-SITE-003: Given any published site URL is opened directly or refreshed,
+  then the correct page and all required assets load without a redirect loop,
+  404 response, or repository-name path prefix.
 - AC-SITE-004: Given JavaScript is disabled, then each page still exposes its
-  core explanation and primary destinations in semantic HTML.
-- AC-SITE-005: Given both pages are visually compared, then they share the same
-  design tokens and brand atmosphere while using recognizably different page
-  structures appropriate to their distinct purposes.
+  core explanation and primary destinations in semantic HTML, and a guide page
+  exposes its complete prose.
+- AC-SITE-005: Given the hand-authored pages are visually compared, then they
+  share the same design tokens and brand atmosphere while using recognizably
+  different page structures appropriate to their distinct purposes.
 - AC-SITE-006: Given keyboard-only and automated accessibility checks, then both
   pages expose logical landmarks, ordered headings, visible focus, descriptive
   links, and WCAG 2.2 AA contrast.
@@ -176,21 +220,54 @@ This file owns only cross-page behavior and shared delivery constraints.
   and verifies both pages without deploying; given the verified revision reaches
   `main`, it uploads only the current production artifact through the protected
   GitHub Pages environment.
-- AC-SITE-011: Given verification is complete, then site criteria and both page
-  feature criteria have bidirectional traceability, retained expected-red
+- AC-SITE-011: Given verification is complete, then site criteria and every page
+  feature's criteria have bidirectional traceability, retained expected-red
   evidence, and an implementation-bound embedded verification entry.
+- AC-SITE-012: Given a guide is published at `/docs/…`, then its prose was
+  generated during the build from the exact canonical Markdown file under
+  `docs/` in the same revision, and no second copy of that prose is maintained
+  under `website/`.
+- AC-SITE-013: Given the production build completes, then a generated API
+  reference is published beneath `/api/`, produced by the Deno toolchain from
+  the framework's own source documentation comments, and reachable by a
+  descriptive link from the documentation section.
+- AC-SITE-014: Given the repository is inspected, then no documentation entry
+  document, rendered guide content, or generated API reference file is tracked
+  in version control.
+- AC-SITE-015: Given a canonical guide file is added, renamed, or removed, then
+  the next build reflects that change without editing website source, and a
+  guide whose source file is missing fails verification rather than publishing
+  stale prose.
+- AC-SITE-016: Given the site states how to install Sleepy Hollow, then the
+  stated package name, commands, and version claim match the package actually
+  published to JSR and the install instructions in `README.md`.
 
 ## Change history and approval boundary
 
 This draft supersedes the approved single-page intent identified by requirement
-digest `sha256:299742bd6eca92fd51118a13649094ede3224031f2a42081c16df5cf15fdf29f`.
-That historical revision remains recoverable from Git history; its material
+digest `sha256:299742bd6eca92fd51118a13649094ede3224031f2a42081c16df5cf15fdf29f`
+and the approved two-page intent identified by digest
+`sha256:e94af44b188d2ea6fedd19003d0612385a72babf483c9b89627efcb2a8614ed9`. Those
+historical revisions remain recoverable from Git history; their material
 approval and evidence provenance is retained in the governance record below.
 
-The prior approval and verification remain historical evidence for the
-single-page implementation. They do not authorize this two-page revision. Human
-approval must bind this file and both child page requirements before acceptance
-tests or implementation are changed.
+This revision changes three things the prior approval decided differently, and
+each is a deliberate reversal rather than an extension:
+
+1. Product documentation and an API reference moved from out of scope to
+   authorized scope, because the framework is now published and readers need
+   documentation on the site rather than in a code host's file viewer.
+2. Installation instructions moved from out of scope to authorized scope,
+   because `@sleepy-hollow/framework` is published to JSR and stating how to
+   install it is now a fact rather than a claim.
+3. Comprehension became a governed property rather than an implicit one,
+   because the delivered copy satisfied every prior criterion while leaving a
+   first-time reader unable to say what the framework does.
+
+The prior approvals and verifications remain historical evidence for the
+two-page implementation. They do not authorize this revision. Human approval
+must bind this file and each child page requirement before acceptance tests or
+implementation are changed.
 
 ## Governance record
 
@@ -201,6 +278,45 @@ other digest normalization is permitted.
 
 ### Approval
 
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-09T23:32:11Z.
+- Approved criteria: AC-SITE-001 through AC-SITE-016.
+- Governed-content digest:
+  `sha256:730077cb52300a9492f753139ceeec8954c56286911897a9a496e06ff3bc939f`.
+- Decision source: owner review; direct response `Approve all four` after being
+  shown the material changes and the exact governed-content digest.
+- Decision: publish the canonical guides and a generated API reference on the
+  site, state the real JSR install commands, and make comprehension a governed
+  property of every page rather than an implicit hope.
+
+### Approval, superseded
+
+- Status: approved for the two-page scope this revision supersedes.
+- Approver: human-project-owner.
+- Approved at: 2026-08-08T20:21:37Z.
+- Approved criteria: the criteria recorded in this requirement.
+- Governed-content digest:
+  `sha256:e94af44b188d2ea6fedd19003d0612385a72babf483c9b89627efcb2a8614ed9`.
+- Decision source: owner review; direct response `Approve` after review
+  of the current content after the unbound-approval correction and the exact governed-content digest.
+
+### Approval, unbound
+
+- Status: no recorded approval binds the current content.
+- Observed at: 2026-08-08T20:20:04Z.
+- Current governed-content digest:
+  `sha256:e94af44b188d2ea6fedd19003d0612385a72babf483c9b89627efcb2a8614ed9`.
+- Finding: recomputing the canonical governed-content digest for this file
+  matches none of the digests recorded below. The content has changed since
+  every recorded approval, so the `approved` projection asserted authority the
+  digest disproves. The status is corrected to `draft` pending re-approval of
+  the current content.
+- No downstream evidence is invalidated by this correction, because the
+  correction records a drift that already existed rather than introducing one.
+
+### Approval
+
 | Requirement revision | Approved criteria | Digest | Approver | Approved at | Decision |
 |---|---|---|---|---|---|
 | Historical single-page website | AC-WEB-001–019 | `sha256:299742bd6eca92fd51118a13649094ede3224031f2a42081c16df5cf15fdf29f` | human-project-owner | 2026-08-06T14:57:58Z | “Perfect, let's continue still using SGAD” |
@@ -208,11 +324,78 @@ other digest normalization is permitted.
 | SGAD page with short install | AC-WEB-SGAD-001–012 | `sha256:49c7921fc5f92784a79b1c1379c50fadfa5c57b5be1645e6a4e71bcd7046e170` | human-project-owner | 2026-08-06T19:19:08Z | Publish the standalone skill with the short agent-skills command |
 | Two-page website and delivery scope | AC-SITE-001–011 | `sha256:57d0e449cae7d4bc2e5fc6397ac9641f9255fd16b3417368e68b043a3a34075e` | human-project-owner | 2026-08-06T17:20:18Z | Commit, push, and publish the verified website at `https://sleepyhollow.io` |
 
+### Verification, current content
+
+- Status: passed for the approved documentation, install, and comprehension
+  revision.
+- Verified at: 2026-08-10T00:12:45Z.
+- Base revision: `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`.
+- Implementation manifest:
+  `working-tree:sha256:a5fd16f591f23d13e31ee96367f48f28c2f01047d86ceeb3a3f175413a8c9f39`
+  (diff of `website/` against the base revision, including new untracked
+  sources).
+- Verifier: `website/package.json#verify` version `0.1.1`, plus
+  `deno task check:governance` from the repository root.
+- Results: structural 28/28, links 1/1, repository-consistency 9/9,
+  React/Vitest 12/12, TypeScript build, Vite production build across 18 entry
+  documents, and Playwright/Axe 129/129 across Chromium, Firefox, and WebKit —
+  covering WCAG 2.2 AA on all four routes, all four required responsive widths
+  on all four routes, reduced motion, keyboard focus, the no-JavaScript
+  fallback for the home, SGAD, documentation index, and guide routes, the
+  1280×800 hero fit, and a live fetch of the generated `/api/` reference.
+  Governed digests bind for 29 tracked requirements and for the new
+  documentation requirement.
+- Scope of this entry: it establishes that the site as built satisfies every
+  criterion approved at 2026-08-09T23:32:11Z, including the criteria added by
+  that approval. It supersedes the entries below, which were bound to the
+  two-page scope.
+- Owner review pass, 2026-08-10: the project owner reviewed the running site
+  and four defects were corrected under the same approved criteria, with no
+  requirement text or acceptance criterion changed.
+  1. `/api/` was served only from a production build, so the link was live in
+     production and dead in development. A dev-only Vite middleware now serves
+     the generated reference from `dist/api`; it is `apply: "serve"` and cannot
+     affect the production bundle.
+  2. The generated reference contained no link back to the site — its own
+     wordmark points at its own index — so following the documentation link
+     stranded the visitor. `scripts/brand-api-reference.mjs` now inserts one
+     return bar into each of the 1,814 generated documents after `deno doc`
+     runs, and a browser check follows that link back to `/docs/`.
+  3. The six capability cards inherited the two-column `.framework` split and
+     rendered at roughly twenty characters a line on a desktop viewport. The
+     section now owns its layout and uses the full measure.
+  4. The `hollow check` note sat in a second grid row beneath the taller prose
+     column, visually detached from the output it explains. It is now grouped
+     with that output in one panel.
+- Residual risk: the generated API reference is verified as reachable, as
+  containing expected symbols, and as routing back to the site, not audited
+  page by page — its markup is produced by the Deno toolchain and is not
+  governed by this project's visual or accessibility criteria. The injected
+  return bar is the one exception, and it depends on the toolchain continuing
+  to emit a `<body>` tag; the injector skips any document where that fails
+  rather than corrupting it, so a format change would silently drop the bar
+  from affected pages. The published site has not been re-fetched from
+  `sleepyhollow.io` since this revision; delivery remains ungoverned here.
+
+### Verification, superseded two-page content
+
+- Status: passed for the re-approved content.
+- Verified at: 2026-08-08T20:24:58Z.
+- Commands: `npm run test:links`, `npm run test:repository`, and
+  `npm run test:structure` in `website`.
+- Result: all three suites pass, covering the website link, repository-consistency, and two-page structure suites.
+- Scope of this entry: it establishes that the current content is consistent and
+  that its mapped repository checks pass. It supersedes the historical entries
+  below, which were bound to digests that no longer match this file.
+- Residual risk: browser-level acceptance through Playwright was not executed in
+  this environment, so rendered-page behavior rests on the structural suites
+  rather than a live browser run.
+
 ### Criterion mapping
 
 | Criterion | Governed tests or checks |
 |---|---|
-| AC-SITE-001 | `tests/two-page-acceptance.test.mjs`; `npm run build` |
+| AC-SITE-001 | `tests/site-acceptance.test.mjs`; `npm run build` |
 | AC-SITE-002 | `src/App.test.tsx`; `tests/landing-page.spec.ts` |
 | AC-SITE-003 | structural and browser checks; custom-domain expected red |
 | AC-SITE-004 | structural and no-JavaScript browser checks |
@@ -223,6 +406,34 @@ other digest normalization is permitted.
 | AC-SITE-009 | React and structural storage/analytics checks |
 | AC-SITE-010 | structural workflow checks; `.github/workflows/website-pages.yml`; concurrency expected red |
 | AC-SITE-011 | embedded traceability and two-page expected red |
+| AC-SITE-012 | `tests/site-acceptance.test.mjs` generated-prose and no-duplicate-copy checks |
+| AC-SITE-013 | structural `docs:api` build-chain checks; Playwright API-reference link check |
+| AC-SITE-014 | structural `git ls-files` and `.gitignore` checks |
+| AC-SITE-015 | structural `planGuides` missing-source check |
+| AC-SITE-016 | structural install-command, `deno.json`, and `README.md` agreement checks |
+| AC-HOME-011 | React, structural, and Playwright install-command checks |
+| AC-HOME-012 | structural route-example checks against the current public API |
+| AC-HOME-013 | React, structural, and Playwright `hollow check` checks |
+| AC-HOME-014 | React and Playwright documentation-route checks |
+| AC-HOME-015 | structural capability-list checks |
+| AC-HOME-016 | React, structural, and Playwright agentic-positioning checks on the first screen |
+| AC-HOME-017 | structural developer-analogy check |
+| AC-HOME-018 | React, structural, and Playwright compact-loop checks, including its position above the code example |
+| AC-HOME-019 | structural checks barring output-quality, correctness, and review-replacement claims |
+| AC-HOME-020 | structural check barring any productivity, velocity, or time-saving figure |
+| AC-HOME-021 | React, structural, and Playwright test-first-step checks on the compact loop |
+| AC-WEB-SGAD-013 | structural concrete-opening ordering check |
+| AC-WEB-SGAD-014 | structural on-site documentation route check |
+| AC-DOCS-001 | React, structural, and Playwright index-listing checks |
+| AC-DOCS-002 | React, structural, and Playwright rendered-guide checks |
+| AC-DOCS-003 | structural generated-prose and no-duplicate-copy checks |
+| AC-DOCS-004 | React and Playwright current-marker and next-guide checks |
+| AC-DOCS-005 | structural and Playwright API-reference link checks |
+| AC-DOCS-006 | structural link-rewriting checks; Playwright resolved-link check |
+| AC-DOCS-007 | structural noscript-fallback checks; Playwright no-JavaScript guide check |
+| AC-DOCS-008 | structural `overflow-x` check; Playwright 320px code-block check |
+| AC-DOCS-009 | Playwright Axe checks on `/docs/` and `/docs/routing/` |
+| AC-DOCS-010 | React and structural data-entry-surface checks |
 | AC-HOME-001 | React and Playwright product-opening checks |
 | AC-HOME-002 | React and structural product-explanation checks |
 | AC-HOME-003 | structural plain-language checks |
@@ -250,6 +461,7 @@ other digest normalization is permitted.
 
 | Change | Observed result | Material characterization |
 |---|---|---|
+| Documentation, install, and comprehension, 2026-08-09T23:41:00Z | 13 passed, 15 failed; Node.js `v26.0.0`; `node --test tests/site-acceptance.test.mjs` at base `2d97b6cd0c7d655ae58df039cbf647fb47e064b0` | Missing documentation generator, generated guide content and entry documents, `/docs/` and `/api/` routes and their navigation, the published install commands, the route example, the verification claim, the concrete SGAD opening, the guide-source workflow trigger, and the extended criterion mapping. The 13 unrelated structural checks continued to pass, so the failures are absent behavior rather than a broken runner |
 | Historical single-page baseline, 2026-08-06T14:57:58Z | 1 passed, 18 failed; Node.js `v26.0.0` | Missing React/Vite app, canonical copy, design system, browser coverage, workflow, and traceability; the no-collection invariant passed |
 | Two-page split, 2026-08-06T16:29:00Z | 3 passed, 11 failed | Missing SGAD entry, shared navigation, page components, browser coverage, and mappings |
 | Feature-record correction, 2026-08-06T16:52:00Z | 13 passed, 1 failed | Old application-wide example remained |
