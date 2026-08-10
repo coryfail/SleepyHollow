@@ -406,7 +406,7 @@ other digest normalization is permitted.
   broken runner.
 - Status: failed-as-expected at 2026-08-09T23:41:00Z for AC-HOME-011 through
   AC-HOME-015: 13 of 28 structural checks passed and 15 failed at base revision
-  `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`. The three checks carrying the new
+  `ba80feae1a35afdd3765b14dbfddd702e1694999`. The three checks carrying the new
   home criteria failed because the page carried no install command, no route
   example, no `hollow check` claim, no documentation route, and no list of the
   ordinary backend capabilities the framework provides. The runner was healthy

@@ -161,7 +161,7 @@ AC-DOCS-001 through AC-DOCS-010 map to the exact per-criterion entries in
 
 - Status: failed-as-expected at 2026-08-09T23:41:00Z under
   `node --test tests/site-acceptance.test.mjs` at base revision
-  `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`, with 13 checks passing and 15
+  `ba80feae1a35afdd3765b14dbfddd702e1694999`, with 13 checks passing and 15
   failing.
 - The five checks carrying AC-DOCS criteria all failed for absent behavior:
   `scripts/generate-docs.mjs` did not exist, `generated/docs-content.js` could
@@ -174,7 +174,11 @@ AC-DOCS-001 through AC-DOCS-010 map to the exact per-criterion entries in
 ### Verification
 
 - Status: passed at 2026-08-10T00:12:45Z.
-- Base revision: `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`.
+- Base revision: `ba80feae1a35afdd3765b14dbfddd702e1694999`, formerly
+  `2d97b6cd0c7d655ae58df039cbf647fb47e064b0`. The commit was renamed by a
+  `git filter-branch` that stripped co-author trailers on 2026-08-10; the tree
+  is unchanged and the pre-squash history is retained under the tag
+  `evidence/development-pre-squash-0.1.1`.
 - Implementation manifest:
   `working-tree:sha256:a5fd16f591f23d13e31ee96367f48f28c2f01047d86ceeb3a3f175413a8c9f39`.
 - Verifier: `website/package.json#verify` version `0.1.1`.
