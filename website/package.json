@@ -1,6 +1,6 @@
 {
   "name": "sleepy-hollow-website",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "engines": {
@@ -22,11 +22,12 @@
     "test:browser": "playwright test",
     "test:links": "node --test tests/link-targets.test.mjs",
     "test:repository": "node --test tests/repository-consistency.test.mjs",
+    "test:framework-docs": "node --test tests/framework-docs.test.mjs",
     "pretest:structure": "npm run docs:build",
     "test:structure": "node --test tests/site-acceptance.test.mjs",
     "pretypecheck": "npm run docs:build",
     "typecheck": "tsc -b",
-    "verify": "npm run test:structure && npm run test:links && npm run test:repository && npm run test && npm run typecheck && npm run test:browser"
+    "verify": "npm run test:structure && npm run test:links && npm run test:repository && npm run test:framework-docs && npm run test && npm run typecheck && npm run test:browser"
   },
   "dependencies": {
     "react": "19.2.8",

@@ -25,12 +25,14 @@ const TREE = `${REPOSITORY_URL}/tree/main`;
 const READING_ORDER = {
   framework: [
     "getting-started",
+    "writing-requirements",
     "routing",
     "data",
     "security",
     "verification",
     "deployment",
     "cli",
+    "requirements",
   ],
   sgad: [
     "README",
@@ -50,12 +52,14 @@ const READING_ORDER = {
  */
 const SUMMARIES = {
   "framework/getting-started": "Install the CLI, create a project, write your first endpoint, and verify it.",
+  "framework/writing-requirements": "Authoring and approving the requirements that hollow check verifies against, by hand.",
   "framework/routing": "How the file tree becomes your URL surface, and how methods and parameters are declared.",
   "framework/data": "Typed Deno KV resources, secondary indexes, and why every query carries a bound.",
   "framework/security": "Per-route authentication modes and the one project module that decides who gets in.",
   "framework/verification": "What the framework records while your tests run, and what hollow check refuses to certify.",
   "framework/deployment": "Shipping a verified revision to your own Deno Deploy account, with your own token.",
   "framework/cli": "Every hollow command, its options, and what it reports.",
+  "framework/requirements": "The framework documentation set's own governed requirement.",
   "sgad/README": "What Specification-Governed Agentic Development is, and the planes it keeps apart.",
   "sgad/principles": "The principles governing how authority, agent autonomy, and evidence interact.",
   "sgad/workflow": "The phases that turn uncertain intent into bounded authority and independent evidence.",
@@ -71,6 +75,8 @@ const SUMMARIES = {
  * in a 16rem column. The page still shows the canonical title.
  */
 const NAV_TITLES = {
+  "framework/writing-requirements": "Writing requirements",
+  "framework/requirements": "Documentation requirement",
   "sgad/README": "SGAD overview",
   "sgad/artifacts-and-lifecycle": "Artifacts and lifecycle",
   "sgad/verification-model": "Verification model",
