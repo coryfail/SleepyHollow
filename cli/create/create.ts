@@ -79,7 +79,7 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-export const FRAMEWORK_VERSION = "0.1.1";
+export const FRAMEWORK_VERSION = "0.1.2";
 
 export async function createProject(
   options: CreateProjectOptions,
