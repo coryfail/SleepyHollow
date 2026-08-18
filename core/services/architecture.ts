@@ -67,6 +67,15 @@ function validateService(
       ));
     }
   }
+  if (!service.requirementsPath.endsWith(".req.md")) {
+    diagnostics.push(diagnostic(
+      "SH_SERVICE_PATH_INVALID",
+      `${service.id} declares a noncanonical requirement path`,
+      "Use a meaningful named .req.md file inside the service root.",
+      service.id,
+      service.requirementsPath,
+    ));
+  }
   if (!identifier.test(service.kvBinding)) {
     diagnostics.push(diagnostic(
       "SH_SERVICE_KV_BINDING_INVALID",
@@ -94,6 +103,7 @@ function validateService(
     const criteria = Object.values(dependency.failureCriteria);
     if (
       !safeRelative(dependency.requirementsPath) ||
+      !dependency.requirementsPath.endsWith(".req.md") ||
       !dependency.authenticationRequirementId.trim() ||
       criteria.some((value) => !criterion.test(value)) ||
       dependency.partialFailure.atomic !== false

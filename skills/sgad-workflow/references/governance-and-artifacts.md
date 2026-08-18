@@ -11,7 +11,7 @@ Application specification -> Component specification -> Approval record
 
 ## Embedded governance record
 
-The component's `requirements.md` is the single home for its complete governance
+The component's named `*.req.md` file is the single home for its complete governance
 history. Append approval, criterion mapping, red-state evidence, verification,
 and applicable delivery entries beneath `## Governance record`.
 
@@ -26,16 +26,16 @@ prose is not independent evidence.
 
 Define system purpose, actors, scope, boundaries, shared contracts, security,
 operations, delivery, dependencies, risks, open decisions, and cross-cutting
-criteria in `requirements/application.md`. Keep it as the sole item inside the
+criteria in `requirements/application.req.md`. Keep it as the application-wide item inside the
 top-level `requirements/` directory.
 
 Define the smallest independently approvable behavior in each component
-specification and colocate its `requirements.md` with the component. Include
+specification and colocate a meaningful named `*.req.md` file with the component. Include
 scope, non-scope, inputs, outputs, errors, state, side effects, security,
 non-functional constraints, dependencies, assumptions, change impact, and stable
 acceptance criteria.
 
-Use root `requirements.md` only for durable repository-wide behavior that cannot
+Use a meaningful root-level `*.req.md` file only for durable repository-wide behavior that cannot
 be owned honestly by the application or one component.
 
 ## Approval

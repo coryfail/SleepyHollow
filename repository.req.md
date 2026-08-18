@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: sleepy-hollow-repository
 title: Repository-wide consistency and polish
-status: verified
+status: draft
 risk: standard
 depends_on:
   - sgad-methodology
@@ -37,9 +37,9 @@ canonical embedded SGAD model.
 - Correct the placement and completeness of embedded governance records.
 - Limit the current requirement inventory, documentation, tests, and governance
   prose to canonical active requirements and their embedded records.
-- Make `requirements/application.md` the only item inside the top-level
-  `requirements/` directory. Keep repository-wide governance in the root
-  `requirements.md` and keep component requirements beside their behavior.
+- Make `requirements/application.req.md` the application-wide requirement.
+  Keep repository-wide governance in a meaningful root-level `*.req.md` file
+  and keep named component requirements beside their behavior.
 - Update the canonical SGAD documentation, packaged skill, adoption guidance,
   templates, and public explanation with the requirement-ownership rule for
   application-wide, component-owned, and repository-wide behavior.
@@ -97,21 +97,21 @@ record.
 
 ### Requirements and governance
 
-- Each governed `requirements.md` is the sole current-tree home for its complete
+- Each governed `*.req.md` file is the sole current-tree home for its complete
   approval, criterion-mapping, red-state, verification, and applicable delivery
   history.
 - Requirement placement follows behavioral ownership:
-  - `requirements/application.md` owns product-wide intent, shared architecture,
+  - `requirements/application.req.md` owns product-wide intent, shared architecture,
     cross-cutting behavior, and system-level acceptance criteria.
-  - `<component>/requirements.md` owns behavior that can be assigned to one
+  - A meaningful `<component>/<feature>.req.md` owns behavior that can be assigned to one
     subsystem, including a website, CLI, runtime module, skill, or documentation
     set.
-  - Root `requirements.md` is used only for durable governed behavior that spans
+  - A meaningful root-level `*.req.md` file is used only for durable governed behavior that spans
     the repository and cannot be assigned honestly to the application or one
     component.
-- The top-level `requirements/` directory contains only `application.md`. It is
-  not a miscellaneous document collection, and root `requirements.md` is not a
-  substitute for identifying a real component owner.
+- The top-level `requirements/` directory contains `application.req.md`. It is
+  not a miscellaneous document collection, and a root-level requirement is not
+  a substitute for identifying a real component owner.
 - Active application and component requirements use explicit schema, ID, title,
   lifecycle status, risk, dependency, and owner metadata appropriate to their
   type.
@@ -143,7 +143,7 @@ record.
   filenames, and current governance records present the canonical embedded
   model as the repository's sole design.
 - Canonical documentation and the packaged skill teach the same ownership-based
-  placement rule. The minimal public tree may omit root `requirements.md` when
+  placement rule. The minimal public tree may omit a root-level `*.req.md` file when
   no separately governed repository-wide behavior exists.
 - Documentation and skill guidance describe only the two canonical requirement
   templates. They do not promise a standalone verification-report template.
@@ -186,9 +186,9 @@ record.
   open-decision references resolve, and website SGAD criteria use
   `AC-WEB-SGAD-*` without changing their meaning.
 - AC-REPO-004: Given the requirement inventory and filesystem are inspected,
-  then `requirements/application.md` is the only item inside `requirements/`,
-  the repository requirement is root-level `requirements.md`, every component
-  requirement is colocated, and no empty unowned feature tree remains.
+  then `requirements/application.req.md` owns application intent, the repository
+  requirement is a meaningful root-level `*.req.md` file, every component
+  requirement is named and colocated, and no empty unowned feature tree remains.
 - AC-REPO-005: Given current project prose is searched and reviewed, then public
   naming and development-state claims follow the documented convention,
   application and model governance language is current, and no active guidance
@@ -248,6 +248,18 @@ mapped checks, red or characterization evidence, implementation, and independent
 verification described above.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 ### Approval
 

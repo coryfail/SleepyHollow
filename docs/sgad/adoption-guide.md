@@ -23,32 +23,36 @@ One possible minimal structure is:
 
 ```text
 project/
-├── requirements/application.md
-└── src/feature-name/
-    ├── requirements.md
-    ├── feature.test.ts
-    └── feature.ts
+├── requirements/application.req.md
+└── src/account/
+    ├── profile.req.md
+    ├── profile.test.ts
+    ├── profile.ts
+    ├── password-reset.req.md
+    ├── password-reset.test.ts
+    └── password-reset.ts
 ```
 
 Place requirements according to the behavior they own:
 
-- `requirements/application.md` owns application-wide intent, shared
+- `requirements/application.req.md` owns application-wide intent, shared
   architecture, cross-cutting behavior, and system criteria. It is the only item
   in the top-level `requirements/` directory.
-- A component's `requirements.md` lives beside the feature, service, package,
-  website, skill, or documentation behavior it governs.
-- Root `requirements.md` is optional and reserved for durable behavior that
-  spans the repository and cannot be assigned honestly to the application or one
-  component.
+- A component's meaningful named `*.req.md` file lives beside the feature,
+  service, package, website, skill, or documentation behavior it governs. A
+  directory may contain several independently governed requirement files.
+- Repository-wide behavior uses its own meaningful root-level `*.req.md` name
+  when it cannot be assigned honestly to the application or one component.
 
-Use each governed `requirements.md` as the single home for its complete
+Use each governed `*.req.md` file as the single home for its complete
 governance history: exact-content approval, stable criteria, bidirectional test
 mapping, red-state evidence, independent verification, and applicable delivery
 results. Append these records beneath `## Governance record` after the governed
 behavioral content.
 
 Git history, a protected review, CI, or an attestation may be linked as
-supporting provenance, but the canonical record remains in `requirements.md`.
+supporting provenance, but the canonical record remains in the named
+requirement file.
 Do not accept an editable status as sole proof of approval or verification.
 
 ## 3. Write the system specification
@@ -66,7 +70,7 @@ starting point.
 ## 4. Decompose one component
 
 Select a component small enough to review and verify independently. Create its
-`requirements.md` before new tests or implementation. Give every criterion a
+named `*.req.md` file before new tests or implementation. Give every criterion a
 stable ID.
 
 Good criteria describe observable outcomes:
@@ -88,7 +92,7 @@ Use [the component template](templates/component-requirements.md).
 
 At minimum, review the specification through an authorized control, calculate
 the governed-content digest, and append the approval decision and its supporting
-source beneath `## Governance record` in the same `requirements.md`.
+source beneath `## Governance record` in the same named requirement file.
 
 Calculate the digest over the exact bytes before that heading after omitting the
 single top-level frontmatter `status:` line and its line ending. Apply no other
@@ -103,7 +107,7 @@ Choose one deterministic mapping mechanism:
 
 - Criterion IDs in test names.
 - Test annotations or metadata.
-- A mapping table in the governed `requirements.md` connecting criteria and tests.
+- A mapping table in the governed `*.req.md` file connecting criteria and tests.
 - Generated mappings from a supported test framework.
 
 Add a CI check for unmapped criteria and unapproved acceptance tests.
@@ -129,7 +133,7 @@ Create one stable command or CI entry point that:
 - Runs relevant tests and existing quality gates.
 - Detects changed or stale generated artifacts.
 - Appends a human-readable result and links any machine-readable runner output in
-  the governed `requirements.md`.
+  the governed `*.req.md` file.
 - Returns nonzero when required evidence fails or is missing.
 
 The first verifier may be a small script around existing tools. Independence
@@ -139,7 +143,7 @@ platform.
 ## 9. Bind CI and delivery
 
 Protect governed branches or environments so delivery requires a valid verifier
-result for the exact revision. Record the result in `requirements.md` and link
+result for the exact revision. Record the result in the named `*.req.md` file and link
 the supporting CI run or repository attestation.
 
 Add post-delivery evidence only after pre-delivery verification is reliable.

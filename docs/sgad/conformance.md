@@ -8,7 +8,7 @@ document.
 
 ## SGAD Core
 
-A project claiming **SGAD Core 0.1** must satisfy every requirement below.
+A project claiming **SGAD Core 0.2.0** must satisfy every requirement below.
 
 ### Intent
 
@@ -67,7 +67,7 @@ Projects may append these capability claims after satisfying SGAD Core.
 
 ### Content-addressed
 
-Claim: `SGAD Core 0.1 + Content-Addressed`
+Claim: `SGAD Core 0.2.0 + Content-Addressed`
 
 The project:
 
@@ -79,7 +79,7 @@ The project:
 
 ### Bidirectionally traceable
 
-Claim: `SGAD Core 0.1 + Bidirectional-Traceability`
+Claim: `SGAD Core 0.2.0 + Bidirectional-Traceability`
 
 The project:
 
@@ -89,7 +89,7 @@ The project:
 
 ### Adversarially tested
 
-Claim: `SGAD Core 0.1 + Adversarial-Testing`
+Claim: `SGAD Core 0.2.0 + Adversarial-Testing`
 
 The project selects risk-appropriate independent assurance such as mutation
 testing, property-based testing, fuzzing, protected regression tests, security
@@ -97,7 +97,7 @@ analysis, or independently produced test cases and records the results.
 
 ### Risk-governed
 
-Claim: `SGAD Core 0.1 + Risk-Governed`
+Claim: `SGAD Core 0.2.0 + Risk-Governed`
 
 The project:
 
@@ -108,7 +108,7 @@ The project:
 
 ### Delivery-gated
 
-Claim: `SGAD Core 0.1 + Delivery-Gated`
+Claim: `SGAD Core 0.2.0 + Delivery-Gated`
 
 The project:
 
@@ -120,7 +120,7 @@ The project:
 
 ### AI-system evaluated
 
-Claim: `SGAD Core 0.1 + AI-System-Evaluated`
+Claim: `SGAD Core 0.2.0 + AI-System-Evaluated`
 
 For nondeterministic AI behavior, the project:
 
@@ -153,7 +153,7 @@ An exception does not silently preserve full conformance. It must identify:
 - The residual risk and compensating controls.
 - The condition for removal.
 
-A project with an active exception states `SGAD Core 0.1 with exceptions` and
+A project with an active exception states `SGAD Core 0.2.0 with exceptions` and
 links the exception record.
 
 ## Non-conforming claims

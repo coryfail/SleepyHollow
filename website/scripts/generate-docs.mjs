@@ -32,7 +32,7 @@ const READING_ORDER = {
     "verification",
     "deployment",
     "cli",
-    "requirements",
+    "framework.req",
   ],
   sgad: [
     "README",
@@ -42,7 +42,7 @@ const READING_ORDER = {
     "verification-model",
     "conformance",
     "adoption-guide",
-    "requirements",
+    "sgad.req",
   ],
 };
 
@@ -59,7 +59,7 @@ const SUMMARIES = {
   "framework/verification": "What the framework records while your tests run, and what hollow check refuses to certify.",
   "framework/deployment": "Shipping a verified revision to your own Deno Deploy account, with your own token.",
   "framework/cli": "Every hollow command, its options, and what it reports.",
-  "framework/requirements": "The framework documentation set's own governed requirement.",
+  "framework/framework.req": "The framework documentation set's own governed requirement.",
   "sgad/README": "What Specification-Governed Agentic Development is, and the planes it keeps apart.",
   "sgad/principles": "The principles governing how authority, agent autonomy, and evidence interact.",
   "sgad/workflow": "The phases that turn uncertain intent into bounded authority and independent evidence.",
@@ -67,7 +67,7 @@ const SUMMARIES = {
   "sgad/verification-model": "Validation asks whether the intent is right; verification asks whether the artifacts match it.",
   "sgad/conformance": "The minimum bar for claiming SGAD conformance, plus optional capability profiles.",
   "sgad/adoption-guide": "Introducing SGAD to an existing project, one governed component at a time.",
-  "sgad/requirements": "The methodology's own governed requirement — SGAD specified in its own terms.",
+  "sgad/sgad.req": "The methodology's own governed requirement — SGAD specified in its own terms.",
 };
 
 /**
@@ -76,7 +76,7 @@ const SUMMARIES = {
  */
 const NAV_TITLES = {
   "framework/writing-requirements": "Writing requirements",
-  "framework/requirements": "Documentation requirement",
+  "framework/framework.req": "Documentation requirement",
   "sgad/README": "SGAD overview",
   "sgad/artifacts-and-lifecycle": "Artifacts and lifecycle",
   "sgad/verification-model": "Verification model",
@@ -84,7 +84,7 @@ const NAV_TITLES = {
   "sgad/workflow": "Workflow",
   "sgad/conformance": "Conformance",
   "sgad/adoption-guide": "Adopting SGAD",
-  "sgad/requirements": "Methodology requirement",
+  "sgad/sgad.req": "Methodology requirement",
 };
 
 export const GROUPS = [
@@ -104,8 +104,13 @@ export const GROUPS = [
 
 const sourceDirectory = (group) => resolve(repository, group === "framework" ? "docs/framework" : "docs/sgad");
 
-const routeFor = (group, slug) =>
-  group === "framework" ? `/docs/${slug}/` : slug === "README" ? "/docs/sgad/" : `/docs/sgad/${slug}/`;
+const routeFor = (group, slug) => {
+  if (group === "framework") {
+    return slug === "framework.req" ? "/docs/requirements/" : `/docs/${slug}/`;
+  }
+  if (slug === "README") return "/docs/sgad/";
+  return slug === "sgad.req" ? "/docs/sgad/requirements/" : `/docs/sgad/${slug}/`;
+};
 
 const slugify = (text) =>
   text.toLowerCase().trim()

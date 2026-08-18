@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-application
 title: Sleepy Hollow requirements and architecture specification
-status: verified
+status: draft
 risk: standard
 depends_on: []
 owners:
@@ -143,7 +143,7 @@ No endpoint implementation shall be generated before the application-level plan 
 The planning phase shall create a single authoritative document at:
 
 ```text
-requirements/application.md
+requirements/application.req.md
 ```
 
 The document shall include at minimum:
@@ -172,7 +172,7 @@ After the overall design is approved, the skill shall:
 
 1. Split the master document into endpoint-level requirements.
 2. Create the complete proposed API directory structure.
-3. Place a `requirements.md` file in every proposed endpoint directory.
+3. Place a named `<requirement-id>.req.md` file for every proposed endpoint.
 4. Create shared model or policy requirements where multiple endpoints depend on the same contract.
 5. Avoid creating endpoint tests or implementation files at this stage.
 6. Present the resulting endpoint inventory to the user for review.
@@ -182,17 +182,17 @@ Example structure:
 ```text
 my-application/
 ├── requirements/
-│   └── application.md
+│   └── application.req.md
 ├── sleepyhollow.config.ts
 ├── api/
 │   ├── bookmarks/
-│   │   ├── requirements.md
+│   │   ├── bookmarks.req.md
 │   │   └── [id]/
-│   │       └── requirements.md
+│   │       └── bookmark-by-id.req.md
 │   └── collections/
-│       ├── requirements.md
+│       ├── collections.req.md
 │       └── [id]/
-│           └── requirements.md
+│           └── collection-by-id.req.md
 ├── models/
 │   ├── bookmark.md
 │   └── collection.md
@@ -203,7 +203,7 @@ After an endpoint is approved and built, its directory becomes:
 
 ```text
 api/bookmarks/[id]/
-├── requirements.md
+├── bookmark-by-id.req.md
 ├── route.test.ts
 └── route.ts
 ```
@@ -387,16 +387,16 @@ npx skills add coryfail/SleepyHollow --skill sgad-workflow
 
 Requirement placement follows behavioral ownership:
 
-- `requirements/application.md` owns product-wide intent, shared architecture,
+- `requirements/application.req.md` owns product-wide intent, shared architecture,
   cross-cutting behavior, and system-level acceptance criteria.
-- A component's `requirements.md` lives beside and owns the behavior of that
-  endpoint, CLI surface, runtime module, skill, website, or documentation set.
-- Root `requirements.md` is reserved for durable governed behavior that spans an
-  entire repository and cannot be assigned honestly to the application or one
-  component.
+- A component uses a meaningful named `*.req.md` file beside and owns the
+  behavior of that endpoint, CLI surface, runtime module, skill, website, or
+  documentation set. A directory may contain multiple governed features.
+- Repository-wide behavior uses its own meaningful root-level `*.req.md` name
+  when it cannot be assigned honestly to the application or one component.
 
-The top-level `requirements/` directory contains only `application.md`; it is not
-a collection point for miscellaneous specifications.
+The top-level `requirements/` directory contains `application.req.md`; it is
+not a collection point for unrelated specifications.
 
 ### 5.1 Endpoint requirement frontmatter
 
@@ -490,7 +490,7 @@ Return one bookmark by its primary identifier.
 
 ### 5.3 Embedded governance format
 
-Each application and endpoint `requirements.md` shall contain its complete
+Each application and endpoint `*.req.md` file shall contain its complete
 `Governance record` after the behavioral specification. It embeds exact-content
 approval, bidirectional criterion mapping, credible red-state evidence,
 independent verification, and applicable delivery results. Calculate the
@@ -672,15 +672,15 @@ When multiple services are approved, each service shall have its own application
 ```text
 services/
 ├── users/
-│   ├── requirements/application.md
+│   ├── requirements/application.req.md
 │   ├── sleepyhollow.config.ts
 │   └── api/
 ├── projects/
-│   ├── requirements/application.md
+│   ├── requirements/application.req.md
 │   ├── sleepyhollow.config.ts
 │   └── api/
 └── notifications/
-    ├── requirements/application.md
+    ├── requirements/application.req.md
     ├── sleepyhollow.config.ts
     └── api/
 ```
@@ -850,7 +850,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 - Official Sleepy Hollow agent skill
 - Standalone framework-independent SGAD workflow skill
 - Whole-application planning dialogue
-- Comprehensive `requirements/application.md`
+- Comprehensive `requirements/application.req.md`
 - Endpoint requirement decomposition
 - Structure-first API scaffolding
 - Endpoint-by-endpoint approval
@@ -911,26 +911,26 @@ Standalone executables and additional cloud adapters are deferred until the init
 
 | ID | Location | Responsibility |
 |---|---|---|
-| SH-F001 | `cli/create/requirements.md` | Installation and safe project creation |
-| SH-F002 | `core/routing/requirements.md` | File-based HTTP routing runtime |
-| SH-F003 | `core/validation/requirements.md` | Schemas, validation, and Problem Details |
-| SH-F004 | `core/kv/requirements.md` | Typed, bounded Deno KV access |
-| SH-F005 | `core/security/requirements.md` | Security, authentication, and authorization boundaries |
-| SH-F006 | `skills/sleepy-hollow/planning/requirements.md` | Application planning, decomposition, and approval |
-| SH-F007 | `core/testing/requirements.md` | Test utilities and criterion traceability |
-| SH-F008 | `cli/check/requirements.md` | Independent `hollow check` verification |
-| SH-F009 | `skills/sleepy-hollow/requirements.md` | Official agent skill and end-to-end workflow |
-| SH-F010 | `cli/generate/requirements.md` | OpenAPI and typed-client generation |
-| SH-F011 | `cli/requirements.md` | Shared CLI behavior and diagnostics |
-| SH-F012 | `core/config/requirements.md` | Configuration and observability |
-| SH-F013 | `cli/deploy/requirements.md` | Verified Deno Deploy delivery |
-| SH-F014 | `core/services/requirements.md` | Optional multi-service projects |
-| SH-F015 | `cli/dev/requirements.md` | Local development server |
-| SH-F016 | `cli/test/requirements.md` | Test execution and criterion results |
-| SH-F017 | `skills/sgad-workflow/requirements.md` | Framework-independent SGAD workflow skill |
-| SH-F018 | `cli/evidence/requirements.md` | Repository evidence loading for check, test, and deploy |
-| SH-F019 | `core/capture/requirements.md` | Runtime evidence capture during test execution |
-| SH-F020 | `packaging/requirements.md` | Distribution and public API surface |
+| SH-F001 | `cli/create/create.req.md` | Installation and safe project creation |
+| SH-F002 | `core/routing/routing.req.md` | File-based HTTP routing runtime |
+| SH-F003 | `core/validation/validation.req.md` | Schemas, validation, and Problem Details |
+| SH-F004 | `core/kv/kv.req.md` | Typed, bounded Deno KV access |
+| SH-F005 | `core/security/security.req.md` | Security, authentication, and authorization boundaries |
+| SH-F006 | `skills/sleepy-hollow/planning/planning.req.md` | Application planning, decomposition, and approval |
+| SH-F007 | `core/testing/testing.req.md` | Test utilities and criterion traceability |
+| SH-F008 | `cli/check/check.req.md` | Independent `hollow check` verification |
+| SH-F009 | `skills/sleepy-hollow/sleepy-hollow.req.md` | Official agent skill and end-to-end workflow |
+| SH-F010 | `cli/generate/generate.req.md` | OpenAPI and typed-client generation |
+| SH-F011 | `cli/cli.req.md` | Shared CLI behavior and diagnostics |
+| SH-F012 | `core/config/config.req.md` | Configuration and observability |
+| SH-F013 | `cli/deploy/deploy.req.md` | Verified Deno Deploy delivery |
+| SH-F014 | `core/services/services.req.md` | Optional multi-service projects |
+| SH-F015 | `cli/dev/dev.req.md` | Local development server |
+| SH-F016 | `cli/test/test.req.md` | Test execution and criterion results |
+| SH-F017 | `skills/sgad-workflow/sgad-workflow.req.md` | Framework-independent SGAD workflow skill |
+| SH-F018 | `cli/evidence/evidence.req.md` | Repository evidence loading for check, test, and deploy |
+| SH-F019 | `core/capture/capture.req.md` | Runtime evidence capture during test execution |
+| SH-F020 | `packaging/packaging.req.md` | Distribution and public API surface |
 
 ### 15.5 Distribution
 
@@ -953,7 +953,7 @@ The first release is complete when all of the following are demonstrated:
 2. The official skill can turn a plain-language idea into a comprehensive application requirements document.
 3. The user can review and approve the application design before implementation.
 4. The skill can decompose the design into endpoint requirements and create the API folder structure without generating endpoint code.
-5. Every proposed endpoint contains `requirements.md` before it contains tests or implementation.
+5. Every proposed endpoint has a named `<requirement-id>.req.md` artifact before it has tests or implementation.
 6. A user can approve endpoints individually.
 7. Approval of one endpoint causes the skill to generate tests mapped to its acceptance criteria.
 8. The skill runs the tests before implementation and recognizes the expected failure.
@@ -1083,7 +1083,7 @@ The following decisions require prototypes or focused evaluation before their ex
 
 An endpoint is done when:
 
-- A valid approval record resolves to the exact content of its `requirements.md`
+- A valid approval record resolves to the exact content of its named `*.req.md` file
   and bounded criteria.
 - Its dependencies are approved or explicitly available.
 - Every acceptance criterion maps to at least one test.
@@ -1109,6 +1109,18 @@ The shortest expression of the product is:
 > Describe it. Review it. Sleepy Hollow builds and deploys it.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

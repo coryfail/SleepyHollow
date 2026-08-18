@@ -15,6 +15,7 @@ interface DiscoveredFile {
   readonly path: string;
   readonly absolutePath: string;
   readonly serviceId?: string;
+  readonly legacy: boolean;
 }
 
 function issue(
@@ -39,6 +40,7 @@ async function collect(
       entries.push({
         name: entry.name,
         isDirectory: entry.isDirectory,
+        isFile: entry.isFile,
         isSymlink: entry.isSymlink,
       });
     }
@@ -60,10 +62,14 @@ async function collect(
       const nextDisplay = `${display}/${entry.name}`;
       if (entry.isDirectory) {
         await walk(nextAbsolute, nextDisplay);
-      } else if (entry.name === "requirements.md") {
+      } else if (
+        entry.isFile &&
+        (entry.name.endsWith(".req.md") || entry.name === "requirements.md")
+      ) {
         found.push({
           path: nextDisplay,
           absolutePath: nextAbsolute,
+          legacy: entry.name === "requirements.md",
           ...(serviceId ? { serviceId } : {}),
         });
       }
@@ -104,6 +110,15 @@ export async function requirements(
   const seen = new Map<string, string>();
 
   for (const file of files) {
+    if (file.legacy) {
+      diagnostics.push(issue(
+        "SH_EVIDENCE_REQUIREMENT_LEGACY_FILENAME",
+        file.path,
+        "The legacy requirements.md filename is not a governed artifact in Sleepy Hollow 0.2.0.",
+        "Rename it to a meaningful <feature>.req.md filename and update current references.",
+      ));
+      continue;
+    }
     let source: string;
     try {
       source = await read(file.absolutePath);

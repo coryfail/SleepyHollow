@@ -22,13 +22,22 @@ const repositoryFiles = () => execFileSync(
   "git",
   ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
   { cwd: repository, encoding: "utf8" },
-).split("\0").filter(Boolean);
+).split("\0").filter((path) => path && existsSync(resolve(repository, path)));
 
-const requirementPaths = () => repositoryFiles().filter((path) => (
-  path === "requirements.md"
-  || path === "requirements/application.md"
-  || path.endsWith("/requirements.md")
-)).sort();
+const requirementPaths = () => repositoryFiles().filter((path) =>
+  path.endsWith(".req.md") &&
+  !/^examples\/[^/]+\/requirements\/application\.req\.md$/.test(path)
+).sort();
+
+const legacyRequirementPath = (path) => {
+  if (path === "repository.req.md") return "requirements.md";
+  if (path === "requirements/application.req.md") return "requirements/application.md";
+  return path.replace(/[^/]+\.req\.md$/, "requirements.md");
+};
+
+const normalizeNamedRequirementText = (text) => text
+  .replaceAll("requirements/application.req.md", "requirements/application.md")
+  .replaceAll("named `<requirement-id>.req.md`", "`requirements.md`");
 
 const frontmatter = (document, path) => {
   const match = document.match(/^---\n([\s\S]*?)\n---\n/);
@@ -100,12 +109,12 @@ test("AC-REPO-001 AC-REPO-002 · requirements use one digest and governance boun
   }
   assert.ok(endpoints > 0, "endpoint requirements must be covered by this sweep");
 
-  const repositoryRequirement = read("requirements.md");
-  const { normalized, record } = governedContent(repositoryRequirement, "requirements.md");
+  const migrationRequirement = read("named-requirement-files.req.md");
+  const { normalized, record } = governedContent(migrationRequirement, "named-requirement-files.req.md");
   assert.match(
     record,
     new RegExp(`Governed-content digest:[\\s\\S]{0,80}sha256:${sha256(normalized)}`),
-    "the repository approval must bind the current governed content",
+    "the named-file migration approval must bind the current governed content",
   );
 
   const canonicalRules = [
@@ -135,7 +144,7 @@ test("AC-REPO-003 · requirement, criterion, dependency, and decision identities
       assert.ok(identities.has(dependency), `${item.path} has unresolved dependency ${dependency}`);
     }
     for (const decision of metadata.open_decisions ?? []) {
-      assert.match(read("requirements/application.md"), new RegExp(`\\| ${decision} \\|`), `${item.path} has unresolved ${decision}`);
+      assert.match(read("requirements/application.req.md"), new RegExp(`\\| ${decision} \\|`), `${item.path} has unresolved ${decision}`);
     }
   }
 
@@ -146,17 +155,17 @@ test("AC-REPO-003 · requirement, criterion, dependency, and decision identities
       criteria.set(match[1], item.path);
     }
   }
-  assert.match(read("website/src/pages/sgad/requirements.md"), /AC-WEB-SGAD-001/);
-  assert.doesNotMatch(read("website/src/pages/sgad/requirements.md"), /^- AC-SGAD-/m);
+  assert.match(read("website/src/pages/sgad/sgad.req.md"), /AC-WEB-SGAD-001/);
+  assert.doesNotMatch(read("website/src/pages/sgad/sgad.req.md"), /^- AC-SGAD-/m);
 });
 
 test("AC-REPO-004 · requirement placement follows behavioral ownership", () => {
   const applicationDirectory = resolve(repository, "requirements");
   assert.deepEqual(
     walk(applicationDirectory).map((path) => relative(applicationDirectory, path)).sort(),
-    ["application.md"],
+    ["application.req.md"],
   );
-  assert.equal(existsSync(resolve(repository, "requirements.md")), true);
+  assert.equal(existsSync(resolve(repository, "repository.req.md")), true);
 
   const guidance = [
     "docs/sgad/README.md",
@@ -166,9 +175,9 @@ test("AC-REPO-004 · requirement placement follows behavioral ownership", () => 
     "skills/sgad-workflow/references/adoption.md",
     "website/src/pages/sgad/SgadPage.tsx",
   ].map(read).join("\n");
-  assert.match(guidance, /requirements\/application\.md[\s\S]{0,200}(?:product|application)-wide|(?:product|application)-wide[\s\S]{0,200}requirements\/application\.md/i);
-  assert.match(guidance, /component[\s\S]{0,160}requirements\.md[\s\S]{0,160}(?:colocat|own|beside)/i);
-  assert.match(guidance, /root `?requirements\.md`?[\s\S]{0,160}repository-wide/i);
+  assert.match(guidance, /requirements\/application\.req\.md[\s\S]{0,200}(?:product|application)-wide|(?:product|application)-wide[\s\S]{0,200}requirements\/application\.req\.md/i);
+  assert.match(guidance, /component[\s\S]{0,200}\.req\.md[\s\S]{0,200}(?:colocat|own|beside)/i);
+  assert.match(guidance, /repository-wide behavior[\s\S]{0,200}(?:root-level|\.req\.md)/i);
 });
 
 test("AC-REPO-005 · current naming and status claims are honest", () => {
@@ -179,11 +188,11 @@ test("AC-REPO-005 · current naming and status claims are honest", () => {
   assert.doesNotMatch(read("CONTRIBUTING.md"), /main contains production-ready code/i);
 
   const currentGuidance = [
-    "requirements/application.md",
+    "requirements/application.req.md",
     "docs/sgad/README.md",
-    "docs/sgad/requirements.md",
+    "docs/sgad/sgad.req.md",
     "skills/sgad-workflow/SKILL.md",
-    "skills/sgad-workflow/requirements.md",
+    "skills/sgad-workflow/sgad-workflow.req.md",
   ].map(read).join("\n");
   assert.doesNotMatch(currentGuidance, /verification-report\.md|verification reports? template/i);
   assert.match(read("docs/sgad/README.md"), /draft methodology/i);
@@ -239,7 +248,7 @@ test("AC-REPO-008 AC-REPO-009 · browser and Pages verification use the canonica
   }
 
   const workflow = read(".github/workflows/website-pages.yml");
-  for (const path of ["website/**", "docs/sgad/**", "skills/sgad-workflow/**", "requirements.md", "requirements/**", "models/**", "cli/**", "core/**", "deno.json", "deno.lock"]) {
+  for (const path of ["website/**", "docs/sgad/**", "skills/sgad-workflow/**", "*.req.md", "**/*.req.md", "models/**", "cli/**", "core/**", "deno.json", "deno.lock"]) {
     assert.match(workflow, new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.match(workflow, /deno task verify:framework/);
@@ -250,13 +259,17 @@ test("AC-REPO-008 AC-REPO-009 · browser and Pages verification use the canonica
 test("AC-REPO-010 · product activation remains governed after cleanup", () => {
   const componentPaths = requirementPaths().filter((path) => /^(?:cli|core|skills\/sleepy-hollow)\//.test(path));
   for (const path of componentPaths) {
-    const prior = execFileSync("git", ["show", `HEAD:${path}`], { cwd: repository, encoding: "utf8" });
+    const prior = execFileSync("git", ["show", `HEAD:${legacyRequirementPath(path)}`], { cwd: repository, encoding: "utf8" });
     const current = read(path);
     const previousMetadata = frontmatter(prior, path);
     const currentMetadata = frontmatter(current, path);
 
     if (currentMetadata.status === "draft") {
-      assert.equal(section(current, "Acceptance criteria"), section(prior, "Acceptance criteria"), `${path} draft criteria changed`);
+      assert.equal(
+        normalizeNamedRequirementText(section(current, "Acceptance criteria")),
+        section(prior, "Acceptance criteria"),
+        `${path} draft criteria changed beyond the approved filename migration`,
+      );
       assert.deepEqual(currentMetadata.depends_on, previousMetadata.depends_on, `${path} draft dependencies changed`);
       assert.deepEqual(currentMetadata.open_decisions ?? [], previousMetadata.open_decisions ?? [], `${path} draft decisions changed`);
       continue;
@@ -270,6 +283,33 @@ test("AC-REPO-010 · product activation remains governed after cleanup", () => {
       `${path} approval does not bind current governed content`,
     );
   }
+});
+
+test("AC-NRF-002 AC-NRF-009 · every current governed artifact has a named requirement path", () => {
+  const files = repositoryFiles();
+  const legacy = files.filter((path) => path === "requirements.md" || path.endsWith("/requirements.md"));
+  assert.deepEqual(legacy, []);
+  assert.ok(requirementPaths().includes("requirements/application.req.md"));
+  assert.ok(requirementPaths().includes("repository.req.md"));
+  assert.ok(requirementPaths().includes("named-requirement-files.req.md"));
+});
+
+test("AC-NRF-012 · release surfaces report 0.2.0", () => {
+  assert.equal(JSON.parse(read("deno.json")).version, "0.2.0");
+  assert.equal(JSON.parse(read("website/package.json")).version, "0.2.0");
+  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.2\.0"/);
+  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.2\.0"/);
+  assert.match(read("cli/generate/artifacts.ts"), /generatorVersion: "0\.2\.0"/);
+  assert.match(read("cli/generate/inventory.ts"), /options\.version \?\? "0\.2\.0"/);
+  assert.match(read("docs/sgad/README.md"), /Draft methodology, version 0\.2\.0/);
+  assert.match(read("docs/sgad/conformance.md"), /SGAD Core 0\.2\.0/);
+});
+
+test("AC-NRF-013 · contribution workflow uses main without a development branch", () => {
+  const contributing = read("CONTRIBUTING.md");
+  assert.match(contributing, /feature branches from an up-to-date `main` branch/i);
+  assert.match(contributing, /pull request into `main`/i);
+  assert.doesNotMatch(contributing, /`development`|origin\/development|git switch development/);
 });
 
 test("AC-REPO-012 · generated and ignored output does not enter the repository", () => {

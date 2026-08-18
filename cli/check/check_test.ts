@@ -16,7 +16,7 @@ function inventory(): VerificationInventory {
     requirements: [
       {
         id: "REQ-BASE",
-        path: "requirements/application.md",
+        path: "requirements/application.req.md",
         status: "approved",
         governedContentDigest: "base-digest",
         criteria: [{ id: "AC-BASE-001" }],
@@ -29,7 +29,7 @@ function inventory(): VerificationInventory {
       },
       {
         id: "REQ-ITEMS",
-        path: "api/items/requirements.md",
+        path: "api/items/items.req.md",
         routePath: "/items",
         methods: ["GET"],
         requiresAuthorization: true,

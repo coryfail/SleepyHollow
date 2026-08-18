@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F014
 title: Optional multi-service projects
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "9"
@@ -78,7 +78,7 @@ this module.
 Given an approved normalized multi-service manifest and approved application
 requirement content for each service, the framework scaffolder shall stage and
 atomically create each service beneath its declared root. Each workspace shall
-contain its own `requirements/application.md`, `sleepyhollow.config.ts`, `api/`,
+contain its own `requirements/application.req.md`, `sleepyhollow.config.ts`, `api/`,
 `tests/`, `generated/`, and deployment configuration. Its config shall bind only
 its declared KV database and shall identify its generated and deployment roots.
 The scaffolder shall not invent endpoint behavior or approval, overwrite an
@@ -190,6 +190,18 @@ initial release supports service-shaped projects and generated clients, not a
 microservice platform.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

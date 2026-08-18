@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F006
 title: Requirements planning and approval workflow
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "3.2"
@@ -43,7 +43,7 @@ questions whose answers materially affect behavior or architecture. It shall
 record unresolved material decisions as explicit open questions, assumptions, or
 risks and shall not replace them with invented behavior.
 
-Planning shall produce `requirements/application.md` before endpoint tests or
+Planning shall produce `requirements/application.req.md` before endpoint tests or
 implementation. The application requirement shall cover purpose, actors and
 consumers, scope and non-scope, data ownership and models, endpoints,
 relationships, indexes, request and response conventions, errors,
@@ -54,7 +54,7 @@ the exact application requirement for review and shall not decompose it until a
 valid approval record binds its current governed-content digest.
 
 After application approval, decomposition shall create the complete proposed API
-directory structure and a `requirements.md` in every endpoint directory without
+directory structure and named `<requirement-id>.req.md` files in endpoint directories without
 creating tests, route implementations, or generated contracts. Shared contracts
 shall live in colocated shared model or policy requirements. The skill shall
 present the endpoint inventory and dependency order before requesting endpoint
@@ -101,7 +101,7 @@ instead of silently accepting a partial requirement.
 
 ### Approval and revision
 
-Every generated application and endpoint `requirements.md` shall contain its
+Every generated application and endpoint `*.req.md` file shall contain its
 complete governance history: approval bound to exact content and bounded
 criteria, bidirectional criterion-to-test mappings, credible red-state evidence,
 independent verification, and applicable delivery results. Supporting Git,
@@ -123,12 +123,12 @@ lifecycle projection; it is not sole approval authority or verification evidence
 
 ## Acceptance criteria
 
-- AC-F006-001: Planning creates `requirements/application.md` containing every
+- AC-F006-001: Planning creates `requirements/application.req.md` containing every
   mandatory application-level topic before any endpoint test or implementation.
 - AC-F006-002: Unresolved material decisions are recorded explicitly rather than
   replaced with invented behavior.
 - AC-F006-003: Decomposition creates a complete proposed API directory tree with
-  one `requirements.md` per endpoint and no endpoint tests or route files.
+  one named `<requirement-id>.req.md` per endpoint and no endpoint tests or route files.
 - AC-F006-004: Every endpoint requirement has parseable frontmatter containing a
   stable ID, path, status, methods, dependencies, and service.
 - AC-F006-005: Every endpoint requirement contains the mandatory behavioral,
@@ -156,6 +156,18 @@ OPEN-004 is resolved by the portable Markdown and YAML frontmatter contract
 above. SH-F001 supplies the valid generated project in which planning operates.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

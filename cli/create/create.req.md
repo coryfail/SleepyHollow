@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F001
 title: Project creation
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "3.1"
@@ -40,7 +40,7 @@ destructive changes, and provide actionable failures. The generated application
 shall not contain example endpoints presented as approved product behavior.
 
 The scaffold shall make the intended locations for
-`requirements/application.md`, endpoint-local requirements, runtime
+`requirements/application.req.md`, endpoint-local named requirements, runtime
 configuration, API routes, models, tests, and generated artifacts evident. It
 shall include concise guidance for activating or installing the official skill
 in supported agent environments.
@@ -137,6 +137,18 @@ The CLI distribution and installation mechanism will be selected during initial
 implementation. That choice must not change the observable scaffold contract.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line

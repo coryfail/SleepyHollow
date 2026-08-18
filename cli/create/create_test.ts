@@ -52,7 +52,7 @@ Deno.test("AC-F001-003 · scaffold exposes typed config and canonical locations"
       const path of [
         "sleepyhollow.config.ts",
         "api/.gitkeep",
-        "requirements/application.md",
+        "requirements/application.req.md",
         "generated/.gitkeep",
         "models/.gitkeep",
         "tests/scaffold_test.ts",
@@ -73,7 +73,7 @@ Deno.test("AC-F001-004 · scaffold directs planning through the official skill",
       join(result.projectPath, "README.md"),
     );
     assert.match(readme, /Sleepy Hollow skill/i);
-    assert.match(readme, /requirements\/application\.md/);
+    assert.match(readme, /requirements\/application\.req\.md/);
     assert.doesNotMatch(readme, /generated endpoint/i);
   }));
 
@@ -162,7 +162,7 @@ Deno.test("AC-F001-009 · compiled installation artifact reports its version sta
     assert.equal(version.code, 0);
     assert.match(
       new TextDecoder().decode(version.stdout),
-      /^hollow \d+\.\d+\.\d+\s*$/,
+      /^hollow 0\.2\.0\s*$/,
     );
   }));
 
@@ -183,6 +183,28 @@ Deno.test("AC-F001-010 · generated projects include capture-aware test setup", 
       String(config.tasks?.test ?? "").length > 0,
       "generated project must declare a test task",
     );
+    assert.deepEqual(config.fmt?.exclude, ["**/*.req.md"]);
+  }));
+
+Deno.test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.2.0", () =>
+  temporary(async (directory) => {
+    const result = await createProject({ name: "named-app", directory });
+    assert.equal(result.version, "0.2.0");
+    assert.ok(result.createdFiles.includes("requirements/application.req.md"));
+    assert.ok(!result.createdFiles.includes("requirements/application.md"));
+    assert.ok(
+      result.nextActions.some((action) =>
+        action.includes("requirements/application.req.md")
+      ),
+    );
+    const config = await Deno.readTextFile(
+      join(result.projectPath, "sleepyhollow.config.ts"),
+    );
+    assert.match(config, /requirements\/application\.req\.md/);
+    const manifest = await Deno.readTextFile(
+      join(result.projectPath, "deno.json"),
+    );
+    assert.match(manifest, /@\^0\.2\.0/);
   }));
 
 Deno.test("AC-F001-011 · the generated test task produces a capture artifact", () =>
@@ -251,7 +273,7 @@ Deno.test("AC-F001-013 · governed requirement content is excluded from formatti
   temporary(async (directory) => {
     await createProject({ name: "governed", directory });
     const root = join(directory, "governed");
-    const requirement = join(root, "requirements", "application.md");
+    const requirement = join(root, "requirements", "application.req.md");
 
     // Prose a formatter would certainly rewrap.
     const original = await Deno.readTextFile(requirement);

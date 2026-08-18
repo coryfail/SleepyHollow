@@ -11,8 +11,8 @@ depends_on: []
 
 # Application requirements
 
-Place this file at `requirements/application.md` as the sole item inside the
-top-level `requirements/` directory.
+Place this file at `requirements/application.req.md` as the application-wide
+requirement inside the top-level `requirements/` directory.
 
 ## Purpose
 

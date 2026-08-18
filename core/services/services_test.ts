@@ -24,7 +24,7 @@ import type {
 function dependency(serviceId: string) {
   return {
     serviceId,
-    requirementsPath: `services/caller/requirements/${serviceId}.md`,
+    requirementsPath: `services/caller/requirements/${serviceId}.req.md`,
     authenticationRequirementId: `AUTH-${serviceId.toUpperCase()}`,
     failureCriteria: {
       timeout: "AC-CALLER-001",
@@ -44,7 +44,7 @@ function service(
   return {
     id,
     root,
-    requirementsPath: `${root}/requirements/application.md`,
+    requirementsPath: `${root}/requirements/application.req.md`,
     configPath: `${root}/sleepyhollow.config.ts`,
     apiRoot: `${root}/api`,
     testsRoot: `${root}/tests`,

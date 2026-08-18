@@ -106,7 +106,7 @@ async function readServices(
       id,
       root,
       apiRoot: `${root}/api`,
-      requirementsPath: `${root}/requirements/application.md`,
+      requirementsPath: `${root}/requirements/application.req.md`,
       generatedRoot: `${root}/generated`,
       testsRoot: `${root}/tests`,
     });
@@ -145,6 +145,30 @@ export async function locations(
         `Declare ${field} as a location inside the project root.`,
       ));
     }
+  }
+  const requirementsFile = config.requirementsFile;
+  if (
+    typeof requirementsFile === "string" &&
+    (requirementsFile === "requirements.md" ||
+      requirementsFile === "requirements/application.md" ||
+      requirementsFile.endsWith("/requirements.md"))
+  ) {
+    diagnostics.push(issue(
+      "SH_EVIDENCE_REQUIREMENT_LEGACY_FILENAME",
+      requirementsFile,
+      "The configured application requirement uses the legacy requirements.md filename.",
+      "Rename it to requirements/application.req.md and update requirementsFile.",
+    ));
+  } else if (
+    typeof requirementsFile === "string" &&
+    !requirementsFile.endsWith(".req.md")
+  ) {
+    diagnostics.push(issue(
+      "SH_EVIDENCE_PROJECT_CONFIG_INVALID",
+      CONFIG_FILE,
+      "The configured application requirement is not a named .req.md artifact.",
+      "Set requirementsFile to a project-relative path ending in .req.md.",
+    ));
   }
   if (diagnostics.length > 0) throw new EvidenceError(diagnostics);
   return {

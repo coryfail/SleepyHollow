@@ -35,7 +35,7 @@ function diagnostic(
 }
 
 function isRequirement(artifact: string): boolean {
-  return artifact.endsWith("requirements.md");
+  return artifact.endsWith(".req.md");
 }
 
 export function applicationReview(
@@ -70,7 +70,7 @@ export function implementation(
   redState: RedStateResult | undefined,
 ): void {
   const diagnostics: SkillDiagnostic[] = [];
-  const path = `${request.path}/requirements.md`;
+  const path = `${request.path}/${request.requirementId}.req.md`;
   if (request.status === "draft" || !request.approvalValid) {
     diagnostics.push(diagnostic(
       "SH_SKILL_APPROVAL_REQUIRED",
@@ -140,7 +140,7 @@ export function verification(check: CheckResult | undefined): "verified" {
   if (!check) {
     throw new SkillError([diagnostic(
       "SH_SKILL_CHECK_EVIDENCE_REQUIRED",
-      "requirements.md",
+      "requirement.req.md",
       "Verification requires independent hollow check evidence.",
       "Run hollow check and record its result before declaring verification.",
     )]);

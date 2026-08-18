@@ -136,13 +136,13 @@ Deno.test("AC-F009-002 · endpoint artifacts require completed application revie
   assert.throws(
     () =>
       authorizeArtifactCreation("discovery", [
-        "api/bookmarks/requirements.md",
+        "api/bookmarks/bookmarks.req.md",
       ]),
     (error: unknown) =>
       codes(error).includes("SH_SKILL_APPLICATION_REVIEW_REQUIRED"),
   );
   authorizeArtifactCreation("decomposition", [
-    "api/bookmarks/requirements.md",
+    "api/bookmarks/bookmarks.req.md",
   ]);
 });
 
@@ -150,7 +150,7 @@ Deno.test("AC-F009-003 · decomposition proposes requirements without endpoint c
   assert.throws(
     () =>
       authorizeArtifactCreation("decomposition", [
-        "api/bookmarks/requirements.md",
+        "api/bookmarks/bookmarks.req.md",
         "api/bookmarks/route.ts",
       ]),
     (error: unknown) => codes(error).includes("SH_SKILL_PREMATURE_CODE"),

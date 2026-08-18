@@ -37,7 +37,7 @@ and the questions worth asking in each.
 
 ### 2. Plan the whole application
 
-Produce one `requirements/application.md` covering purpose, actors, scope, data
+Produce one `requirements/application.req.md` covering purpose, actors, scope, data
 model, endpoints, relationships, indexes, conventions, errors, authentication,
 authorization, security, operations, deployment, service architecture,
 cross-cutting criteria, dependencies, assumptions, and open questions.
@@ -54,8 +54,9 @@ governed document format.
 
 ### 3. Decompose into endpoints
 
-After application approval, create the proposed API directory structure and a
-`requirements.md` in every endpoint directory. Create no tests, no route
+After application approval, create the proposed API directory structure and
+named `<requirement-id>.req.md` files in endpoint directories. A directory may
+contain multiple independently governed requirement files. Create no tests, no route
 implementations, and no generated contracts in this phase.
 
 Present the endpoint inventory and dependency order, then accept approval,

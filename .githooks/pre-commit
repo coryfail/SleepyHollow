@@ -7,7 +7,7 @@
 set -e
 
 staged=$(git diff --cached --name-only --diff-filter=ACM \
-  | grep -E '(^|/)requirements\.md$|^requirements/application\.md$' || true)
+  | grep -E '\.req\.md$' || true)
 
 [ -z "$staged" ] && exit 0
 

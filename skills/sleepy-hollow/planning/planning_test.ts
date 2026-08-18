@@ -213,24 +213,52 @@ Deno.test("AC-F006-002 · unresolved material decisions remain explicit", () => 
 Deno.test("AC-F006-003 · decomposition proposes only directories and requirements", () => {
   const plan = decomposeApplication(
     {
-      path: "requirements/application.md",
+      path: "requirements/application.req.md",
       source: applicationSource("approved"),
     },
     [endpoint],
   );
   assert.deepEqual(plan.directories, ["api/bookmarks"]);
   assert.deepEqual(plan.files.map((item) => item.path), [
-    "api/bookmarks/requirements.md",
+    "api/bookmarks/bookmarks.req.md",
   ]);
   assert.ok(
     plan.files.every((item) => !/route(?:\.test)?\.ts$/.test(item.path)),
   );
 });
 
+Deno.test("AC-NRF-006 · decomposition rejects portable named-file collisions", () => {
+  assert.throws(
+    () =>
+      decomposeApplication(
+        {
+          path: "requirements/application.req.md",
+          source: applicationSource("approved"),
+        },
+        [
+          endpoint,
+          {
+            ...endpoint,
+            id: "BOOKMARKS",
+            acceptanceCriteria: [{
+              id: "AC-BOOKMARKS-UPPER-001",
+              text: "GET returns a bounded bookmark list.",
+            }],
+          },
+        ],
+      ),
+    (error) =>
+      error instanceof PlanningError &&
+      error.diagnostics.some((item) =>
+        item.code === "SH_PLANNING_REQUIREMENT_PATH_DUPLICATE"
+      ),
+  );
+});
+
 Deno.test("AC-F006-004 · endpoint frontmatter is strict and machine-readable", () => {
   const parsed = parseRequirement(
     endpointSource("bookmarks", "/bookmarks"),
-    "api/bookmarks/requirements.md",
+    "api/bookmarks/bookmarks.req.md",
     "endpoint",
   );
   assert.equal(parsed.id, "bookmarks");
@@ -246,7 +274,7 @@ Deno.test("AC-F006-005 · endpoint requirements include every mandatory section"
           "### Data access and indexes",
           "### Missing data section",
         ),
-        "api/bookmarks/requirements.md",
+        "api/bookmarks/bookmarks.req.md",
         "endpoint",
       ),
     (error) =>
@@ -259,11 +287,11 @@ Deno.test("AC-F006-005 · endpoint requirements include every mandatory section"
 
 const decisionDocuments: readonly PlanningDocument[] = [
   {
-    path: "api/bookmarks/requirements.md",
+    path: "api/bookmarks/bookmarks.req.md",
     source: endpointSource("bookmarks", "/bookmarks"),
   },
   {
-    path: "api/collections/requirements.md",
+    path: "api/collections/collections.req.md",
     source: endpointSource("collections", "/collections", ["bookmarks"]),
   },
 ];
@@ -282,7 +310,7 @@ Deno.test("AC-F006-006 · one endpoint decision does not approve another", () =>
 
 Deno.test("AC-F006-007 · explicit group approval changes only named endpoints", () => {
   const third = {
-    path: "api/tags/requirements.md",
+    path: "api/tags/tags.req.md",
     source: endpointSource("tags", "/tags"),
   };
   const result = applyPlanningDecision([...decisionDocuments, third], {
@@ -321,7 +349,7 @@ Deno.test("AC-F006-009 · decomposition reports approved-source conflicts", () =
     () =>
       decomposeApplication(
         {
-          path: "requirements/application.md",
+          path: "requirements/application.req.md",
           source: applicationSource("approved"),
         },
         [{
@@ -347,13 +375,14 @@ Deno.test("AC-F006-010 · malformed and duplicate criteria report source locatio
     "- AC-BOOKMARKS-001: First behavior.\n- AC-BOOKMARKS-001: Duplicate behavior.",
   );
   assert.throws(
-    () => parseRequirement(source, "api/bookmarks/requirements.md", "endpoint"),
+    () =>
+      parseRequirement(source, "api/bookmarks/bookmarks.req.md", "endpoint"),
     (error) => {
       assert.ok(error instanceof PlanningError);
       const duplicate = error.diagnostics.find((item) =>
         item.code === "SH_PLANNING_CRITERION_DUPLICATE"
       );
-      assert.equal(duplicate?.path, "api/bookmarks/requirements.md");
+      assert.equal(duplicate?.path, "api/bookmarks/bookmarks.req.md");
       assert.ok((duplicate?.line ?? 0) > 1);
       return true;
     },

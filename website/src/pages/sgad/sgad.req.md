@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: website-sgad-page
 title: SGAD methodology page
-status: verified
+status: draft
 risk: standard
 depends_on:
   - sleepy-hollow-website
@@ -48,8 +48,9 @@ The page must remain useful to people who never use Sleepy Hollow.
 - Provide a practical adoption checklist and a compact example of colocated
   requirements, tests, implementation, and evidence.
 - Explain that application-wide intent belongs in
-  `requirements/application.md`, component requirements stay beside their
-  behavior, and root `requirements.md` is reserved for repository-wide behavior.
+  `requirements/application.req.md`, components use meaningful named `*.req.md`
+  files beside their behavior, several may share one directory, and
+  repository-wide behavior uses its own meaningful root-level `*.req.md` name.
 - Open with a concrete account of what actually changes for a team that adopts
   SGAD, before any lifecycle detail: what a developer writes, what a human
   approves, what a machine checks, and what a finished change consists of.
@@ -141,6 +142,18 @@ documentation behavior, and the Sleepy Hollow product narrative require their
 own approved requirements.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

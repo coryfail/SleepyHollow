@@ -46,11 +46,13 @@ async function contents(
 }
 
 async function tracked(): Promise<string[]> {
-  const listed = await git(["ls-files"]) ?? "";
-  return listed.split("\n").filter((path) =>
-    path === "requirements.md" || path === "requirements/application.md" ||
-    path.endsWith("/requirements.md")
-  );
+  const listed = await git([
+    "ls-files",
+    "--cached",
+    "--others",
+    "--exclude-standard",
+  ]) ?? "";
+  return listed.split("\n").filter((path) => path.endsWith(".req.md"));
 }
 
 function governedDigest(source: string): string | null {

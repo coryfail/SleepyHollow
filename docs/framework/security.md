@@ -83,7 +83,7 @@ Name the module in your project configuration:
 export default defineProject({
   name: "bookmarks",
   apiDirectory: "api",
-  requirementsFile: "requirements/application.md",
+  requirementsFile: "requirements/application.req.md",
   generatedDirectory: "generated",
   securityModule: "security.ts",
 });

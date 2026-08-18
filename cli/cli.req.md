@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F011
 title: CLI and diagnostics
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "12"
@@ -200,6 +200,14 @@ deployments.
 | AC-F011-009 | Registry, help, and parsing probes rejecting agent/model commands, model options, and model credential access. |
 
 ## Governance record
+
+### Verification invalidation, 0.2.0 release identity
+
+- Status: prior verification is stale; the recorded approval still binds the
+  unchanged governed content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: CLI version reporting changed to 0.2.0 under the approved
+  `named-requirement-files` migration.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

@@ -55,13 +55,13 @@ release controls, and evidence. Determine:
 - Which behavior is governed and which policy applies.
 - The risk classification and required checks.
 - Who or what may approve exact intent.
-- The governed `requirements.md` that will contain the complete approval and
+- The governed named `*.req.md` file that will contain the complete approval and
   evidence history.
 - The independent verifier entry point and delivery gate.
 
 If these controls do not exist, propose the smallest explicit policy before
 continuing. Do not silently appoint the producing agent as approver or verifier.
-Use the governed `requirements.md` as the single governance record. It must embed
+Use the governed named `*.req.md` file as the single governance record. It must embed
 approval, criterion mapping, red-state evidence, verification, and applicable
 delivery history. Git, review, CI, and attestations may be linked only as
 supporting provenance from that record.
@@ -76,11 +76,13 @@ Create or revise the application specification when system boundaries or shared
 behavior change. Decompose work into independently reviewable component
 requirements. Place requirements according to behavioral ownership:
 
-- `requirements/application.md` owns application-wide intent and is the only
+- `requirements/application.req.md` owns application-wide intent and is the only
   item in the top-level `requirements/` directory.
-- A component's `requirements.md` lives beside the behavior it owns.
-- Root `requirements.md` is optional and reserved for durable repository-wide
-  behavior that cannot be assigned to the application or one component.
+- A component's meaningful named `*.req.md` file lives beside the behavior it
+  owns. A directory may contain several independently governed requirement
+  files.
+- Repository-wide behavior uses its own meaningful root-level `*.req.md` name
+  when it cannot be assigned to the application or one component.
 
 Start from:
 
@@ -111,7 +113,7 @@ risk-appropriate adversarial cases.
 
 Run the tests against the pre-implementation baseline. Record identities,
 revision, results, and why each expected failure demonstrates missing approved
-behavior in the same `requirements.md`. Treat compilation errors, malformed
+behavior in the same named requirement file. Treat compilation errors, malformed
 assertions, unavailable dependencies, or unrelated regression failures as a
 broken baseline, not red-state evidence.
 
@@ -146,7 +148,7 @@ revision to the verified revision and retain smoke, health, migration, or other
 required operational evidence.
 
 After any material change, perform impact analysis, invalidate affected approval
-and verification, preserve historical entries in `requirements.md`, and repeat
+and verification, preserve historical entries in the named requirement file, and repeat
 the smallest safe portion of the workflow.
 
 ## Report the outcome

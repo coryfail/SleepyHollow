@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F018
 title: Repository evidence loader
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "3.6"
@@ -83,7 +83,7 @@ shall produce identical inventories, including collection ordering.
 
 ### Governed evidence
 
-The loader shall parse each governed `requirements.md` using the SH-F006 parser,
+The loader shall parse each governed `*.req.md` file using the SH-F006 parser,
 calculate the governed-content digest using the canonical algorithm, and report
 whether each recorded approval binds the requirement's current content. It shall
 treat the frontmatter `status` field as a lifecycle projection and shall never
@@ -204,6 +204,18 @@ evidence can be assembled, and a missing, unreadable, or invalid project
 configuration is reported as a failure rather than a partial inventory.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line

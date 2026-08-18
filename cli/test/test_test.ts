@@ -197,6 +197,19 @@ Deno.test("AC-F016-001 · full tests run natively in isolated test mode", async 
   assert.equal(failed.code, 1);
 });
 
+Deno.test("AC-NRF-008 · named requirement files cannot receive test write permission", () => {
+  const plan = planTestRun(inventory(), { kind: "full" });
+  assert.throws(
+    () =>
+      createDenoTestInvocation(plan, {
+        projectRoot: "/project",
+        denoExecutable: "/bin/deno",
+        permissions: { write: ["feature.req.md"] },
+      }),
+    /governed output/,
+  );
+});
+
 Deno.test("AC-F016-002 · targets close dependencies without unrelated tests", async () => {
   const plans: TestCommandPlan[] = [];
   const execute = runner((plan) => {
@@ -435,7 +448,7 @@ Deno.test("AC-F016-007 · passing tests cannot mutate verification state", async
     prefix: "sleepy-hollow-test-command-",
   });
   try {
-    const requirementPath = join(directory, "requirements.md");
+    const requirementPath = join(directory, "feature.req.md");
     await Deno.writeTextFile(
       requirementPath,
       "---\nstatus: approved\n---\n\n# Requirement\n",
