@@ -47,6 +47,7 @@ export interface EvidenceLoadOptions {
     readonly {
       readonly name: string;
       readonly isDirectory: boolean;
+      readonly isFile: boolean;
       readonly isSymlink: boolean;
     }[]
   >;

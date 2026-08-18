@@ -12,7 +12,7 @@ owners:
 
 # Component requirements
 
-Colocate this `requirements.md` with the component it governs. Use this template
+Colocate a meaningful named `<feature>.req.md` with the component it governs. Use this template
 at repository root only when the governed behavior spans the repository and has
 no honest application or component owner.
 

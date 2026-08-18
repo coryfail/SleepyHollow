@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: framework-documentation
 title: Framework documentation set
-status: verified
+status: draft
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -37,7 +37,7 @@ verifier whose preconditions it never teaches a reader to meet.
 ## Authorized scope
 
 - Document how to obtain and activate the official Sleepy Hollow skill, as the
-  approved onboarding flow in `requirements/application.md` §3.1 step 3 already
+  approved onboarding flow in `requirements/application.req.md` §3.1 step 3 already
   requires of the product.
 - Document the governed requirement format in `docs/framework/` well enough to
   author and approve one requirement by hand.
@@ -50,7 +50,7 @@ verifier whose preconditions it never teaches a reader to meet.
 
 - Changing `cli/create` scaffold output, the CLI, the runtime, or the verifier.
 - Changing what `hollow check` accepts, or the canonical digest algorithm in
-  the root `requirements.md`, which remains that requirement's to define.
+  the root `repository.req.md`, which remains that requirement's to define.
 - Removing or thinning `skills/sleepy-hollow/references/`. The skill is
   installed standalone and must remain self-contained when the repository is
   absent.
@@ -69,7 +69,7 @@ So the format is stated in both `docs/framework/` and
 constraint is agreement rather than single-sourcing: the two must not
 contradict each other on frontmatter fields, file placement, or the governance
 boundary. The canonical digest algorithm has exactly one definition, in the
-root `requirements.md`; both documents cite it and neither restates it as a
+root `repository.req.md`; both documents cite it and neither restates it as a
 competing procedure.
 
 ## Content boundaries
@@ -101,7 +101,7 @@ competing procedure.
   `docs/framework/` and `skills/sleepy-hollow/references/requirement-format.md`,
   then the two agree on frontmatter fields, placement, and the governance
   boundary, and neither states a digest procedure that differs from the
-  canonical algorithm in the root `requirements.md`.
+  canonical algorithm in the root `repository.req.md`.
 - AC-FWDOC-005: Given a guide names an installable artifact, then that artifact
   resolves: the skill name matches a directory under `skills/`, and the
   framework and CLI install commands match the package name in `deno.json`.
@@ -127,11 +127,10 @@ competing procedure.
   listed both `sgad-workflow` and `sleepy-hollow`.
 - `website/scripts/generate-docs.mjs` discovers guides from disk, so every
   Markdown file under `docs/framework/` is published, including this governance
-  file. That follows the established `docs/sgad/requirements.md` precedent,
+  file. That follows the established `docs/sgad/sgad.req.md` precedent,
   which is published with its own summary and navigation title.
-- The filename `requirements.md` is reserved for governance under the placement
-  rule in the root `requirements.md`, so a guide about authoring requirements
-  carries a different filename and route.
+- The suffix `.req.md` identifies governance under the placement rule in the
+  root `repository.req.md`; ordinary guides use descriptive `.md` filenames.
 
 ## Change impact
 
@@ -147,6 +146,18 @@ in `website/`, and the skill-install line in `README.md`. It does not authorize
 any change to the CLI, the runtime, the verifier, or the generated scaffold.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

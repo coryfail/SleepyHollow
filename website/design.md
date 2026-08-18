@@ -3,7 +3,7 @@
 A locked design system for `website/`. Both routes read this file before any
 further redesign work. Do not regenerate the palette or type pairing per page —
 extend or amend this file when the system needs to grow. This system was
-already approved and delivered (see `requirements.md`); this redesign pass
+already approved and delivered (see `website.req.md`); this redesign pass
 keeps every token and reworks only structure and component voice within it.
 
 ## Genre

@@ -15,7 +15,7 @@ Define:
 
 - Authorized approvers and content-binding mechanism.
 - Risk classes and evidence required for each.
-- The governed `requirements.md` files that will contain complete governance
+- The governed named `*.req.md` files that will contain complete governance
   histories.
 - Criterion-mapping convention.
 - One stable verifier command or CI entry point.
@@ -45,23 +45,27 @@ approval and red evidence for new governed behavior.
 
 ```text
 project/
-├── requirements/application.md
-└── src/feature-name/
-    ├── requirements.md
-    ├── feature.test.ts
-    └── feature.ts
+├── requirements/application.req.md
+└── src/account/
+    ├── profile.req.md
+    ├── profile.test.ts
+    ├── profile.ts
+    ├── password-reset.req.md
+    ├── password-reset.test.ts
+    └── password-reset.ts
 ```
 
 Place requirements according to behavioral ownership:
 
-- `requirements/application.md` owns application-wide intent and is the only
+- `requirements/application.req.md` owns application-wide intent and is the only
   item in the top-level `requirements/` directory.
-- A component's `requirements.md` lives beside the feature, service, package,
-  website, skill, or documentation behavior it governs.
-- Root `requirements.md` is optional and reserved for durable repository-wide
-  behavior that cannot be assigned honestly elsewhere.
+- A component's meaningful named `*.req.md` file lives beside the feature,
+  service, package, website, skill, or documentation behavior it governs. A
+  directory may contain several independently governed requirement files.
+- Repository-wide behavior uses its own meaningful root-level `*.req.md` name
+  when it cannot be assigned honestly elsewhere.
 
-Use the feature's `requirements.md` as the single home for its complete
+Use the feature's named `*.req.md` file as the single home for its complete
 governance history: approval, criterion mapping, red-state evidence,
 verification, and applicable delivery. Append those records beneath
 `## Governance record`. Git, review, CI, and attestations may be linked as

@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F017
 title: Standalone SGAD workflow skill
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "4.6"
@@ -134,6 +134,14 @@ repositories remain responsible for defining authorized approvers and a verifier
 appropriate to their stack and risk.
 
 ## Governance record
+
+### Verification invalidation, 0.2.0 named requirement files
+
+- Status: prior verification is stale; the recorded approval still binds the
+  unchanged governed content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: the packaged skill implementation changed under the approved
+  `named-requirement-files` migration.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

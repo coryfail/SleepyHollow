@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F016
 title: Test command
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "11"
@@ -93,7 +93,7 @@ The production adapter shall invoke the current Deno executable directly through
 deduplicated, project-contained test files, frozen and cached dependency flags,
 `--no-prompt`, TAP output, and only the bounded read, write, run, environment,
 network, and unstable-KV permissions declared by normalized project test
-configuration. Write permissions may not include a governed `requirements.md`,
+configuration. Write permissions may not include a governed `*.req.md` file,
 generated contract, repository metadata, or a path outside the project. Test
 mode shall be explicit and shall not load production-only credentials.
 
@@ -244,6 +244,18 @@ unknown structural events rather than silently discarding them.
 | AC-F016-007 | Before/after governed-file digests proving a passing run cannot mutate approval or verification state. |
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

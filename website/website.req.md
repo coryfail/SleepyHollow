@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-website
 title: Sleepy Hollow public website
-status: verified
+status: draft
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -79,9 +79,9 @@ accurate it is.
 
 | Feature | Route | Requirement |
 |---|---|---|
-| Sleepy Hollow framework page | `/` | `src/pages/sleepy-hollow/requirements.md` |
-| Documentation section | `/docs/` | `src/pages/docs/requirements.md` |
-| SGAD methodology page | `/sgad/` | `src/pages/sgad/requirements.md` |
+| Sleepy Hollow framework page | `/` | `src/pages/sleepy-hollow/sleepy-hollow.req.md` |
+| Documentation section | `/docs/` | `src/pages/docs/docs.req.md` |
+| SGAD methodology page | `/sgad/` | `src/pages/sgad/sgad.req.md` |
 
 Each feature is independently valuable and owns its narrative acceptance
 criteria. This file owns only cross-page behavior and shared delivery
@@ -270,6 +270,18 @@ must bind this file and each child page requirement before acceptance tests or
 implementation are changed.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

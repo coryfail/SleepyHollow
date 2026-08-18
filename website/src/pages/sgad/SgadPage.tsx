@@ -35,11 +35,11 @@ const stages = [
 ] as const;
 
 const adoptionSteps = [
-  "Store a requirements.md file beside each independently valuable feature.",
+  "Store each independently valuable feature in a meaningful named .req.md file beside the behavior it governs.",
   "Give every stable acceptance-criterion ID a test mapping that survives refactoring.",
-  "Record approval inside requirements.md, bound to the exact governed-content digest—a fingerprint of the approved intent.",
+  "Record approval inside the named .req.md file, bound to the exact governed-content digest—a fingerprint of the approved intent.",
   "Keep bidirectional traceability: requirements point to tests and tests point back to requirements.",
-  "Append expected-red, verification, and applicable delivery results to the same requirements.md governance record.",
+  "Append expected-red, verification, and applicable delivery results to the same named .req.md governance record.",
   "Use an independent verification command, not the producing agent’s summary, to decide whether evidence passes.",
 ];
 
@@ -138,26 +138,38 @@ export default function SgadPage() {
               <div className="file-map__root"><code>my-application/</code></div>
               <ul className="file-map__files" aria-label="Example SGAD application files">
                 <li className="file-map__entry">
-                  <code>requirements/application.md</code>
+                  <code>requirements/application.req.md</code>
                   <span className="file-map__role">application intent</span>
                 </li>
                 <li className="file-map__folder">
                   <div className="file-map__folder-head">
-                    <code>feature/</code>
-                    <span className="file-map__role">colocated behavior</span>
+                    <code>account/</code>
+                    <span className="file-map__role">multiple governed features</span>
                   </div>
                   <ul className="file-map__nested" aria-label="Files inside the feature folder">
                     <li>
-                      <code>requirements.md</code>
-                      <span className="file-map__role">intent + governance</span>
+                      <code>profile.req.md</code>
+                      <span className="file-map__role">profile intent + governance</span>
                     </li>
                     <li>
-                      <code>feature.test.ts</code>
-                      <span className="file-map__role">acceptance check</span>
+                      <code>profile.test.ts</code>
+                      <span className="file-map__role">profile acceptance check</span>
                     </li>
                     <li>
-                      <code>feature.ts</code>
-                      <span className="file-map__role">implementation</span>
+                      <code>profile.ts</code>
+                      <span className="file-map__role">profile implementation</span>
+                    </li>
+                    <li>
+                      <code>password-reset.req.md</code>
+                      <span className="file-map__role">reset intent + governance</span>
+                    </li>
+                    <li>
+                      <code>password-reset.test.ts</code>
+                      <span className="file-map__role">reset acceptance check</span>
+                    </li>
+                    <li>
+                      <code>password-reset.ts</code>
+                      <span className="file-map__role">reset implementation</span>
                     </li>
                   </ul>
                 </li>
@@ -165,13 +177,13 @@ export default function SgadPage() {
             </div>
 
             <p className="file-map__evidence">
-              Each feature&apos;s requirements.md contains its complete governance
+              Each feature&apos;s named .req.md file contains its complete governance
               history: exact-content approval, criterion mapping, red-state
               evidence, independent verification, and applicable delivery results.
               Git reviews and CI runs can be linked as supporting provenance.
-              Application-wide intent belongs in requirements/application.md;
-              component requirements stay beside their behavior; and optional
-              root requirements.md is reserved for repository-wide behavior.
+              Application-wide intent belongs in requirements/application.req.md;
+              component requirements stay beside their behavior; and
+              repository-wide behavior uses its own meaningful .req.md name.
             </p>
           </figure>
         </section>

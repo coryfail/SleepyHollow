@@ -103,7 +103,7 @@ test("LICENSE · public license copy matches the repository license", () => {
 });
 
 test("AC-SITE-011 · traceability covers every declared criterion", () => {
-  const requirement = read("requirements.md");
+  const requirement = read("website.req.md");
   const mapping = requirement.split("### Criterion mapping")[1]?.split("### Red-state evidence")[0] ?? "";
   const ids = new Set(Array.from(mapping.matchAll(/\| (AC-(?:SITE|HOME|WEB-SGAD|DOCS)-\d{3}) \|/g), (match) => match[1]));
   for (const [prefix, count] of [["AC-SITE", 16], ["AC-HOME", 21], ["AC-WEB-SGAD", 14], ["AC-DOCS", 10]]) {
@@ -278,7 +278,7 @@ test("AC-WEB-SGAD-003 AC-WEB-SGAD-004 AC-WEB-SGAD-005 · SGAD explains every ord
 
 test("AC-WEB-SGAD-006 AC-WEB-SGAD-007 AC-WEB-SGAD-008 AC-WEB-SGAD-010 AC-WEB-SGAD-012 · SGAD provides an understandable adoption reference", () => {
   const text = sgad();
-  for (const phrase of ["stable acceptance-criterion", "Record approval inside", "bidirectional", "independent verification command", "my-application/", "requirements/application.md", "feature/", "requirements.md", "feature.test.ts", "feature.ts", "complete governance history", "criterion mapping", "supporting provenance"]) {
+  for (const phrase of ["stable acceptance-criterion", "Record approval inside", "bidirectional", "independent verification command", "my-application/", "requirements/application.req.md", "account/", "profile.req.md", "profile.test.ts", "profile.ts", "password-reset.req.md", "password-reset.test.ts", "password-reset.ts", "complete governance history", "criterion mapping", "supporting provenance"]) {
     assert.match(text, new RegExp(phrase, "i"));
   }
   assert.match(text, /file-map__nested/);
@@ -311,7 +311,7 @@ test("AC-SITE-012 AC-DOCS-003 · guide prose is generated, never copied into web
     ["docs/framework/verification.md", "Passing tests are evidence that assertions held"],
     ["docs/sgad/principles.md", "These principles govern how authority"],
   ];
-  const sourceFiles = walk(resolve(website, "src")).filter((path) => !path.endsWith("requirements.md"));
+  const sourceFiles = walk(resolve(website, "src")).filter((path) => !path.endsWith(".req.md"));
   for (const [guide, fingerprint] of fingerprints) {
     const pattern = new RegExp(fingerprint.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     assert.match(prose(readFileSync(resolve(repository, guide), "utf8")), pattern, `${guide} lost its fingerprint`);

@@ -23,7 +23,7 @@ export function parseRequirement(
 
 export function validateApplicationRequirement(
   source: string,
-  path = "requirements/application.md",
+  path = "requirements/application.req.md",
 ): ParsedRequirement {
   return validateApplication(source, path);
 }

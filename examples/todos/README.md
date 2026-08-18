@@ -10,9 +10,9 @@ authenticated caller, see the `authentication` example.
 
 ## Where the rules live
 
-`requirements/application.md` records the application-wide decisions, and each
-endpoint directory owns its own `requirements.md` with criteria and an approval
-bound to the exact content approved.
+`requirements/application.req.md` records the application-wide decisions, and
+each endpoint directory owns a named `*.req.md` file with criteria and an
+approval bound to the exact content approved.
 
 ## Verify
 

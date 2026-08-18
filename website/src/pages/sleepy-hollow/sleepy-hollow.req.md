@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: website-sleepy-hollow-page
 title: Sleepy Hollow framework landing page
-status: approved
+status: draft
 risk: standard
 depends_on:
   - sleepy-hollow-website
@@ -151,7 +151,7 @@ Two failures this revision corrects:
 - AC-HOME-002: Given a visitor reads the framework explanation, then the page
   describes the relationship among reviewed requirements, agent implementation,
   test-driven development, deterministic verification, and a deployable API
-  without contradicting `requirements/application.md`.
+  without contradicting `requirements/application.req.md`.
 - AC-HOME-003: Given a visitor does not know Deno or deterministic verification,
   then nearby copy explains the essential meaning without requiring specialist
   knowledge.
@@ -224,6 +224,18 @@ AC-HOME-001 through AC-HOME-021. Site-wide delivery behavior, documentation
 behavior, and SGAD methodology content require their own approved requirements.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

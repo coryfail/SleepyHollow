@@ -8,8 +8,7 @@
   },
   "fmt": {
     "exclude": [
-      "**/requirements.md",
-      "requirements/application.md"
+      "**/*.req.md"
     ]
   },
   "tasks": {

@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: sgad-methodology
 title: Specification-Governed Agentic Development methodology
-status: verified
+status: draft
 risk: standard
 depends_on: []
 owners:
@@ -83,9 +83,10 @@ governed software lifecycle transitions.
   the current documentation as a draft until approval and verification evidence
   exist.
 - AC-SGAD-018: Requirement placement follows behavioral ownership:
-  `requirements/application.md` owns application-wide intent, component
-  requirements are colocated, and optional root `requirements.md` is reserved
-  for irreducible repository-wide behavior.
+  `requirements/application.req.md` owns application-wide intent, components
+  use meaningful colocated `*.req.md` files, multiple requirements may share a
+  directory, and repository-wide behavior uses its own meaningful root-level
+  `*.req.md` name.
 
 ## Dependencies and assumptions
 
@@ -94,7 +95,7 @@ governed software lifecycle transitions.
 - Each adopting stack can provide a verifier appropriate to its behavior and
   risk.
 - Normative conformance language will receive compatibility review before SGAD
-  advances beyond version 0.1 draft.
+  advances beyond version 0.2.0 draft.
 
 ## Change impact
 
@@ -105,10 +106,22 @@ compatibility assessment.
 ## Approval scope
 
 Approval should cover the methodology purpose, all AC-SGAD criteria, SGAD Core
-normative requirements, optional capability profiles, and the version 0.1
+normative requirements, optional capability profiles, and the version 0.2.0
 templates. Partial approval must list excluded criteria explicitly.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

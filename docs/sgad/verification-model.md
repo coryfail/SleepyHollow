@@ -146,7 +146,7 @@ A conforming verifier should be:
       "code": "SGAD-TRACE-UNMAPPED",
       "result": "failed",
       "criterionId": "AC-BOOKMARKS-003",
-      "location": "api/bookmarks/[id]/requirements.md",
+      "location": "api/bookmarks/[id]/bookmark.req.md",
       "message": "Approved criterion has no mapped test"
     }
   ]

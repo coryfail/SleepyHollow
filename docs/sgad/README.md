@@ -2,7 +2,7 @@
 
 **Abbreviation:** SGAD
 
-**Status:** Draft methodology, version 0.1
+**Status:** Draft methodology, version 0.2.0
 
 > Intent authorizes. Agents implement. Evidence verifies.
 
@@ -39,7 +39,7 @@ Keeping these planes distinct prevents a coding agent from silently turning an
 assumption into intent, intent into authority, or its own completion statement
 into evidence.
 
-These are trust boundaries, not file boundaries. Each governed `requirements.md`
+These are trust boundaries, not file boundaries. Each governed `*.req.md`
 is the single home for its complete governance history: approval, criterion
 mapping, red-state evidence, verification, and applicable delivery results. Git,
 protected review, CI, and attestations may be linked as supporting provenance
@@ -105,7 +105,7 @@ See [workflow.md](workflow.md) for phase entry and exit conditions.
 
 ## Documents
 
-- [Methodology requirements](requirements.md) defines the draft scope and
+- [Methodology requirements](sgad.req.md) defines the draft scope and
   acceptance criteria SGAD will use to govern itself.
 - [Principles](principles.md) defines the values and design constraints.
 - [Workflow](workflow.md) defines the end-to-end operating process.

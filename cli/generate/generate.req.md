@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F010
 title: API contracts and typed clients
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "3.7"
@@ -196,6 +196,14 @@ authentication decision. SH-F007's compatible in-process fetch seam is available
 for client tests but is not a runtime dependency of generated output.
 
 ## Governance record
+
+### Verification invalidation, 0.2.0 release identity
+
+- Status: prior verification is stale; the recorded approval still binds the
+  unchanged governed content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: the generator identity changed to 0.2.0 under the approved
+  `named-requirement-files` migration.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

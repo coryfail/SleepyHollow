@@ -41,7 +41,7 @@ function issue(
 
 export function validateApplication(
   source: string,
-  path = "requirements/application.md",
+  path = "requirements/application.req.md",
 ): ParsedRequirement {
   const parsed = parseRequirementDocument(source, path, "application");
   const diagnostics = applicationSections.filter((section) =>
@@ -223,7 +223,7 @@ function dependencyOrder(
     if (visiting.has(id)) {
       throw new PlanningError([issue(
         "SH_PLANNING_DEPENDENCY_CYCLE",
-        "requirements/application.md",
+        "requirements/application.req.md",
         `Proposed requirement dependency cycle includes ${id}.`,
         "Remove the cycle or extract a shared contract requirement.",
       )]);
@@ -264,7 +264,7 @@ export function decompose(
     for (const conflict of endpoint.conflicts ?? []) {
       diagnostics.push(issue(
         "SH_PLANNING_APPLICATION_CONFLICT",
-        `${routeDirectory(endpoint.path)}/requirements.md`,
+        `${routeDirectory(endpoint.path)}/${endpoint.id}.req.md`,
         `Proposed behavior "${conflict.proposedText}" conflicts with approved application text "${conflict.applicationText}".`,
         "Revise the endpoint proposal or return to application-level review.",
       ));
@@ -273,7 +273,7 @@ export function decompose(
       if (!parsedApplication.sections.has(citation)) {
         diagnostics.push(issue(
           "SH_PLANNING_SOURCE_SECTION_MISSING",
-          `${routeDirectory(endpoint.path)}/requirements.md`,
+          `${routeDirectory(endpoint.path)}/${endpoint.id}.req.md`,
           `Cited application section ${citation} does not exist.`,
           "Cite an exact approved application heading.",
         ));
@@ -282,15 +282,33 @@ export function decompose(
   }
   if (diagnostics.length > 0) throw new PlanningError(diagnostics);
   const files = endpoints.map((proposal) => ({
-    path: `${routeDirectory(proposal.path)}/requirements.md`,
+    path: `${routeDirectory(proposal.path)}/${proposal.id}.req.md`,
     source: endpointRequirement(proposal),
     requirementId: proposal.id,
   })).sort((left, right) => left.path.localeCompare(right.path));
+  const paths = new Map<string, string>();
+  for (const file of files) {
+    const portable = file.path.toLowerCase();
+    const prior = paths.get(portable);
+    if (prior) {
+      diagnostics.push(issue(
+        "SH_PLANNING_REQUIREMENT_PATH_DUPLICATE",
+        file.path,
+        `Named requirement path collides with ${prior} on a case-insensitive filesystem.`,
+        "Give each proposed requirement a filename-distinct stable ID.",
+      ));
+    } else {
+      paths.set(portable, file.path);
+    }
+  }
+  if (diagnostics.length > 0) throw new PlanningError(diagnostics);
   validateInventory(files);
   return {
-    directories: files.map((file) =>
-      file.path.replace(/\/requirements\.md$/, "")
-    ),
+    directories: [
+      ...new Set(
+        files.map((file) => file.path.slice(0, file.path.lastIndexOf("/"))),
+      ),
+    ],
     files,
     dependencyOrder: dependencyOrder(endpoints),
   };
@@ -372,7 +390,7 @@ export function applyDecision(
   if (targets.size !== decision.requirementIds.length || targets.size === 0) {
     diagnostics.push(issue(
       "SH_PLANNING_DECISION_SCOPE_INVALID",
-      documents[0]?.path ?? "requirements.md",
+      documents[0]?.path ?? "requirement.req.md",
       "A planning decision must name a non-empty unique requirement set.",
       "Name each intended endpoint exactly once.",
     ));
@@ -382,7 +400,7 @@ export function applyDecision(
     if (!known.has(target)) {
       diagnostics.push(issue(
         "SH_PLANNING_DECISION_TARGET_UNKNOWN",
-        documents[0]?.path ?? "requirements.md",
+        documents[0]?.path ?? "requirement.req.md",
         `Planning decision names unknown requirement ${target}.`,
         "Use an ID from the presented endpoint inventory.",
       ));
@@ -391,7 +409,7 @@ export function applyDecision(
   if (!decision.actor || !decision.at || !decision.decisionSource) {
     diagnostics.push(issue(
       "SH_PLANNING_DECISION_PROVENANCE_REQUIRED",
-      documents[0]?.path ?? "requirements.md",
+      documents[0]?.path ?? "requirement.req.md",
       "Planning decisions require actor, time, and decision source.",
       "Record independently reviewable decision provenance.",
     ));

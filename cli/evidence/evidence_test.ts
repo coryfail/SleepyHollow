@@ -121,10 +121,11 @@ async function writeEndpoint(
   projectRoot: string,
   directory: string,
   source: string,
+  filename = `${directory.split("/").at(-1)}.req.md`,
 ): Promise<void> {
   await Deno.mkdir(`${projectRoot}/api/${directory}`, { recursive: true });
   await Deno.writeTextFile(
-    `${projectRoot}/api/${directory}/requirements.md`,
+    `${projectRoot}/api/${directory}/${filename}`,
     source,
   );
 }
@@ -153,7 +154,7 @@ Deno.test("AC-F018-001 · the loader assembles evidence matching the project on 
   const project = await resolveProjectLocations({ projectRoot: root });
   assert.equal(project.name, "bookmarks");
   assert.equal(project.apiDirectory, "api");
-  assert.equal(project.requirementsFile, "requirements/application.md");
+  assert.equal(project.requirementsFile, "requirements/application.req.md");
   assert.equal(project.generatedDirectory, "generated");
 
   const inventory = await loadRequirementEvidence(project, {
@@ -165,7 +166,7 @@ Deno.test("AC-F018-001 · the loader assembles evidence matching the project on 
   assert.ok(created);
   assert.equal(created.status, "approved");
   assert.deepEqual(created.criteria.map((item) => item.id), ["AC-EP-001"]);
-  assert.equal(created.path, "api/bookmarks/requirements.md");
+  assert.equal(created.path, "api/bookmarks/bookmarks.req.md");
 });
 
 Deno.test("AC-F018-002 · a governed change leaves the recorded approval unbound", async () => {
@@ -277,7 +278,7 @@ Deno.test("AC-F018-006 · discovery reads only declared locations", async () => 
   );
   await Deno.mkdir(`${root}/notes`, { recursive: true });
   await Deno.writeTextFile(
-    `${root}/notes/requirements.md`,
+    `${root}/notes/notes.req.md`,
     endpointRequirement({ id: "EP-OUTSIDE-DECLARED" }),
   );
   const project = await resolveProjectLocations({ projectRoot: root });
@@ -318,6 +319,57 @@ Deno.test("AC-F018-007 · malformed and duplicate requirements fail closed", asy
   assert.ok(reported.includes("SH_EVIDENCE_REQUIREMENT_DUPLICATE"));
 });
 
+Deno.test("AC-NRF-003 · discovery loads multiple named requirements from one directory", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+    "create-bookmark.req.md",
+  );
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({
+      id: "EP-BOOKMARKS-LIST",
+      criteria: ["AC-EP-002"],
+    }),
+    "list-bookmarks.req.md",
+  );
+  const project = await resolveProjectLocations({ projectRoot: root });
+  const inventory = await loadRequirementEvidence(project, {
+    projectRoot: root,
+  });
+  assert.deepEqual(inventory.requirements.map((item) => item.id), [
+    "EP-BOOKMARKS-CREATE",
+    "EP-BOOKMARKS-LIST",
+  ]);
+  assert.deepEqual(inventory.requirements.map((item) => item.path), [
+    "api/bookmarks/create-bookmark.req.md",
+    "api/bookmarks/list-bookmarks.req.md",
+  ]);
+});
+
+Deno.test("AC-NRF-005 · legacy requirement filenames fail with migration guidance", async () => {
+  const root = await scaffold();
+  await Deno.mkdir(`${root}/api/bookmarks`, { recursive: true });
+  await Deno.writeTextFile(
+    `${root}/api/bookmarks/requirements.md`,
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  const project = await resolveProjectLocations({ projectRoot: root });
+  const error = await caught(() =>
+    loadRequirementEvidence(project, { projectRoot: root })
+  );
+  assert.ok(error instanceof EvidenceError);
+  const diagnostic = error.diagnostics.find((item) =>
+    item.code === "SH_EVIDENCE_REQUIREMENT_LEGACY_FILENAME"
+  );
+  assert.ok(diagnostic);
+  assert.equal(diagnostic.path, "api/bookmarks/requirements.md");
+  assert.match(diagnostic.correction, /\.req\.md/);
+});
+
 Deno.test("AC-F018-012 · multi-service discovery is scoped per service", async () => {
   const root = await scaffold();
   await Deno.mkdir(`${root}/services/orders/api/orders`, { recursive: true });
@@ -325,11 +377,11 @@ Deno.test("AC-F018-012 · multi-service discovery is scoped per service", async 
     recursive: true,
   });
   await Deno.writeTextFile(
-    `${root}/services/orders/api/orders/requirements.md`,
+    `${root}/services/orders/api/orders/orders.req.md`,
     endpointRequirement({ id: "EP-ORDERS-CREATE" }),
   );
   await Deno.writeTextFile(
-    `${root}/services/billing/api/invoices/requirements.md`,
+    `${root}/services/billing/api/invoices/invoices.req.md`,
     endpointRequirement({ id: "EP-INVOICES-CREATE", criteria: ["AC-EP-003"] }),
   );
   await Deno.writeTextFile(
@@ -375,6 +427,28 @@ Deno.test("AC-F018-013 · a missing or invalid project configuration fails close
     await caught(() => resolveProjectLocations({ projectRoot: invalid })),
   );
   assert.ok(reported.includes("SH_EVIDENCE_PROJECT_CONFIG_INVALID"));
+
+  const legacy = await Deno.makeTempDir({ prefix: "sh-evidence-legacy-" });
+  await Deno.writeTextFile(
+    `${legacy}/sleepyhollow.config.ts`,
+    `export default {
+  name: "legacy",
+  apiDirectory: "api",
+  requirementsFile: "requirements/application.md",
+  generatedDirectory: "generated",
+};
+`,
+  );
+  const legacyError = await caught(() =>
+    resolveProjectLocations({ projectRoot: legacy })
+  );
+  assert.ok(legacyError instanceof EvidenceError);
+  const legacyDiagnostic = legacyError.diagnostics.find((item) =>
+    item.code === "SH_EVIDENCE_REQUIREMENT_LEGACY_FILENAME"
+  );
+  assert.ok(legacyDiagnostic);
+  assert.equal(legacyDiagnostic.path, "requirements/application.md");
+  assert.match(legacyDiagnostic.correction, /application\.req\.md/);
 });
 
 function captureArtifact(

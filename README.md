@@ -167,10 +167,11 @@ release, and hotfix procedures.
 
 Sleepy Hollow develops itself using the process it provides. The application
 specification lives at
-[requirements/application.md](requirements/application.md), and component
+[requirements/application.req.md](requirements/application.req.md), and component
 requirements are colocated with their tests and implementation under
 [`cli/`](cli/), [`core/`](core/), and [`skills/`](skills/). Repository-wide
-behavior is governed by the root [requirements.md](requirements.md).
+behavior is governed by named `*.req.md` files, including the root
+[repository requirement](repository.req.md).
 
 ## License
 

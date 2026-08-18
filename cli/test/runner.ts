@@ -57,7 +57,7 @@ function permissionArgs(
         path === ".github" || path.startsWith(".github/") ||
         path === "generated" || path.startsWith("generated/") ||
         path === "deno.json" || path === "deno.lock" ||
-        path.endsWith("requirements.md") || path.includes("/requirements.md")
+        path.endsWith(".req.md")
       )
     ) {
       throw new TypeError("Test write permission includes governed output");

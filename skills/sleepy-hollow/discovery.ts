@@ -62,7 +62,7 @@ function diagnostic(
 ): SkillDiagnostic {
   return {
     code,
-    path: "requirements/application.md",
+    path: "requirements/application.req.md",
     line: 1,
     column: 1,
     message,

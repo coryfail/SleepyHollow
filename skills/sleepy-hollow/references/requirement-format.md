@@ -8,9 +8,10 @@ delimiter are invalid.
 
 ## Placement
 
-- `requirements/application.md` owns application-wide intent and is the only
+- `requirements/application.req.md` owns application-wide intent and is the only
   item in the top-level `requirements/` directory.
-- A component or endpoint `requirements.md` lives beside the behavior it owns.
+- A component or endpoint uses a meaningful named `*.req.md` file beside the
+  behavior it owns. A directory may contain multiple named requirement files.
 
 ## Frontmatter
 

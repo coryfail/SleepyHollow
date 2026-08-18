@@ -1,6 +1,6 @@
 # SGAD artifacts and lifecycle
 
-SGAD uses an embedded governance record in each governed `requirements.md` to
+SGAD uses an embedded governance record in each governed `*.req.md` file to
 connect intent, authority, execution, and evidence. This document defines the
 record's responsibilities without requiring a particular repository or CI tool.
 
@@ -23,7 +23,7 @@ repository revisions, or deterministic references.
 ## Embedded record
 
 Approval and evidence are required functions, and their canonical record lives
-inside the governed `requirements.md`. Append a `Governance record` after the
+inside the governed `*.req.md` file. Append a `Governance record` after the
 behavioral specification with approval, criterion mapping, red-state evidence,
 verification, and applicable delivery subsections.
 
@@ -43,7 +43,7 @@ results, and linked provenance.
 
 ## Application specification
 
-The application specification lives at `requirements/application.md` and is the
+The application specification lives at `requirements/application.req.md` and is the
 authoritative system-level intent. It
 defines:
 
@@ -56,14 +56,14 @@ defines:
 
 Component specifications refine it and may not silently contradict it.
 
-The top-level `requirements/` directory contains only `application.md`.
+The top-level `requirements/` directory contains `application.req.md`.
 Repository-wide behavior that cannot be owned by the application or one
-component may use root `requirements.md`.
+component may use a meaningful root-level `*.req.md` file.
 
 ## Component specification
 
 A component specification is the smallest independently approvable unit of
-behavior. Its `requirements.md` is colocated with the component it owns and
+behavior. Its named `*.req.md` file is colocated with the component it owns and
 contains machine-readable metadata and human-readable intent.
 
 Recommended metadata:
@@ -128,14 +128,14 @@ Recommended embedded approval fields:
 
 An approval decision may come from a protected pull-request review, signed
 decision, ticket, repository policy, or another auditable authority. Record that
-source in `requirements.md`; the verifier must determine that the approver was
+source in the named requirement file; the verifier must determine that the approver was
 authorized and the digest matches current governed content.
 
 ## Acceptance-test mapping
 
 The embedded mapping connects criteria to tests and tests back to criteria. Test
 names, test metadata, or generated analysis may supply deterministic inputs, but
-the resolved mapping remains in the governed `requirements.md`.
+the resolved mapping remains in the governed `*.req.md` file.
 
 The mapping reports:
 
@@ -175,7 +175,7 @@ Uncommitted or external state must be captured explicitly if it affects results.
 
 ## Verification entry
 
-The verification entry in `requirements.md` binds current execution evidence to
+The verification entry in the named `*.req.md` file binds current execution evidence to
 approved intent. It includes:
 
 - Requirement and approval digests.
@@ -234,7 +234,7 @@ implementation:
 
 ```text
 component/
-├── requirements.md
+├── feature.req.md
 ├── component.test.ts
 └── component.ts
 ```

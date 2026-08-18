@@ -15,12 +15,13 @@ Placement follows ownership, and the verifier reads it from the path:
 
 | File | Owns |
 | ---- | ---- |
-| `requirements/application.md` | Application-wide intent, shared architecture, cross-cutting criteria |
-| `api/<route>/requirements.md` | One endpoint's behavior, beside the route it governs |
-| `<component>/requirements.md` | One subsystem's behavior, beside its code |
+| `requirements/application.req.md` | Application-wide intent, shared architecture, cross-cutting criteria |
+| `api/<route>/<endpoint>.req.md` | One endpoint's behavior, beside the route it governs |
+| `<component>/<feature>.req.md` | One subsystem's behavior, beside its code |
 
-`requirements/application.md` is the only file in the top-level `requirements/`
-directory. Everything else sits next to the behavior it describes, so moving
+`requirements/application.req.md` owns application-wide behavior. Everything
+else uses a meaningful named `*.req.md` file next to the behavior it describes,
+so one directory may contain several independently governed features and moving
 code moves its governing intent with it.
 
 ## The file
@@ -83,7 +84,7 @@ evidence, and verification. Append to it; never rewrite an old entry to make
 stale evidence look current.
 
 Approval is bound to a SHA-256 digest of the governed content. The canonical
-algorithm has one definition, in the repository's root `requirements.md`, and
+algorithm has one definition, in the repository's root `repository.req.md`, and
 [Verification](verification.md) explains why editing an approved requirement
 detaches its approval. Do not reimplement the digest from either description —
 `deno task check:governance` computes it.

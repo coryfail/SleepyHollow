@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F009
 title: Official Sleepy Hollow agent skill
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "3"
@@ -62,7 +62,7 @@ conventions but shall not replace the official workflow.
 - AC-F009-002: The skill produces a complete application requirement and requests
   design review before creating endpoint tests or source files.
 - AC-F009-003: After application approval, the skill decomposes every proposed
-  endpoint into `requirements.md` files and presents the inventory without
+  endpoint into named `<requirement-id>.req.md` files and presents the inventory without
   generating endpoint code.
 - AC-F009-004: The skill accepts approval, revision, deferral, or rejection at the
   individual endpoint level.
@@ -98,6 +98,18 @@ file editing. OPEN-010 evaluates which portable guidance remains reliable across
 hosts.
 
 ## Governance record
+
+### Invalidation, 0.2.0 named requirement files
+
+- Status: prior approval and verification are stale for current content.
+- Invalidated at: 2026-08-18T13:18:57Z.
+- Reason: governed prose changed to adopt the approved named `*.req.md`
+  convention and current artifact paths.
+- Superseding authority: `named-requirement-files`, approved for AC-NRF-001
+  through AC-NRF-014 at
+  `sha256:e75c7a3c82796f8833779e32e3a740e02011cd35754082b7bc233b6f0baeb0eb`.
+- Historical entries below remain intact and apply only to their recorded
+  content digests and revisions.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The

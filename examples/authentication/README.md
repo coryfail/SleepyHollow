@@ -53,6 +53,6 @@ curl -i -H 'authorization: Bearer sleepy-hollow-demo-token' http://127.0.0.1:800
 
 ## Where the rules live
 
-`requirements/application.md` records the application-wide decision to require
-authentication. `api/hello/requirements.md` owns the route's criteria, and each
-carries its own approval bound to the exact content approved.
+`requirements/application.req.md` records the application-wide decision to
+require authentication. `api/hello/hello.req.md` owns the route's criteria, and
+each carries its own approval bound to the exact content approved.

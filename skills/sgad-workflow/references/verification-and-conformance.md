@@ -55,7 +55,7 @@ Assess optional profiles only after SGAD Core is satisfied:
 - Delivery-Gated
 - AI-System-Evaluated
 
-State `SGAD Core 0.1 with exceptions` when active exceptions remain. Identify the
+State `SGAD Core 0.2.0 with exceptions` when active exceptions remain. Identify the
 unmet rule, bounded scope and duration, authority, residual risk, compensating
 controls, and removal condition.
 

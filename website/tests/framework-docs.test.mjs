@@ -6,7 +6,7 @@
  * one — `website-docs-section` already owns how these files are published.
  */
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -15,7 +15,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repository = resolve(here, "../..");
 const read = (path) => readFileSync(resolve(repository, path), "utf8");
 
-const SKILL_INSTALL = "npx skills add coryfail/SleepyHollow --skill sleepy-hollow";
+const SKILL_INSTALL =
+  "npx skills add coryfail/SleepyHollow --skill sleepy-hollow";
 
 /** Every published file, governance included — what AC-FWDOC-007 must cover. */
 const frameworkGuides = () =>
@@ -27,7 +28,7 @@ const frameworkGuides = () =>
 /**
  * Reader-facing prose only.
  *
- * `requirements.md` states what the guides must say, in nearly the words they
+ * `framework.req.md` states what the guides must say, in nearly the words they
  * must say it. Including it here would let this component's own governance
  * satisfy the checks that govern it, which is a green light for an unwritten
  * guide. Content criteria read the guides; AC-FWDOC-007 reads everything.
@@ -77,27 +78,39 @@ test("AC-FWDOC-003 · the requirement format is documented for a reader without 
       `writing-requirements.md must document the ${field} frontmatter field`,
     );
   }
-  assert.match(guide, /## Governance record/, "must document the reserved governance boundary");
-  assert.match(guide, /AC-[A-Z0-9-]+-\d{3}/, "must show acceptance-criterion identity");
   assert.match(
     guide,
-    /requirements\/application\.md/,
+    /## Governance record/,
+    "must document the reserved governance boundary",
+  );
+  assert.match(
+    guide,
+    /AC-[A-Z0-9-]+-\d{3}/,
+    "must show acceptance-criterion identity",
+  );
+  assert.match(
+    guide,
+    /requirements\/application\.req\.md/,
     "must document where an application requirement lives",
   );
   assert.match(
     guide,
-    /requirements\.md/,
+    /<feature>\.req\.md/,
     "must document component requirement placement",
   );
 });
 
 test("AC-FWDOC-004 · the guide and the installed skill's reference agree", () => {
   const guide = read("docs/framework/writing-requirements.md");
-  const reference = read("skills/sleepy-hollow/references/requirement-format.md");
+  const reference = read(
+    "skills/sleepy-hollow/references/requirement-format.md",
+  );
 
   // Placement and boundary are the two facts an agent and a human must not
   // learn differently, because both produce files the same verifier reads.
-  for (const shared of ["requirements/application.md", "## Governance record"]) {
+  for (
+    const shared of ["requirements/application.req.md", "## Governance record"]
+  ) {
     assert.ok(
       guide.includes(shared) && reference.includes(shared),
       `both documents must state ${shared}`,
@@ -107,8 +120,8 @@ test("AC-FWDOC-004 · the guide and the installed skill's reference agree", () =
   // Exactly one canonical digest algorithm exists. Neither document may restate
   // it as a competing procedure; both may cite it.
   const restatesAlgorithm = (text) =>
-    /omitting the single top-level frontmatter `?status:?`? line/i.test(text)
-    && /\bSHA-?256\b/i.test(text);
+    /omitting the single top-level frontmatter `?status:?`? line/i.test(text) &&
+    /\bSHA-?256\b/i.test(text);
   assert.equal(
     restatesAlgorithm(guide),
     false,
@@ -123,17 +136,28 @@ test("AC-FWDOC-004 · the guide and the installed skill's reference agree", () =
 
 test("AC-FWDOC-005 · every installable artifact a guide names resolves", () => {
   const prose = guideProse();
-  const skills = readdirSync(resolve(repository, "skills"), { withFileTypes: true })
+  const skills = readdirSync(resolve(repository, "skills"), {
+    withFileTypes: true,
+  })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name);
 
   for (const [, name] of prose.matchAll(/--skill ([a-z0-9-]+)/g)) {
-    assert.ok(skills.includes(name), `guides name skill '${name}', which has no directory under skills/`);
+    assert.ok(
+      skills.includes(name),
+      `guides name skill '${name}', which has no directory under skills/`,
+    );
   }
 
   const { name } = JSON.parse(read("deno.json"));
-  for (const [, specifier] of prose.matchAll(/jsr:(@[a-z0-9-]+\/[a-z0-9-]+)/g)) {
-    assert.equal(specifier, name, `guides install '${specifier}' but deno.json publishes '${name}'`);
+  for (
+    const [, specifier] of prose.matchAll(/jsr:(@[a-z0-9-]+\/[a-z0-9-]+)/g)
+  ) {
+    assert.equal(
+      specifier,
+      name,
+      `guides install '${specifier}' but deno.json publishes '${name}'`,
+    );
   }
 });
 
@@ -157,7 +181,10 @@ test("AC-FWDOC-007 · every framework guide has a reading-order position and a s
   const listed = [...order.matchAll(/"([^"]+)"/g)].map((match) => match[1]);
 
   for (const slug of frameworkGuides()) {
-    assert.ok(listed.includes(slug), `docs/framework/${slug}.md has no READING_ORDER position`);
+    assert.ok(
+      listed.includes(slug),
+      `docs/framework/${slug}.md has no READING_ORDER position`,
+    );
     assert.match(
       generator,
       new RegExp(`"framework/${slug}":\\s*"[^"]+"`),
@@ -173,7 +200,11 @@ test("AC-FWDOC-008 · getting-started introduces identifiers before it depends o
   // example. Whatever position those appear in, the guide must have already
   // explained where an approved requirement comes from.
   const dependency = guide.search(/requirementId:/);
-  assert.notEqual(dependency, -1, "expected the criterionTest example to remain in the guide");
+  assert.notEqual(
+    dependency,
+    -1,
+    "expected the criterionTest example to remain in the guide",
+  );
 
   const introduction = guide.search(/writing-requirements|npx skills add/);
   assert.notEqual(
