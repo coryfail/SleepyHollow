@@ -285,7 +285,7 @@ It does not authorize release delivery.
   skill
   `sha256:7f6f8fe02f0f0b5017c652f2b5dcfffae9c24ce9b2b07c1eb5cfe25abc19dea3`;
   repository
-  `sha256:ee27e1ac5b6539ca922c979ccccb573f869cffb89e69fa2e02ba86f6e44f92ac`;
+  `sha256:27fc9586687684a630626d45a9529d0c1ea68b094096fe05688ae0e9a2d8da03`;
   site structure
   `sha256:ffb217cf818987b65ca4582fefb0d7abc4af785a55f00c0e0368dcb35eeafa1f`;
   browser
@@ -293,6 +293,11 @@ It does not authorize release delivery.
 - Healthy controls: unchanged test-command behavior passed 12/12 before the
   added governed-write case; the remaining planning and skill cases stayed
   green; and 29/31 website structural checks remained green.
+- CI-correction replay: on 2026-08-18T13:54:11Z, the finalized repository test
+  again failed as expected against the clean pre-migration baseline (4 passed,
+  8 failed). The failures remained about absent named artifacts, paths, CI
+  patterns, and release versions; the corrected historical lookup did not make
+  a missing implementation appear green.
 
 ### Verification
 
@@ -323,6 +328,9 @@ It does not authorize release delivery.
   legacy-path strings outside governed history are bounded migration
   diagnostics, negative assertions, and baseline-comparison fixtures.
 - `git diff --check` passed.
+- CI-correction follow-up: the historical-baseline lookup was made resilient to
+  shallow checkouts and later revisions, then the complete `npm run verify` gate
+  passed again, including all 135 Playwright browser checks.
 - Residual risk: this is a pre-1.0 filename compatibility break, so downstream
   0.1.x projects must apply the documented rename and configuration migration.
   Delivery evidence and a committed revision are intentionally absent.
