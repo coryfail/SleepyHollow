@@ -357,8 +357,9 @@ test("AC-SITE-015 · a curated guide whose source file is missing fails the buil
 test("AC-SITE-013 AC-DOCS-005 · the generated API reference is built and linked", () => {
   const manifest = JSON.parse(read("package.json"));
   const api = `${manifest.scripts["docs:api"] ?? ""} ${manifest.scripts["docs:api:generate"] ?? ""} ${manifest.scripts["docs:api:link"] ?? ""}`;
-  assert.match(api, /typedoc/);
-  assert.match(api, /--out website\/dist\/api/);
+  assert.match(api, /\.\/node_modules\/\.bin\/typedoc/, "the locked website TypeDoc binary must generate the reference");
+  assert.match(api, /--tsconfig \.\.\/tsconfig\.json/, "the generator must use the framework TypeScript config");
+  assert.match(api, /--out dist\/api/);
   assert.match(api, /brand-api-reference/, "the generated reference must be linked back to the site");
   assert.match(manifest.scripts.postbuild ?? "", /docs:api/);
   assert.match(manifest.scripts.prebuild ?? "", /docs:build/);

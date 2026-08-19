@@ -101,7 +101,10 @@ test("AC-SITE-013 · the generated API reference is published and reachable", as
   await page.getByRole("link", { name: /API reference/i }).first().click();
   await expect(page).toHaveURL(/\/api\/$/);
   await expect(page.locator("body")).toContainText(/Sleepy Hollow/i);
-  await expect(page.getByRole("link", { name: /defineRoute/ }).first())
+  // The landing page describes the package; TypeDoc groups exported symbols in
+  // their module pages. Check a real exported symbol where TypeDoc owns it.
+  await page.goto("/api/modules/core_routing_mod.html");
+  await expect(page.getByRole("link", { name: "defineRoute", exact: true }).first())
     .toBeVisible();
   expect(failures).toEqual([]);
 

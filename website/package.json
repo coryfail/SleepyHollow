@@ -9,7 +9,7 @@
   "scripts": {
     "docs:build": "node scripts/generate-docs.mjs",
     "docs:api": "npm run docs:api:generate && npm run docs:api:link",
-    "docs:api:generate": "cd .. && npx typedoc --name 'Sleepy Hollow' --out website/dist/api mod.ts core/routing/mod.ts core/validation/mod.ts core/database/mod.ts core/security/mod.ts core/config/mod.ts core/services/mod.ts core/testing/mod.ts core/capture/mod.ts",
+    "docs:api:generate": "./node_modules/.bin/typedoc --tsconfig ../tsconfig.json --name 'Sleepy Hollow' --out dist/api ../mod.ts ../core/routing/mod.ts ../core/validation/mod.ts ../core/database/mod.ts ../core/security/mod.ts ../core/config/mod.ts ../core/services/mod.ts ../core/testing/mod.ts ../core/capture/mod.ts",
     "docs:api:link": "node scripts/brand-api-reference.mjs",
     "predev": "npm run docs:build",
     "dev": "vite",
