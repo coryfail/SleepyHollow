@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "mod.ts",
+    "cli/**/*.ts",
+    "core/**/*.ts",
+    "packaging/**/*.ts",
+    "scripts/**/*.ts",
+    "skills/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["dist", "node_modules", "website", "examples", "**/*_test.ts", "**/type_test.ts"]
+}

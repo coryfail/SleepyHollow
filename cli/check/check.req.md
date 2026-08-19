@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F008
 title: Independent verification
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "3.6"
@@ -36,7 +36,7 @@ claim of completion.
 
 - Deterministic whole-project and safely targeted verification through
   `hollow check`.
-- Bounded type checking and native Deno test execution.
+- Bounded type checking and pinned Node-hosted test execution.
 - Exact approval, red-state, implementation, and requirements-to-test evidence.
 - Route, method, schema, security, index, query-bound, and concurrency checks.
 - OpenAPI, documentation, generated-client, and manifest consistency.
@@ -99,7 +99,7 @@ allow project metadata to disable, replace, reorder, or mark them successful:
 1. repository and governance structure, including exact current approval
    digests, bounded approved criteria, dependency resolution, credible red-state
    evidence, and status honesty;
-2. type-check runner and native Deno criterion-test runner health;
+2. type-check runner and pinned criterion-test runner health;
 3. bidirectional SH-F007 traceability, unchanged governed test mappings, and all
    selected mapped test results;
 4. approved endpoint path/method inventory against SH-F002 discovery, with no
@@ -137,7 +137,7 @@ selected criteria and integration checks pass, and no applicable error remains.
 
 ### Runners and resource safety
 
-The CLI shall launch the pinned Deno executable directly without a shell, using
+The CLI shall launch the supported Node executable and pinned tool modules directly without a shell, using
 sorted explicit source/test paths discovered under canonical project roots,
 frozen lockfile behavior, and cached dependencies only. It shall not execute an
 arbitrary task or command string from project source. Tests run from the project
@@ -154,8 +154,8 @@ minutes, terminate its child on expiry or caller cancellation, and cap retained
 stdout and stderr to one MiB per stream. Diagnostics shall recursively apply
 SH-F005/SH-F012 redaction and shall not include environment values, credentials,
 request bodies, arbitrary stack traces, or unbounded child output. Deterministic
-unit tests may inject a runner; production verification uses the direct Deno
-runner.
+unit tests may inject a runner; production verification uses the direct
+Node-hosted runner.
 
 ### Result and diagnostics contract
 
@@ -373,3 +373,14 @@ other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, deployment, or external
   mutation was authorized or attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F008.
+- Governed-content digest:
+  `sha256:bcd51a36d292d71b0b51c632550929d8b9bf29c8879365285c42a9cb6b5b4b0d`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

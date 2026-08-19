@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash } from "crypto";
 
 function stable(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(stable);

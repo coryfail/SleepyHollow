@@ -1,15 +1,14 @@
-import { defineKvResource } from "@sleepy-hollow/framework/kv";
-import { z } from "@sleepy-hollow/framework/validation";
+import { defineResource } from "@sleepy-hollow/framework/database";
 
-export const todoValue = z.object({
-  title: z.string().min(1).max(200),
-  done: z.boolean(),
-  createdAt: z.string().datetime(),
-});
-
-export const todos = defineKvResource({
+/** The portable relational shape behind the Todo example. */
+export const todos = defineResource({
   name: "todos",
-  id: z.string().uuid(),
-  value: todoValue,
-  indexes: { done: { kind: "index", value: (todo) => todo.done } },
+  primaryKey: "id",
+  fields: {
+    id: { kind: "uuid" },
+    title: { kind: "text" },
+    done: { kind: "boolean" },
+    created_at: { kind: "timestamp" },
+    version: { kind: "integer" },
+  },
 });

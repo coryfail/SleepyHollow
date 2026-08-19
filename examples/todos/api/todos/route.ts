@@ -57,11 +57,7 @@ export default defineRoute({
     contract: { summary: "List todos by done state" },
     handler: async ({ query }) => {
       const repository = await todoRepository();
-      const page = await repository.list({
-        index: "done",
-        value: query.done,
-        limit: query.limit,
-      });
+      const page = await repository.list({ done: query.done, limit: query.limit });
       return Response.json({
         items: page.items.map((entry) => ({ id: entry.id, ...entry.value })),
         cursor: page.cursor,

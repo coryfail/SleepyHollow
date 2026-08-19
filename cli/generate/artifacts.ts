@@ -1,4 +1,5 @@
-import { basename, dirname, join } from "node:path";
+import { platform } from "#platform";
+import { basename, dirname, join } from "path";
 
 import { canonicalJson, digest } from "./canonical.ts";
 import { analyzeChanges } from "./changes.ts";
@@ -44,7 +45,7 @@ export function renderArtifacts(
   ] as const;
   const manifestContent = canonicalJson({
     schema: "sleepy-hollow-generated-manifest/v1",
-    generatorVersion: "0.2.0",
+    generatorVersion: "0.3.0",
     serviceId: normalized.serviceId,
     inputDigest: digest(input),
     artifacts: Object.fromEntries(
@@ -59,36 +60,36 @@ export function renderArtifacts(
 
 async function readText(path: string): Promise<string | undefined> {
   try {
-    return await Deno.readTextFile(path);
+    return await platform.readTextFile(path);
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return undefined;
+    if (platform.isNotFound(error)) return undefined;
     throw error;
   }
 }
 
 async function exists(path: string): Promise<boolean> {
   try {
-    await Deno.lstat(path);
+    await platform.lstat(path);
     return true;
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return false;
+    if (platform.isNotFound(error)) return false;
     throw error;
   }
 }
 
 async function copyEntry(source: string, target: string): Promise<void> {
-  const info = await Deno.lstat(source);
-  if (info.isDirectory) {
-    await Deno.mkdir(target, { recursive: true });
-    for await (const entry of Deno.readDir(source)) {
+  const info = await platform.lstat(source);
+  if (info.isDirectory()) {
+    await platform.mkdir(target, { recursive: true });
+    for await (const entry of platform.readDir(source)) {
       await copyEntry(join(source, entry.name), join(target, entry.name));
     }
     return;
   }
-  if (!info.isFile) {
+  if (!info.isFile()) {
     throw new Error(`Refusing to copy unsupported generated entry: ${source}`);
   }
-  await Deno.copyFile(source, target);
+  await platform.copyFile(source, target);
 }
 
 function outputFailure(error: unknown): GenerationError {
@@ -127,7 +128,7 @@ async function writeAtomically(
   rendered: GeneratedArtifacts,
 ): Promise<void> {
   const target = join(projectRoot, "generated");
-  await Deno.mkdir(projectRoot, { recursive: true });
+  await platform.mkdir(projectRoot, { recursive: true });
   const targetExists = await exists(target);
   const priorOwned = targetExists ? await previousOwned(target) : undefined;
   if (targetExists && !priorOwned) {
@@ -143,7 +144,7 @@ async function writeAtomically(
       }
     }
   }
-  const stage = await Deno.makeTempDir({
+  const stage = await platform.makeTempDir({
     dir: dirname(target),
     prefix: `.${basename(target)}-stage-`,
   });
@@ -151,25 +152,25 @@ async function writeAtomically(
   let movedPrior = false;
   try {
     if (targetExists) {
-      for await (const entry of Deno.readDir(target)) {
+      for await (const entry of platform.readDir(target)) {
         if (priorOwned?.has(entry.name)) continue;
         await copyEntry(join(target, entry.name), join(stage, entry.name));
       }
     }
     for (const item of rendered.artifacts) {
-      await Deno.writeTextFile(join(stage, item.path), item.content);
+      await platform.writeTextFile(join(stage, item.path), item.content);
     }
     if (targetExists) {
-      await Deno.rename(target, backup);
+      await platform.rename(target, backup);
       movedPrior = true;
     }
-    await Deno.rename(stage, target);
-    if (movedPrior) await Deno.remove(backup, { recursive: true });
+    await platform.rename(stage, target);
+    if (movedPrior) await platform.remove(backup, { recursive: true });
   } catch (error) {
     if (movedPrior && !(await exists(target)) && await exists(backup)) {
-      await Deno.rename(backup, target);
+      await platform.rename(backup, target);
     }
-    if (await exists(stage)) await Deno.remove(stage, { recursive: true });
+    if (await exists(stage)) await platform.remove(stage, { recursive: true });
     throw outputFailure(error);
   }
 }

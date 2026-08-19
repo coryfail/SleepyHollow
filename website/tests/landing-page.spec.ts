@@ -33,7 +33,7 @@ test("AC-SITE-002 · the two destinations are separate and mutually navigable", 
 test("AC-HOME-001 AC-HOME-005 AC-HOME-010 AC-HOME-016 · home leads as an agentic framework with SGAD built in", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByText(/agentic-first headless API framework for Deno/i).first(),
+    page.getByText(/agentic-first headless API framework for Node\.js and Bun/i).first(),
   ).toBeVisible();
   await expect(
     page.getByText(/Specification-Governed Agentic Development/i).first(),
@@ -65,7 +65,7 @@ test("AC-HOME-018 · the compact method loop is at most four steps and sits abov
 test("AC-HOME-011 AC-HOME-012 AC-HOME-013 AC-HOME-014 · home shows how to install, write, and check a route", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByText("deno add jsr:@sleepy-hollow/framework", { exact: true }),
+    page.getByText("npm install @sleepy-hollow/framework", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText(/defineRoute/).first()).toBeVisible();
   await expect(page.getByText(/hollow check/).first()).toBeVisible();

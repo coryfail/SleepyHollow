@@ -76,8 +76,8 @@ export async function release(
     ok: diagnostics.length === 0,
     name: identity.name,
     version: identity.version,
-    registries: ["jsr"],
-    runtime: "deno",
+    registries: ["npm"],
+    runtime: "node-bun",
     diagnostics,
   };
 }

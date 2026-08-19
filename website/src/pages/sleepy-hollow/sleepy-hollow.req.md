@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: website-sleepy-hollow-page
 title: Sleepy Hollow framework landing page
-status: draft
+status: approved
 risk: standard
 depends_on:
   - sleepy-hollow-website
@@ -15,7 +15,7 @@ owners:
 
 ## Purpose
 
-Position Sleepy Hollow as what it is: an agentic-first API framework for Deno
+Position Sleepy Hollow as what it is: an agentic-first API framework for Node and Bun
 with Specification-Governed Agentic Development built into it. Show that this
 combination lets a developer build API endpoints with AI rapidly, while holding
 that work to the procedures, requirements, and review a senior engineer would
@@ -52,11 +52,12 @@ Two failures this revision corrects:
 
 ## Authorized narrative
 
-- Identify Sleepy Hollow as an agentic-first headless API framework for Deno
+- Identify Sleepy Hollow as an agentic-first headless API framework for Node and Bun
   with SGAD built in, and say plainly what an API framework does for readers who
   need that.
-- Explain Deno briefly for readers who do not know the runtime.
-- State the honest release status: published to JSR, in development, pre-1.0,
+- Explain the included SQLite and optional PostgreSQL profiles for readers who
+  do not know why the database choice affects deployment.
+- State the honest release status: in development, pre-1.0, locally packable for npm,
   API subject to change.
 - Lead with what the framework is for — building API endpoints with AI rapidly,
   under a method that keeps the work to a professional standard — before
@@ -146,13 +147,13 @@ Two failures this revision corrects:
 
 - AC-HOME-001: Given a visitor opens the root page, then the first screen names
   Sleepy Hollow, identifies it as an agentic-first headless API framework for
-  Deno with Specification-Governed Agentic Development built in, and clearly
+  Node and Bun with Specification-Governed Agentic Development built in, and clearly
   states that it is in development and pre-1.0.
 - AC-HOME-002: Given a visitor reads the framework explanation, then the page
   describes the relationship among reviewed requirements, agent implementation,
   test-driven development, deterministic verification, and a deployable API
   without contradicting `requirements/application.req.md`.
-- AC-HOME-003: Given a visitor does not know Deno or deterministic verification,
+- AC-HOME-003: Given a visitor does not know embedded SQLite or deterministic verification,
   then nearby copy explains the essential meaning without requiring specialist
   knowledge.
 - AC-HOME-004: Given SGAD is introduced, then the page expands its name or links
@@ -179,8 +180,8 @@ Two failures this revision corrects:
   evidence-trail path, tree-and-marker illustration, or substitute process
   diagram; typography and restrained atmosphere carry the hero hierarchy.
 - AC-HOME-011: Given a visitor decides to try Sleepy Hollow, then the page shows
-  the copy-pasteable command `deno add jsr:@sleepy-hollow/framework`, shows how
-  to install the `hollow` CLI, and links to the published package on JSR.
+  the copy-pasteable command proven by the local npm package test, shows how to
+  install the `hollow` CLI, and does not claim publication before it occurs.
 - AC-HOME-012: Given a visitor wants to see what using the framework looks like,
   then the page shows a route definition written against the framework's current
   public API, including its declared schemas and its explicit authentication
@@ -438,3 +439,14 @@ other digest normalization is permitted.
 
 - Status: governed by the parent website requirement; no independent page-only
   delivery record exists.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by the Sleepy Hollow landing page.
+- Governed-content digest:
+  `sha256:42fd145521ee277d6d1b6bbeb26512bd6bdd5fa3691547ba177fe3ba51793079`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

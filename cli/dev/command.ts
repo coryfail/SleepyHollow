@@ -1,4 +1,5 @@
-import { isAbsolute, relative, resolve, sep } from "node:path";
+import { platform } from "#platform";
+import { isAbsolute, relative, resolve, sep } from "path";
 
 import { normalizeDiagnostics, renderDevEvent } from "./render.ts";
 import { createLocalDevDependencies } from "./local.ts";
@@ -106,7 +107,7 @@ function changedPaths(
     if (
       local === ".git" || local.startsWith(".git/") ||
       local === "generated" || local.startsWith("generated/") ||
-      local.includes("/.deno/") || local.includes("/node_modules/") ||
+      local.includes("/node_modules/") ||
       /(?:^|\/)(?:\.DS_Store|.*(?:\.swp|~))$/.test(local)
     ) continue;
     normalized.push(local);
@@ -148,7 +149,7 @@ export async function runDevCommand(
   const dependencies = suppliedDependencies ?? createLocalDevDependencies();
   const projectRoot = suppliedDependencies
     ? resolve(io.cwd)
-    : await Deno.realPath(resolve(io.cwd));
+    : await platform.realPath(resolve(io.cwd));
   const signal = dependencies.signal ?? new AbortController().signal;
   let sequence = 0;
   let generation = 1;

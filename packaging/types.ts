@@ -45,7 +45,7 @@ export interface ReleaseResult {
   readonly ok: boolean;
   readonly name: string;
   readonly version: string;
-  readonly registries: readonly ["jsr"];
-  readonly runtime: "deno";
+  readonly registries: readonly ["npm"];
+  readonly runtime: "node-bun";
   readonly diagnostics: readonly ReleaseDiagnostic[];
 }

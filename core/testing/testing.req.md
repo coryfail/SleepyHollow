@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F007
 title: Testing and acceptance-criterion traceability
-status: verified
+status: approved
 risk: standard
 source_sections:
   - "3.6"
@@ -35,7 +35,7 @@ red-green TDD loop and explicit criterion mapping.
 - Endpoint acceptance-test generation from approved criteria.
 - Stable criterion metadata in tests.
 - Expected pre-implementation failure capture.
-- Isolated application and Deno KV test utilities.
+- Isolated application and relational database test utilities.
 - Typed requests, data seeding, principals, Problem Details assertions, and
   generated-client testing.
 - Traceability reports for criteria and tests.
@@ -49,14 +49,15 @@ bound to the current governed-content digest and bounded criteria. A `draft`
 requirement, an approval for stale content, or an approval that omits a
 requested criterion shall fail before a test file is proposed.
 
-OPEN-005 is resolved by a transparent `criterionTest` wrapper over `Deno.test`.
+OPEN-005 is resolved by a transparent `criterionTest` wrapper over the explicitly
+imported pinned Vitest API.
 Each generated acceptance test shall declare a globally stable test ID, one
 requirement ID, a non-empty unique list of approved criterion IDs, a human name,
-and the native Deno test function and options. The wrapper shall register the
-native test with a readable name containing its criterion IDs and expose a
+and the native test function and options. The wrapper shall register the test
+with a readable name containing its criterion IDs and expose a
 frozen descriptor containing the same metadata. It shall reject duplicate test
 IDs, malformed or duplicate criterion IDs, empty names, and metadata that does
-not resolve to the approved requirement. It shall not replace Deno's runner,
+not resolve to the approved requirement. It shall not replace the project runner,
 hide mappings in comments, or require a proprietary test file format.
 
 Every approved criterion shall map to at least one test, and every governed
@@ -103,8 +104,8 @@ or stale manifest prevents the traceability result from supporting `verified`.
 ### Isolated test application
 
 `createTestApplication(options)` shall create one isolated test-mode application
-around an injected application factory. It shall open a fresh in-memory Deno KV
-context, pass that KV together with optional project-defined principal or
+around an injected application factory. It shall open a fresh in-memory
+relational database context, pass its repository context together with optional project-defined principal or
 credential fixtures to the factory, run an optional async seed function, and
 return an idempotently disposable context. Setup failure shall close every
 resource already opened; disposal shall close KV and run registered cleanup even
@@ -164,7 +165,7 @@ the falsehood propagates into verification.
   approved behavior before implementation begins.
 - AC-F007-005: An unrelated type, startup, dependency, or baseline failure stops
   the TDD loop and is reported separately from expected red-state evidence.
-- AC-F007-006: Test utilities start an application with isolated Deno KV state
+- AC-F007-006: Test utilities start an application with isolated database state
   and deterministic cleanup.
 - AC-F007-007: Tests can issue typed requests, seed data, supply project-defined
   principals or credentials, and assert RFC 9457 responses.
@@ -191,7 +192,7 @@ OPEN-005 is resolved by the native `criterionTest` registration and manifest
 contract above. OPEN-006 is resolved by bidirectional dependency closure with
 explicit full-suite escalation. SH-F002 supplies the normalized route inventory
 the test application composes, SH-F003 supplies typed validation and Problem
-Details behavior, SH-F004 supplies isolated Deno KV contexts, SH-F005 supplies
+Details behavior, SH-F004 supplies isolated relational database contexts, SH-F005 supplies
 the security router and project security declaration, and SH-F006 supplies
 approved parsed requirements and dependency metadata.
 
@@ -385,3 +386,14 @@ readability; no other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, or deployment was
   authorized or attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F007.
+- Governed-content digest:
+  `sha256:458fc146f1728350bda38ca2a963dacb475de0c84823095bacbf68f753fa2c00`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

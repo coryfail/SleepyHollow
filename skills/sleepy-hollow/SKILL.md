@@ -1,6 +1,6 @@
 ---
 name: sleepy-hollow
-description: Build and deploy a headless API on the Sleepy Hollow Deno framework. Use when a developer describes an application idea to build, asks to add or change an endpoint in a Sleepy Hollow project, or asks to verify or deploy one. Plans the whole application first, writes requirements beside every endpoint, implements approved behavior through TDD, and verifies with hollow check before deployment.
+description: Build and deploy a headless API on the Sleepy Hollow Node.js and Bun framework. Use when a developer describes an application idea to build, asks to add or change an endpoint in a Sleepy Hollow project, or asks to verify or deploy one. Plans the whole application first, writes requirements beside every endpoint, implements approved behavior through TDD, and verifies with hollow check before deployment.
 ---
 
 # Sleepy Hollow
@@ -76,9 +76,8 @@ reason, stop and report it: that is a broken baseline, not red state.
 Implement the smallest behavior that satisfies the approved contract, then rerun
 the mapped tests. Read [references/tdd.md](references/tdd.md) for the mapping
 and red-state rules, [references/security.md](references/security.md) for
-required request, response, and authorization behavior, and
-[references/deno-kv.md](references/deno-kv.md) for bounded, index-compatible
-data access.
+required request, response, and authorization behavior, and relational resource
+definitions for bounded, index-compatible data access.
 
 ### 5. Verify independently
 

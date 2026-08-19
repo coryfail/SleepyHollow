@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import {
   parseRequirement,
   PlanningError,
@@ -36,7 +37,7 @@ async function collect(
 ): Promise<readonly DiscoveredFile[]> {
   const list = options.listDirectory ?? (async (path: string) => {
     const entries = [];
-    for await (const entry of Deno.readDir(path)) {
+    for await (const entry of platform.readDir(path)) {
       entries.push({
         name: entry.name,
         isDirectory: entry.isDirectory,
@@ -84,7 +85,7 @@ export async function requirements(
   options: EvidenceLoadOptions,
 ): Promise<RequirementInventory> {
   const read = options.readTextFile ??
-    ((path: string) => Deno.readTextFile(path));
+    ((path: string) => platform.readTextFile(path));
   const roots = project.services.length > 0
     ? project.services.map((service) => ({
       absolute: `${project.projectRoot}/${service.apiRoot}`,

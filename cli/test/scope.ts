@@ -1,4 +1,4 @@
-import { isAbsolute, normalize, sep } from "node:path";
+import { isAbsolute, normalize, sep } from "path";
 
 import { selectAffectedTests } from "../../core/testing/mod.ts";
 import type {

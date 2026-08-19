@@ -1,7 +1,7 @@
 ---
 schema: sgad-component/v0.2
 id: SH-F020
-title: Distribution and public API surface
+title: npm distribution and public API surface
 status: approved
 risk: standard
 source_sections:
@@ -10,144 +10,140 @@ source_sections:
 depends_on:
   - SH-F001
   - SH-F011
+  - SH-F021
 owners:
   - Sleepy Hollow maintainers
 ---
 
-# Distribution and public API surface
+# npm distribution and public API surface
 
 ## Purpose
 
-Make Sleepy Hollow installable, and make explicit which of its exports are a
-supported public API that consumers may depend on.
+Publish one verified Node and Bun package with an explicit supported API and an
+ordinary installable `hollow` executable.
 
-The repository currently declares no package name, version, or export map.
-Every `mod.ts` export is therefore equally reachable and equally undefined as
-public or internal, which makes any future change potentially breaking and
-makes compatibility impossible to reason about.
+## Authorized scope
 
-## In scope
+- A root npm package with one semantic version and committed lockfile.
+- Compiled ESM JavaScript, declaration files, source maps, license, readme,
+  changelog, package metadata, explicit exports, and a `hollow` binary.
+- Node 24 LTS as the declared minimum engine and Bun compatibility proven by
+  package-level conformance.
+- npm as the only framework package registry.
+- Packed-artifact installation tests and a release gate that refuses an
+  unverified, dirty, malformed, unpublished-name, or reused-version release.
 
-- A declared package identity and version.
-- An explicit export map naming the supported entry points.
-- Publication to JSR.
-- Documented installation and project-creation instructions that match the
-  published artifacts.
-- A release check that refuses to publish an unverified or inconsistent tree.
+## Identity and public surface
 
-## Requirements
+The repository shall declare one npm package name and one semantic version. The
+package name remains `@sleepy-hollow/framework` unless npm ownership or
+availability verification proves it unusable, in which case changing it
+requires a requirement amendment rather than a silent substitute. A release
+shall never reuse an npm version.
 
-### Identity
+Only entries declared in `package.json` exports are public. The surface shall
+include the application API, routing, validation, database, security,
+configuration, services, testing, capture, generated-client support where
+applicable, and CLI entry point. Removed legacy entry points shall not remain as
+empty compatibility claims. A module reachable only through a deep filesystem
+path is internal.
 
-The repository shall declare one package name and one version. The version
-shall follow semantic versioning, and a release shall not reuse a published
-version.
+The package shall expose a `bin` mapping named `hollow`. Global installation,
+package-manager execution, and local project execution shall reach the same CLI
+contract. Documentation may use `npx hollow` only when a packed or published
+artifact proves that command resolves; otherwise it shall show the scoped
+package invocation accurately.
 
-### Public surface
+## Artifact construction
 
-The package shall declare an explicit export map. Only exported entry points
-are public API. A module reachable only by deep path is internal, and consumers
-depending on it receive no compatibility guarantee.
+Published contents shall be built from strict TypeScript into ESM JavaScript and
+declarations before packing. Consumers shall not execute TypeScript from
+`node_modules`. The tarball shall contain only declared runtime files and
+documentation, including the changelog: no tests, repository governance history,
+local database,
+credentials, website build, development cache, uncompiled source-only entry,
+or unrelated generated artifact.
 
-The public surface shall include the framework runtime entry points a generated
-project imports, the CLI entry point, and nothing whose stability the project is
-unwilling to maintain. Test utilities intended for consumers shall be exported
-deliberately rather than incidentally.
+The package shall install and run from a temporary empty project under Node and
+Bun without repository-relative imports or undeclared dependencies. The npm
+lockfile, package manifest, built export graph, executable permissions, and
+tarball contents shall be deterministic for the verified revision.
 
-A change that removes or narrows a public export is a breaking change and
-requires a major version.
+## Registry and release gate
 
-### Registries
+npm is the only framework registry. Published metadata shall state the Node and
+Bun support policy and shall not imply support for removed runtimes or
+unimplemented deployment providers.
 
-The package shall publish to JSR, and to no other registry. JSR is the registry
-Deno consumers install from, and it serves every published package through an
-npm-compatible registry as well, so a consumer working through npm tooling can
-install the package without a second publication by this project.
+Publication requires the repository verifier, Node package conformance, Bun
+package conformance, clean-tree check, version check, package-name ownership or
+availability check, pack-content check, and provenance inputs to pass for the
+same revision. Published versions and package identity shall be resolved from
+the npm registry through an injected transport at release time, not supplied by
+the caller. An unreachable, malformed, unauthorized, or contradictory registry
+response refuses release.
 
-A second artifact on npm would require a build toolchain the project does not
-otherwise need, would have to be held at the same version as the JSR release,
-and would have to be verified on its own. The project declines that cost.
-
-The publication shall not imply support for runtimes the framework does not
-support. The framework targets Deno, and the published metadata and
-documentation shall state that plainly rather than leaving a consumer to
-discover it through a runtime failure.
-
-### Release gate
-
-Publication shall require that the repository's own verification passes for the
-revision being published. A release shall not proceed from a tree with failing
-checks, uncommitted changes, or a version already published.
-
-The set of already published versions shall be resolved from the registry's own
-listing for the declared package at release time, rather than asserted by the
-caller requesting the release. A caller-supplied list states what the caller
-believes; only the registry knows what it holds, and a JSR version is immutable
-once published, so a release proceeding on a stale belief cannot be undone.
-
-Resolution shall be through a declared transport seam, so the gate's behaviour
-is verifiable without network access and the registry is consulted once, at the
-point of release, rather than by every test run.
-
-A registry that does not answer, or answers in a form the gate cannot read,
-shall refuse the release. An unreachable registry is an unanswered question
-about whether the version is free, and treating an unanswered question as
-permission is what the gate exists to prevent.
+No publish, tag, commit, push, release, package-name reservation, organization
+creation, or ownership mutation is authorized by this requirement. The release
+implementation and tests may construct and install local tarballs only.
 
 ## Acceptance criteria
 
-- AC-F020-001: The repository declares one package name and one semantic
-  version, and the declared version is checked against the versions JSR's
-  listing reports for the declared package, resolved through the gate's
-  transport seam rather than supplied by the caller.
-- AC-F020-002: The package declares an explicit export map, and every entry
-  point it names resolves.
-- AC-F020-003: A module not named in the export map is not reachable as a
-  package import.
-- AC-F020-004: The published metadata and installation documentation state that
-  the framework targets Deno.
-- AC-F020-005: Installation instructions in the repository resolve against the
-  published artifacts for the declared version.
-- AC-F020-006: A release attempt from a tree whose verification fails is
-  refused, and the failing evidence is reported.
-- AC-F020-007: A release attempt reusing an already published version is
-  refused.
+- AC-F020-001: The root manifest declares one name, semantic version, npm
+  lockfile, Node engine, module type, build outputs, and `hollow` binary, and the
+  release gate resolves package identity and versions from npm through an
+  injected transport.
+- AC-F020-002: Every explicit export resolves from the packed artifact under
+  Node and Bun, while an undeclared deep import is rejected.
+- AC-F020-003: The packed tarball contains compiled ESM JavaScript,
+  declarations, source maps, license, readme, changelog, and required runtime
+  assets, and
+  excludes tests, governance records, local data, credentials, caches, and
+  unrelated artifacts.
+- AC-F020-004: A temporary empty project can install the tarball and use the
+  public API and `hollow` executable under Node and Bun without repository
+  access or undeclared dependencies.
+- AC-F020-005: Installation and CLI documentation exactly match commands proven
+  against the packed artifact and state the supported runtime policy.
+- AC-F020-006: A release attempt with failing verification, package
+  conformance, or artifact inspection is refused with the blocking evidence.
+- AC-F020-007: A release attempt reusing an npm version or targeting an
+  unavailable or unauthorized package identity is refused.
 - AC-F020-008: A release attempt from a tree with uncommitted changes is
   refused.
-- AC-F020-009: A release attempt is refused, with the registry's response
-  reported as evidence, when the registry listing cannot be reached or cannot
-  be read.
+- AC-F020-009: An unreachable or malformed npm registry response refuses release
+  rather than treating missing evidence as permission.
+- AC-F020-010: Active package metadata, exports, scripts, locks, documentation,
+  and installation behavior contain no removed registry or runtime dependency.
 
 ## Out of scope
 
-- Supporting Node, Bun, or any runtime other than Deno.
-- A compatibility layer or polyfill for Deno-specific APIs.
-- Publication to npm, and reservation of the package name there. The name is
-  consequently unprotected on that registry.
-- An npm-installable executable. JSR declares no `bin` entry, so the CLI is
-  invoked as `deno run -A jsr:<package>/cli` and is not reachable through
-  `npx`.
-- Automated version selection, changelog generation, or release notes.
+- CommonJS publication.
+- Supporting browsers or every Node-compatible runtime.
 - Publishing the SGAD workflow skill, which SH-F017 owns.
-- Deployment of applications built with the framework, which SH-F013 owns.
+- Application deployment, which SH-F013 owns.
+- Automated semantic-version selection, release notes, changelog generation,
+  commits, pushes, tags, or publication.
 
 ## Dependencies and assumptions
 
-SH-F001 generates projects that import the published package, so the export map
-must satisfy what a generated project imports. SH-F011 owns the CLI entry point
-the package exposes as a binary.
+SH-F001 generates package consumers, SH-F011 owns CLI behavior, and SH-F021 owns
+runtime compatibility. npm organization ownership for the existing scoped name
+has not been demonstrated; local implementation shall retain the intended name
+and report that external publication remains blocked until ownership is proven.
 
-Resolving published versions assumes JSR exposes a listing for the declared
-package and that the release environment can reach it. The transport seam keeps
-that assumption out of the test suite: the gate's behaviour is verified against
-a supplied transport, and the live query happens only when a release is
-attempted.
+## Change impact
 
-The framework depends on Deno KV, Deno Deploy, and Deno runtime APIs. Reach to
-consumers installing through npm tooling comes from JSR's npm-compatible
-registry, which serves the JSR publication rather than a separate artifact.
-That is not a claim of Node support, and this requirement does not introduce
-one.
+This requirement removes the current registry, source-distribution model,
+runtime invocation, export filenames, and release transport. It adds a compiled
+artifact and executable and invalidates the historical approval and verification
+entries below.
+
+## Approval scope
+
+Approval authorizes AC-F020-001 through AC-F020-010 and local build, pack, and
+temporary-install tests. It does not authorize npm publication or any external
+registry mutation.
 
 ## Governance record
 
@@ -403,3 +399,24 @@ readability; no other digest normalization is permitted.
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F020.
+- Governed-content digest:
+  `sha256:add7aa3a8123323a5d090ca36bc68031f152065482b4c7204a1d91fd637bbb96`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Red-state evidence, platform migration baseline
+
+- Status: mixed baseline before implementation.
+- Observed at: 2026-08-19T13:52:03Z.
+- Command: `node --test tests/platform-migration-baseline.test.mjs`.
+- Result: the changelog portion of AC-F020-003 passed because the requested
+  changelog and linked migration notice are present; package construction and
+  packed-artifact behavior remain unimplemented and are covered by the failed
+  AC-F021-001 baseline.

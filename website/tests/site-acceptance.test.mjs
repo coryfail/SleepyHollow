@@ -116,12 +116,12 @@ test("AC-SITE-011 · traceability covers every declared criterion", () => {
 
 test("AC-HOME-001 AC-HOME-003 AC-HOME-016 · home opens as an agentic framework with the method built in", () => {
   const text = prose(home());
-  assert.match(text, /agentic-first headless API framework for Deno/i);
+  assert.match(text, /agentic-first headless API framework for Node\.js and Bun/i);
   assert.match(text, /Specification-Governed Agentic Development/);
   assert.match(text, /built in|built into/i, "SGAD must be presented as part of the framework");
   assert.match(text, /in development/i);
   assert.match(text, /pre-1\.0/i);
-  assert.match(text, /runs JavaScript and TypeScript outside the browser/i);
+  assert.match(text, /Node\.js and Bun/i);
   assert.match(text, /rapidly|quickly|fast/i, "the first screen must say what the framework is for");
 
   // The positioning must be on the first screen, not recovered later.
@@ -221,15 +221,15 @@ test("AC-HOME-006 AC-HOME-007 AC-HOME-010 · home excludes full methodology deta
 
 test("AC-HOME-011 AC-SITE-016 · home shows the real published install commands", () => {
   const text = `${home()}\n${site()}`;
-  assert.match(text, /deno add jsr:@sleepy-hollow\/framework/);
-  assert.match(text, /deno install -A --global --name hollow jsr:@sleepy-hollow\/framework\/cli/);
-  assert.match(site(), /jsr\.io\/@sleepy-hollow\/framework/);
+  assert.match(text, /npm install @sleepy-hollow\/framework/);
+  assert.match(text, /npm install -g @sleepy-hollow\/framework/);
+  assert.match(site(), /npmjs\.com\/package\/@sleepy-hollow\/framework/);
 
-  const manifest = JSON.parse(readFileSync(resolve(repository, "deno.json"), "utf8"));
+  const manifest = JSON.parse(readFileSync(resolve(repository, "package.json"), "utf8"));
   assert.equal(manifest.name, "@sleepy-hollow/framework");
   const readme = readFileSync(resolve(repository, "README.md"), "utf8");
-  assert.match(readme, /deno add jsr:@sleepy-hollow\/framework/);
-  assert.match(readme, /deno install -A --global --name hollow jsr:@sleepy-hollow\/framework\/cli/);
+  assert.match(readme, /npm install -g @sleepy-hollow\/framework/);
+  assert.match(readme, /npm install -g @sleepy-hollow\/framework/);
 });
 
 test("AC-HOME-012 · home shows a route definition written against the current public API", () => {
@@ -357,8 +357,8 @@ test("AC-SITE-015 · a curated guide whose source file is missing fails the buil
 test("AC-SITE-013 AC-DOCS-005 · the generated API reference is built and linked", () => {
   const manifest = JSON.parse(read("package.json"));
   const api = `${manifest.scripts["docs:api"] ?? ""} ${manifest.scripts["docs:api:generate"] ?? ""} ${manifest.scripts["docs:api:link"] ?? ""}`;
-  assert.match(api, /deno doc --html/);
-  assert.match(api, /--output=website\/dist\/api/);
+  assert.match(api, /typedoc/);
+  assert.match(api, /--out website\/dist\/api/);
   assert.match(api, /brand-api-reference/, "the generated reference must be linked back to the site");
   assert.match(manifest.scripts.postbuild ?? "", /docs:api/);
   assert.match(manifest.scripts.prebuild ?? "", /docs:build/);

@@ -14,7 +14,7 @@ owners:
 
 A service is an independently describable and deployable Sleepy Hollow
 application with its own application requirement, runtime configuration, API
-routes, tests, generated contract, deployment, and Deno KV database.
+routes, tests, generated contract, deployment, and owned database binding.
 
 Services own their data. Cross-service access uses the owning service's generated
 client and approved authentication mechanism, propagates request IDs, applies

@@ -1,11 +1,11 @@
-import { isAbsolute, join, relative, sep } from "node:path";
-import { pathToFileURL } from "node:url";
+import { isAbsolute, join, relative, sep } from "path";
+import { pathToFileURL } from "url";
 
 import { discoverRoutes } from "../core/routing/mod.ts";
 import { runCheckCommand, type VerificationInventory } from "./check/mod.ts";
 import {
   buildDeployPlan,
-  createDenoDeployAdapter,
+  createFlyAdapter,
   type DeployAdapter,
   type DeployInventory,
   renderHumanDeployResult,
@@ -428,7 +428,13 @@ function deployHandler(
               ? { confirmationSource: `operator confirmed plan ${digest}` }
               : {}),
           },
-          adapter ?? createDenoDeployAdapter({}),
+          adapter ?? createFlyAdapter({
+            runner: {
+              async run() {
+                throw new Error("No Fly command runner was configured for this invocation.");
+              },
+            },
+          }),
           () => new Date().toISOString(),
         );
       } catch (error) {

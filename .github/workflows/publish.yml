@@ -3,7 +3,7 @@ name: Publish
 # SH-F020 requires that publication proceed only from a revision whose own
 # verification passes, whose tree is clean, and whose version is not already
 # published. This workflow is where that gate is enforced, and publishing from
-# Actions is also what lets JSR attest the artifact's provenance.
+# Actions is also what lets npm attest the artifact's provenance.
 
 on:
   push:
@@ -23,58 +23,28 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # Required for JSR provenance: the OIDC token is what attests that this
+      # Required for npm provenance: the OIDC token is what attests that this
       # artifact was built from this repository at this revision.
       id-token: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Use Deno
-        uses: denoland/setup-deno@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v6
         with:
-          deno-version: 2.9.5
-          cache: true
-          cache-hash: ${{ hashFiles('deno.json', 'deno.lock') }}
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
 
-      - name: Verify governed approvals bind their content
-        run: deno task check:governance
+      - name: Install dependencies
+        run: npm ci
 
       - name: Verify framework
-        run: deno task verify:framework
+        run: npm run verify
 
-      - name: Verify capture
-        run: deno task verify:capture
-
-      - name: Verify project creation
-        run: deno task verify:create
-
-      - name: Verify independent project checking
-        run: deno task verify:check
-
-      - name: Verify CLI dispatch and diagnostics
-        run: deno task verify:cli
-
-      - name: Verify test command
-        run: deno task verify:test-command
-
-      - name: Verify development command
-        run: deno task verify:dev
-
-      - name: Verify evidence loading
-        run: deno task verify:evidence
-
-      - name: Verify deployment
-        run: deno task verify:deploy
-
-      - name: Verify planning workflow
-        run: deno task verify:planning
-
-      - name: Verify skill
-        run: deno task verify:skill
-
-      - name: Verify packaging
-        run: deno task verify:packaging
+      - name: Verify package contents
+        run: npm run pack:check
 
       # AC-F020-001: the tag being released must name the version the package
       # declares, so a tag cannot publish a version other than the one in the
@@ -82,49 +52,37 @@ jobs:
       - name: Check the tag matches the declared version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          declared="$(deno eval --quiet \
-            'const c = JSON.parse(await Deno.readTextFile("deno.json")); console.log(c.version)')"
+          declared="$(node -p 'require("./package.json").version')"
           tagged="${GITHUB_REF_NAME#v}"
           if [ "$declared" != "$tagged" ]; then
             echo "Tag ${GITHUB_REF_NAME} does not match declared version ${declared}." >&2
-            echo "Raise the version in deno.json, or retag the intended revision." >&2
+            echo "Raise the version in package.json, or retag the intended revision." >&2
             exit 1
           fi
           echo "Releasing ${declared}."
 
       # AC-F020-007: a version already on the registry is never republished.
-      # JSR versions are immutable, so this refuses before the upload rather
+      # npm versions are immutable, so this refuses before the upload rather
       # than failing partway through it.
       - name: Refuse a version that is already published
         run: |
-          name="$(deno eval --quiet \
-            'const c = JSON.parse(await Deno.readTextFile("deno.json")); console.log(c.name)')"
-          version="$(deno eval --quiet \
-            'const c = JSON.parse(await Deno.readTextFile("deno.json")); console.log(c.version)')"
-          scope="${name%/*}"
-          scope="${scope#@}"
-          package="${name#*/}"
-          status="$(curl -sS -o /dev/null -w '%{http_code}' \
-            "https://jsr.io/api/scopes/${scope}/packages/${package}/versions/${version}")"
-          case "$status" in
-            200)
-              echo "${name}@${version} is already published, and JSR versions are immutable." >&2
-              echo "Raise the version before releasing again." >&2
-              exit 1
-              ;;
-            404)
-              echo "${name}@${version} is unpublished; proceeding."
-              ;;
-            *)
-              # Anything else means the registry did not answer the question.
-              # Treating that as "unpublished" would be a guess, so refuse.
-              echo "JSR returned ${status} when asked about ${name}@${version}." >&2
-              echo "The release gate cannot confirm the version is unused; refusing." >&2
-              exit 1
-              ;;
-          esac
+          name="$(node -p 'require("./package.json").name')"
+          version="$(node -p 'require("./package.json").version')"
+          if result="$(npm view "${name}@${version}" version --json 2>&1)"; then
+            echo "${name}@${version} is already published, and npm versions are immutable." >&2
+            echo "Raise the version before releasing again." >&2
+            exit 1
+          fi
+          if ! printf '%s' "$result" | grep -q 'E404'; then
+            echo "npm did not confirm whether ${name}@${version} is unused:" >&2
+            printf '%s\n' "$result" >&2
+            exit 1
+          fi
+          echo "${name}@${version} is unpublished; proceeding."
 
       # AC-F020-008: publishing refuses a dirty tree. A fresh checkout is clean
       # by construction, so this asserts nothing above generated a change.
-      - name: Publish to JSR
-        run: deno publish
+      - name: Publish to npm
+        run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

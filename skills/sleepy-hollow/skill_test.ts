@@ -1,4 +1,5 @@
-import assert from "node:assert/strict";
+import { platform } from "#platform";
+import assert from "assert/strict";
 
 import type { CheckResult } from "../../cli/check/mod.ts";
 import type { RedStateResult } from "../../core/testing/mod.ts";
@@ -40,8 +41,8 @@ function redState(overrides: Partial<RedStateResult> = {}): RedStateResult {
     requirementId: "EP-BOOKMARKS-CREATE",
     requirementDigest: "sha256:abc",
     baselineRevision: "96670b3",
-    runner: "deno test",
-    environment: "deno 2.9.5 macos-arm64",
+    runner: "vitest",
+    environment: "node 24 macos-arm64",
     criteria: ["AC-EP-001"],
     tests: [],
     diagnostics: [],
@@ -117,7 +118,7 @@ function caught(fn: () => unknown): unknown {
   assert.fail("Expected the call to throw a SkillError.");
 }
 
-Deno.test("AC-F009-001 · discovery asks only unresolved material questions", () => {
+test("AC-F009-001 · discovery asks only unresolved material questions", () => {
   const asked = deriveDiscoveryQuestions(
     inspection({ resolvedTopics: ["persistence", "authentication"] }),
     "A service that saves bookmarks for signed-in people.",
@@ -132,7 +133,7 @@ Deno.test("AC-F009-001 · discovery asks only unresolved material questions", ()
   }
 });
 
-Deno.test("AC-F009-002 · endpoint artifacts require completed application review", () => {
+test("AC-F009-002 · endpoint artifacts require completed application review", () => {
   assert.throws(
     () =>
       authorizeArtifactCreation("discovery", [
@@ -146,7 +147,7 @@ Deno.test("AC-F009-002 · endpoint artifacts require completed application revie
   ]);
 });
 
-Deno.test("AC-F009-003 · decomposition proposes requirements without endpoint code", () => {
+test("AC-F009-003 · decomposition proposes requirements without endpoint code", () => {
   assert.throws(
     () =>
       authorizeArtifactCreation("decomposition", [
@@ -157,7 +158,7 @@ Deno.test("AC-F009-003 · decomposition proposes requirements without endpoint c
   );
 });
 
-Deno.test("AC-F009-004 · one endpoint approval does not authorize another", () => {
+test("AC-F009-004 · one endpoint approval does not authorize another", () => {
   assert.throws(
     () =>
       authorizeImplementation(
@@ -168,7 +169,7 @@ Deno.test("AC-F009-004 · one endpoint approval does not authorize another", () 
   );
 });
 
-Deno.test("AC-F009-005 · implementation requires approval and expected red state", () => {
+test("AC-F009-005 · implementation requires approval and expected red state", () => {
   authorizeImplementation(work(), redState());
   assert.throws(
     () => authorizeImplementation(work(), undefined),
@@ -180,7 +181,7 @@ Deno.test("AC-F009-005 · implementation requires approval and expected red stat
   );
 });
 
-Deno.test("AC-F009-006 · broken baseline is reported instead of treated as red", () => {
+test("AC-F009-006 · broken baseline is reported instead of treated as red", () => {
   const reported = codes(caught(() =>
     authorizeImplementation(
       work(),
@@ -191,7 +192,7 @@ Deno.test("AC-F009-006 · broken baseline is reported instead of treated as red"
   assert.ok(!reported.includes("SH_SKILL_RED_STATE_REQUIRED"));
 });
 
-Deno.test("AC-F009-007 · bounded repair rejects approved-behavior change", () => {
+test("AC-F009-007 · bounded repair rejects approved-behavior change", () => {
   authorizeRepair({
     requirementId: "EP-BOOKMARKS-CREATE",
     changedFiles: ["api/bookmarks/route.ts"],
@@ -221,7 +222,7 @@ Deno.test("AC-F009-007 · bounded repair rejects approved-behavior change", () =
   );
 });
 
-Deno.test("AC-F009-008 · verification requires passing independent check evidence", () => {
+test("AC-F009-008 · verification requires passing independent check evidence", () => {
   assert.equal(concludeVerification(checkResult(true)), "verified");
   assert.throws(
     () => concludeVerification(undefined),
@@ -234,7 +235,7 @@ Deno.test("AC-F009-008 · verification requires passing independent check eviden
   );
 });
 
-Deno.test("AC-F009-009 · authentication planning records every mandatory element", () => {
+test("AC-F009-009 · authentication planning records every mandatory element", () => {
   validateAuthenticationPlan(authenticationPlan());
   validateAuthenticationPlan({
     required: false,
@@ -256,9 +257,9 @@ Deno.test("AC-F009-009 · authentication planning records every mandatory elemen
   assert.ok(reported.includes("SH_SKILL_AUTH_FORBIDDEN_BEHAVIOR_MISSING"));
 });
 
-Deno.test("AC-F009-010 · first external deployment requires explicit confirmation", () => {
+test("AC-F009-010 · first external deployment requires explicit confirmation", () => {
   authorizeDeployment({
-    target: "deno-deploy:bookmarks",
+    target: "fly:bookmarks",
     firstExternalDeployment: true,
     materiallyRisky: false,
     confirmed: true,
@@ -267,7 +268,7 @@ Deno.test("AC-F009-010 · first external deployment requires explicit confirmati
   assert.throws(
     () =>
       authorizeDeployment({
-        target: "deno-deploy:bookmarks",
+        target: "fly:bookmarks",
         firstExternalDeployment: true,
         materiallyRisky: false,
         confirmed: false,
@@ -278,7 +279,7 @@ Deno.test("AC-F009-010 · first external deployment requires explicit confirmati
   assert.throws(
     () =>
       authorizeDeployment({
-        target: "deno-deploy:bookmarks",
+        target: "fly:bookmarks",
         firstExternalDeployment: false,
         materiallyRisky: true,
         confirmed: true,
@@ -288,7 +289,7 @@ Deno.test("AC-F009-010 · first external deployment requires explicit confirmati
   );
 });
 
-Deno.test("AC-F009-011 · completion reporting covers criteria, evidence, and risks", () => {
+test("AC-F009-011 · completion reporting covers criteria, evidence, and risks", () => {
   const report = buildCompletionReport({
     requirementId: "EP-BOOKMARKS-CREATE",
     changedFiles: ["api/bookmarks/route.ts", "api/bookmarks/route_test.ts"],
@@ -298,8 +299,8 @@ Deno.test("AC-F009-011 · completion reporting covers criteria, evidence, and ri
     check: checkResult(true),
     contractArtifacts: ["generated/openapi.json"],
     deployment: {
-      target: "deno-deploy:bookmarks",
-      url: "https://bookmarks.deno.dev",
+      target: "fly:bookmarks",
+      url: "https://bookmarks.fly.dev",
       revision: "96670b3",
     },
     residualRisks: ["Retention duration remains unresolved."],
@@ -316,16 +317,16 @@ Deno.test("AC-F009-011 · completion reporting covers criteria, evidence, and ri
   assert.equal(report.verification.status, "passed");
   assert.ok(report.verification.evidence.length > 0);
   assert.deepEqual(report.contractArtifacts, ["generated/openapi.json"]);
-  assert.equal(report.deployment?.url, "https://bookmarks.deno.dev");
+  assert.equal(report.deployment?.url, "https://bookmarks.fly.dev");
   assert.deepEqual(report.residualRisks, [
     "Retention duration remains unresolved.",
   ]);
 });
 
-Deno.test("AC-F009-012 · mandatory constraints stay in the primary skill instructions", async () => {
+test("AC-F009-012 · mandatory constraints stay in the primary skill instructions", async () => {
   const primary = {
     path: "skills/sleepy-hollow/SKILL.md",
-    source: await Deno.readTextFile(
+    source: await platform.readTextFile(
       new URL("./SKILL.md", import.meta.url),
     ),
   };
@@ -334,14 +335,13 @@ Deno.test("AC-F009-012 · mandatory constraints stay in the primary skill instru
     "requirement-format.md",
     "tdd.md",
     "security.md",
-    "deno-kv.md",
     "service-design.md",
     "deployment.md",
   ];
   const references = await Promise.all(
     referencePaths.map(async (name) => ({
       path: `skills/sleepy-hollow/references/${name}`,
-      source: await Deno.readTextFile(
+      source: await platform.readTextFile(
         new URL(`./references/${name}`, import.meta.url),
       ),
     })),

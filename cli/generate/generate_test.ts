@@ -1,6 +1,7 @@
-import assert from "node:assert/strict";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { platform } from "#platform";
+import assert from "assert/strict";
+import { join } from "path";
+import { pathToFileURL } from "url";
 
 import {
   analyzeContractChanges,
@@ -95,14 +96,14 @@ function artifact(
 
 let importSequence = 0;
 async function importClient(source: string): Promise<Record<string, unknown>> {
-  const directory = await Deno.makeTempDir({ prefix: "sleepy-hollow-client-" });
+  const directory = await platform.makeTempDir({ prefix: "sleepy-hollow-client-" });
   const path = join(directory, "client.ts");
-  await Deno.writeTextFile(path, source);
+  await platform.writeTextFile(path, source);
   importSequence += 1;
   return await import(`${pathToFileURL(path).href}?fixture=${importSequence}`);
 }
 
-Deno.test("AC-F010-001 · OpenAPI contains every normalized route and method", () => {
+test("AC-F010-001 · OpenAPI contains every normalized route and method", () => {
   const rendered = renderContractArtifacts({
     ...inventory(),
     operations: [
@@ -121,7 +122,7 @@ Deno.test("AC-F010-001 · OpenAPI contains every normalized route and method", (
   assert.equal(openapi.paths["/bookmarks"].post.operationId, "createBookmark");
 });
 
-Deno.test("AC-F010-002 · OpenAPI schemas and security match normalized runtime contracts", () => {
+test("AC-F010-002 · OpenAPI schemas and security match normalized runtime contracts", () => {
   const openapi = JSON.parse(
     artifact(
       renderContractArtifacts(inventory("bookmarks", true)),
@@ -145,7 +146,7 @@ Deno.test("AC-F010-002 · OpenAPI schemas and security match normalized runtime 
   });
 });
 
-Deno.test("AC-F010-003 · local API documentation is self-contained and read-only", () => {
+test("AC-F010-003 · local API documentation is self-contained and read-only", () => {
   const docs = artifact(renderContractArtifacts(inventory()), "api-docs.html");
   assert.match(docs, /<!doctype html>/i);
   assert.match(docs, /Get one bookmark/);
@@ -155,7 +156,7 @@ Deno.test("AC-F010-003 · local API documentation is self-contained and read-onl
   assert.doesNotMatch(docs, /try it|fetch\s*\(/i);
 });
 
-Deno.test("AC-F010-004 · generated clients expose typed inputs, successes, and errors", () => {
+test("AC-F010-004 · generated clients expose typed inputs, successes, and errors", () => {
   const client = artifact(renderContractArtifacts(inventory()), "client.ts");
   assert.match(client, /export interface GetBookmarkInput/);
   assert.match(client, /export type GetBookmarkSuccess/);
@@ -164,7 +165,7 @@ Deno.test("AC-F010-004 · generated clients expose typed inputs, successes, and 
   assert.match(client, /getBookmark/);
 });
 
-Deno.test("AC-F010-005 · generated client accepts base URL and injected fetch", async () => {
+test("AC-F010-005 · generated client accepts base URL and injected fetch", async () => {
   const module = await importClient(
     artifact(renderContractArtifacts(inventory()), "client.ts"),
   );
@@ -189,7 +190,7 @@ Deno.test("AC-F010-005 · generated client accepts base URL and injected fetch",
   assert.equal(requests[0].url, "https://example.test/api/v1/bookmarks/b1");
 });
 
-Deno.test("AC-F010-006 · authentication injection remains identity-model neutral", async () => {
+test("AC-F010-006 · authentication injection remains identity-model neutral", async () => {
   const module = await importClient(
     artifact(
       renderContractArtifacts(inventory("bookmarks", true)),
@@ -218,7 +219,7 @@ Deno.test("AC-F010-006 · authentication injection remains identity-model neutra
   assert.equal(authorization, "Project fixture proof");
 });
 
-Deno.test("AC-F010-007 · response validation rejects contract violations", async () => {
+test("AC-F010-007 · response validation rejects contract violations", async () => {
   const module = await importClient(
     artifact(renderContractArtifacts(inventory()), "client.ts"),
   );
@@ -241,11 +242,11 @@ Deno.test("AC-F010-007 · response validation rejects contract violations", asyn
   );
 });
 
-Deno.test("AC-F010-008 · output is deterministic and check mode detects edited artifacts", async () => {
+test("AC-F010-008 · output is deterministic and check mode detects edited artifacts", async () => {
   const first = renderContractArtifacts(inventory());
   const second = renderContractArtifacts(inventory());
   assert.deepEqual(second, first);
-  const projectRoot = await Deno.makeTempDir({
+  const projectRoot = await platform.makeTempDir({
     prefix: "sleepy-hollow-generate-",
   });
   const written = await generateContracts({
@@ -260,7 +261,7 @@ Deno.test("AC-F010-008 · output is deterministic and check mode detects edited 
     check: true,
   });
   assert.equal(current.ok, true);
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     join(projectRoot, "generated", "client.ts"),
     "// user edit\n",
   );
@@ -277,7 +278,7 @@ Deno.test("AC-F010-008 · output is deterministic and check mode detects edited 
   );
 });
 
-Deno.test("AC-F010-009 · breaking analysis reports every supported category actionably", () => {
+test("AC-F010-009 · breaking analysis reports every supported category actionably", () => {
   const rendered = renderContractArtifacts(inventory("bookmarks", true));
   const current = JSON.parse(artifact(rendered, "openapi.json"));
   const previous = structuredClone(current);
@@ -340,14 +341,14 @@ Deno.test("AC-F010-009 · breaking analysis reports every supported category act
   }
 });
 
-Deno.test("AC-F010-010 · service clients expose HTTP contracts without persistence access", async () => {
+test("AC-F010-010 · service clients expose HTTP contracts without persistence access", async () => {
   const users = renderContractArtifacts(inventory("users"));
   const projects = renderContractArtifacts(inventory("projects"));
   const usersClient = artifact(users, "client.ts");
   const projectsClient = artifact(projects, "client.ts");
   assert.doesNotMatch(
     usersClient + projectsClient,
-    /Deno\.openKv|core\/kv|repository/i,
+    /openEmbeddedSqlite|core\/database|repository/i,
   );
   const module = await importClient(usersClient);
   const createClient = module.createClient as (

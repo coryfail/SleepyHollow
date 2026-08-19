@@ -1,11 +1,11 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 
 import { createRouter, discoverRoutes, RouteDiscoveryError } from "./mod.ts";
 
 const fixture = (name: string) =>
   new URL(`./testdata/${name}/api/`, import.meta.url);
 
-Deno.test("AC-F002-001 · discovers and dispatches a static route", async () => {
+test("AC-F002-001 · discovers and dispatches a static route", async () => {
   const routes = await discoverRoutes(fixture("basic"));
   const response = await createRouter(routes).fetch(
     new Request("https://example.test/health"),
@@ -15,7 +15,7 @@ Deno.test("AC-F002-001 · discovers and dispatches a static route", async () => 
   assert.equal(await response.text(), "healthy");
 });
 
-Deno.test("AC-F002-002 · decodes a dynamic path parameter", async () => {
+test("AC-F002-002 · decodes a dynamic path parameter", async () => {
   const routes = await discoverRoutes(fixture("basic"));
   const response = await createRouter(routes).fetch(
     new Request("https://example.test/bookmarks/sleepy%20hollow"),
@@ -25,7 +25,7 @@ Deno.test("AC-F002-002 · decodes a dynamic path parameter", async () => {
   assert.equal(await response.text(), "sleepy hollow");
 });
 
-Deno.test("AC-F002-001 AC-F002-004 · static paths shadow dynamic siblings", async () => {
+test("AC-F002-001 AC-F002-004 · static paths shadow dynamic siblings", async () => {
   const routes = await discoverRoutes(fixture("precedence"));
   const response = await createRouter(routes).fetch(
     new Request("https://example.test/users/me", { method: "POST" }),
@@ -35,7 +35,7 @@ Deno.test("AC-F002-001 AC-F002-004 · static paths shadow dynamic siblings", asy
   assert.equal(response.headers.get("allow"), "GET");
 });
 
-Deno.test("AC-F002-003 · returns Problem Details for an unknown path", async () => {
+test("AC-F002-003 · returns Problem Details for an unknown path", async () => {
   const routes = await discoverRoutes(fixture("basic"));
   const response = await createRouter(routes).fetch(
     new Request("https://example.test/missing"),
@@ -54,7 +54,7 @@ Deno.test("AC-F002-003 · returns Problem Details for an unknown path", async ()
   });
 });
 
-Deno.test("AC-F002-004 · returns Allow and Problem Details for an unsupported method", async () => {
+test("AC-F002-004 · returns Allow and Problem Details for an unsupported method", async () => {
   const routes = await discoverRoutes(fixture("basic"));
   const response = await createRouter(routes).fetch(
     new Request("https://example.test/health", { method: "POST" }),
@@ -69,7 +69,7 @@ Deno.test("AC-F002-004 · returns Allow and Problem Details for an unsupported m
   assert.equal((await response.json()).status, 405);
 });
 
-Deno.test("AC-F002-005 · reports every ambiguous dynamic route source", async () => {
+test("AC-F002-005 · reports every ambiguous dynamic route source", async () => {
   await assert.rejects(
     () => discoverRoutes(fixture("conflict")),
     (error: unknown) => {
@@ -86,7 +86,7 @@ Deno.test("AC-F002-005 · reports every ambiguous dynamic route source", async (
   );
 });
 
-Deno.test("AC-F002-006 · preserves custom handler metadata and behavior", async () => {
+test("AC-F002-006 · preserves custom handler metadata and behavior", async () => {
   const routes = await discoverRoutes(fixture("custom"));
   const route = routes[0];
 
@@ -103,7 +103,7 @@ Deno.test("AC-F002-006 · preserves custom handler metadata and behavior", async
   assert.equal(await response.text(), "custom");
 });
 
-Deno.test("AC-F002-007 · emits one deterministic normalized inventory", async () => {
+test("AC-F002-007 · emits one deterministic normalized inventory", async () => {
   const first = await discoverRoutes(fixture("basic"));
   const second = await discoverRoutes(fixture("basic"));
 
@@ -132,7 +132,7 @@ Deno.test("AC-F002-007 · emits one deterministic normalized inventory", async (
   ]);
 });
 
-Deno.test("AC-F002-008 · rejects malformed modules and invalid segments", async (test) => {
+test("AC-F002-008 · rejects malformed modules and invalid segments", async (test) => {
   await test.step("malformed module", async () => {
     await assert.rejects(
       () => discoverRoutes(fixture("invalid-module")),

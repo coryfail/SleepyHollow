@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
+import { platform } from "#platform";
+import assert from "assert/strict";
+import { createHash } from "crypto";
 
 import { runCheckCommand } from "../check/mod.ts";
 import { runCli } from "../main.ts";
@@ -16,7 +17,7 @@ import {
 import type { EvidenceDiagnostic } from "./types.ts";
 
 async function scaffold(): Promise<string> {
-  const root = await Deno.makeTempDir({ prefix: "sh-evidence-" });
+  const root = await platform.makeTempDir({ prefix: "sh-evidence-" });
   await createProject({ name: "bookmarks", directory: root });
   return `${root}/bookmarks`;
 }
@@ -123,8 +124,8 @@ async function writeEndpoint(
   source: string,
   filename = `${directory.split("/").at(-1)}.req.md`,
 ): Promise<void> {
-  await Deno.mkdir(`${projectRoot}/api/${directory}`, { recursive: true });
-  await Deno.writeTextFile(
+  await platform.mkdir(`${projectRoot}/api/${directory}`, { recursive: true });
+  await platform.writeTextFile(
     `${projectRoot}/api/${directory}/${filename}`,
     source,
   );
@@ -144,7 +145,7 @@ async function caught(fn: () => Promise<unknown>): Promise<unknown> {
   assert.fail("Expected the load to throw an EvidenceError.");
 }
 
-Deno.test("AC-F018-001 · the loader assembles evidence matching the project on disk", async () => {
+test("AC-F018-001 · the loader assembles evidence matching the project on disk", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -169,7 +170,7 @@ Deno.test("AC-F018-001 · the loader assembles evidence matching the project on 
   assert.equal(created.path, "api/bookmarks/bookmarks.req.md");
 });
 
-Deno.test("AC-F018-002 · a governed change leaves the recorded approval unbound", async () => {
+test("AC-F018-002 · a governed change leaves the recorded approval unbound", async () => {
   const root = await scaffold();
   const source = endpointRequirement({ id: "EP-BOOKMARKS-CREATE" });
   await writeEndpoint(root, "bookmarks", source);
@@ -195,7 +196,7 @@ Deno.test("AC-F018-002 · a governed change leaves the recorded approval unbound
   );
 });
 
-Deno.test("AC-F018-003 · a status-only edit changes no digest or binding", async () => {
+test("AC-F018-003 · a status-only edit changes no digest or binding", async () => {
   const root = await scaffold();
   const source = endpointRequirement({ id: "EP-BOOKMARKS-CREATE" });
   await writeEndpoint(root, "bookmarks", source);
@@ -220,7 +221,7 @@ Deno.test("AC-F018-003 · a status-only edit changes no digest or binding", asyn
   assert.equal(second?.status, "verified");
 });
 
-Deno.test("AC-F018-004 · source-authored verification claims are not admitted", async () => {
+test("AC-F018-004 · source-authored verification claims are not admitted", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -247,7 +248,7 @@ All mapped tests passed and every criterion is covered.
   assert.ok(!serialized.includes("All mapped tests passed"));
 });
 
-Deno.test("AC-F018-005 · identical content produces identical inventories", async () => {
+test("AC-F018-005 · identical content produces identical inventories", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -269,15 +270,15 @@ Deno.test("AC-F018-005 · identical content produces identical inventories", asy
   ]);
 });
 
-Deno.test("AC-F018-006 · discovery reads only declared locations", async () => {
+test("AC-F018-006 · discovery reads only declared locations", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
     "bookmarks",
     endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
   );
-  await Deno.mkdir(`${root}/notes`, { recursive: true });
-  await Deno.writeTextFile(
+  await platform.mkdir(`${root}/notes`, { recursive: true });
+  await platform.writeTextFile(
     `${root}/notes/notes.req.md`,
     endpointRequirement({ id: "EP-OUTSIDE-DECLARED" }),
   );
@@ -287,7 +288,7 @@ Deno.test("AC-F018-006 · discovery reads only declared locations", async () => 
     projectRoot: root,
     readTextFile: (path) => {
       read.push(path);
-      return Deno.readTextFile(path);
+      return platform.readTextFile(path);
     },
   });
   assert.deepEqual(inventory.requirements.map((item) => item.id), [
@@ -297,7 +298,7 @@ Deno.test("AC-F018-006 · discovery reads only declared locations", async () => 
   assert.ok(!read.some((path) => path.includes("/notes/")));
 });
 
-Deno.test("AC-F018-007 · malformed and duplicate requirements fail closed", async () => {
+test("AC-F018-007 · malformed and duplicate requirements fail closed", async () => {
   const root = await scaffold();
   await writeEndpoint(root, "bookmarks", "not a governed requirement\n");
   const project = await resolveProjectLocations({ projectRoot: root });
@@ -319,7 +320,7 @@ Deno.test("AC-F018-007 · malformed and duplicate requirements fail closed", asy
   assert.ok(reported.includes("SH_EVIDENCE_REQUIREMENT_DUPLICATE"));
 });
 
-Deno.test("AC-NRF-003 · discovery loads multiple named requirements from one directory", async () => {
+test("AC-NRF-003 · discovery loads multiple named requirements from one directory", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -350,10 +351,10 @@ Deno.test("AC-NRF-003 · discovery loads multiple named requirements from one di
   ]);
 });
 
-Deno.test("AC-NRF-005 · legacy requirement filenames fail with migration guidance", async () => {
+test("AC-NRF-005 · legacy requirement filenames fail with migration guidance", async () => {
   const root = await scaffold();
-  await Deno.mkdir(`${root}/api/bookmarks`, { recursive: true });
-  await Deno.writeTextFile(
+  await platform.mkdir(`${root}/api/bookmarks`, { recursive: true });
+  await platform.writeTextFile(
     `${root}/api/bookmarks/requirements.md`,
     endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
   );
@@ -370,21 +371,21 @@ Deno.test("AC-NRF-005 · legacy requirement filenames fail with migration guidan
   assert.match(diagnostic.correction, /\.req\.md/);
 });
 
-Deno.test("AC-F018-012 · multi-service discovery is scoped per service", async () => {
+test("AC-F018-012 · multi-service discovery is scoped per service", async () => {
   const root = await scaffold();
-  await Deno.mkdir(`${root}/services/orders/api/orders`, { recursive: true });
-  await Deno.mkdir(`${root}/services/billing/api/invoices`, {
+  await platform.mkdir(`${root}/services/orders/api/orders`, { recursive: true });
+  await platform.mkdir(`${root}/services/billing/api/invoices`, {
     recursive: true,
   });
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     `${root}/services/orders/api/orders/orders.req.md`,
     endpointRequirement({ id: "EP-ORDERS-CREATE" }),
   );
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     `${root}/services/billing/api/invoices/invoices.req.md`,
     endpointRequirement({ id: "EP-INVOICES-CREATE", criteria: ["AC-EP-003"] }),
   );
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     `${root}/sleepyhollow.services.json`,
     JSON.stringify({
       services: [
@@ -411,15 +412,15 @@ Deno.test("AC-F018-012 · multi-service discovery is scoped per service", async 
   assert.equal(invoices?.serviceId, "billing");
 });
 
-Deno.test("AC-F018-013 · a missing or invalid project configuration fails closed", async () => {
-  const empty = await Deno.makeTempDir({ prefix: "sh-evidence-empty-" });
+test("AC-F018-013 · a missing or invalid project configuration fails closed", async () => {
+  const empty = await platform.makeTempDir({ prefix: "sh-evidence-empty-" });
   const missing = codes(
     await caught(() => resolveProjectLocations({ projectRoot: empty })),
   );
   assert.ok(missing.includes("SH_EVIDENCE_PROJECT_CONFIG_MISSING"));
 
-  const invalid = await Deno.makeTempDir({ prefix: "sh-evidence-invalid-" });
-  await Deno.writeTextFile(
+  const invalid = await platform.makeTempDir({ prefix: "sh-evidence-invalid-" });
+  await platform.writeTextFile(
     `${invalid}/sleepyhollow.config.ts`,
     "export default { name: 'broken' };\n",
   );
@@ -428,8 +429,8 @@ Deno.test("AC-F018-013 · a missing or invalid project configuration fails close
   );
   assert.ok(reported.includes("SH_EVIDENCE_PROJECT_CONFIG_INVALID"));
 
-  const legacy = await Deno.makeTempDir({ prefix: "sh-evidence-legacy-" });
-  await Deno.writeTextFile(
+  const legacy = await platform.makeTempDir({ prefix: "sh-evidence-legacy-" });
+  await platform.writeTextFile(
     `${legacy}/sleepyhollow.config.ts`,
     `export default {
   name: "legacy",
@@ -456,7 +457,7 @@ function captureArtifact(
 ): Record<string, unknown> {
   return {
     schema: "sleepy-hollow-capture/v1",
-    runner: "deno test",
+    runner: "vitest",
     revision: "test-revision",
     requests: [{
       sequence: 1,
@@ -489,7 +490,7 @@ async function writeCapture(
   projectRoot: string,
   artifact: Record<string, unknown>,
 ): Promise<void> {
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     `${projectRoot}/generated/capture.json`,
     JSON.stringify(artifact, null, 2),
   );
@@ -498,7 +499,7 @@ async function writeCapture(
 async function writeRoute(projectRoot: string): Promise<void> {
   const routingModule = new URL("../../core/routing/mod.ts", import.meta.url)
     .href;
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     `${projectRoot}/api/bookmarks/route.ts`,
     `import { defineRoute } from ${JSON.stringify(routingModule)};
 
@@ -514,7 +515,7 @@ export default defineRoute({
   );
 }
 
-Deno.test("AC-F018-008 · an observed read with no declared schema is missing coverage", async () => {
+test("AC-F018-008 · an observed read with no declared schema is missing coverage", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -537,7 +538,7 @@ Deno.test("AC-F018-008 · an observed read with no declared schema is missing co
   ]);
 });
 
-Deno.test("AC-F018-014 · an uncaptured route is carried through as uncaptured", async () => {
+test("AC-F018-014 · an uncaptured route is carried through as uncaptured", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -568,7 +569,7 @@ Deno.test("AC-F018-014 · an uncaptured route is carried through as uncaptured",
   assert.equal(route.captured, false);
 });
 
-Deno.test("AC-F018-015 · a stale capture artifact is rejected", async () => {
+test("AC-F018-015 · a stale capture artifact is rejected", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -589,7 +590,7 @@ Deno.test("AC-F018-015 · a stale capture artifact is rejected", async () => {
   assert.ok(reported.includes("SH_EVIDENCE_CAPTURE_STALE"));
 });
 
-Deno.test("AC-F018-009 · hollow check runs against a real project without a supplied inventory", async () => {
+test("AC-F018-009 · hollow check runs against a real project without a supplied inventory", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -612,7 +613,7 @@ Deno.test("AC-F018-009 · hollow check runs against a real project without a sup
   assert.ok(code === 0 || code === 1);
 });
 
-Deno.test("AC-F018-010 · hollow test runs against a real project through the CLI", async () => {
+test("AC-F018-010 · hollow test runs against a real project through the CLI", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -641,7 +642,7 @@ Deno.test("AC-F018-010 · hollow test runs against a real project through the CL
   assert.ok(code === 0 || code === 1);
 });
 
-Deno.test("AC-F018-011 · hollow deploy assembles a plan through the CLI", async () => {
+test("AC-F018-011 · hollow deploy assembles a plan through the CLI", async () => {
   const root = await scaffold();
   await writeEndpoint(
     root,
@@ -652,7 +653,7 @@ Deno.test("AC-F018-011 · hollow deploy assembles a plan through the CLI", async
   await writeCapture(root, captureArtifact());
   const loader = createDeployInventoryLoader({
     revision: "test-revision",
-    target: { kind: "deno-deploy", project: "bookmarks" },
+    target: { kind: "fly", project: "bookmarks" },
   });
   const loaded = await loader({ projectRoot: root });
   assert.equal(loaded.target.project, "bookmarks");

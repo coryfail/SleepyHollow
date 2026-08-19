@@ -132,7 +132,7 @@ the generated response validator shall throw `ResponseContractError` when
 `"off"`; it shall never silently coerce an invalid response into the success
 type.
 
-The generated module shall contain no Deno KV import, repository adapter,
+The generated module shall contain no ORM import, database driver, repository adapter,
 filesystem access, environment read, service discovery, credential store, or
 framework runtime dependency. A service client represents only its owning
 service's HTTP contract, so cross-service use cannot grant persistence access.
@@ -272,3 +272,14 @@ other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, or deployment was
   authorized or attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F010.
+- Governed-content digest:
+  `sha256:86047f353734788ae7ad3a6d2dd3c8d34d40d343ad5036ff271e1d3a7a37e18b`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

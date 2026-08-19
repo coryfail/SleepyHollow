@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import type { CriterionTestSpec } from "../testing/mod.ts";
 import type {
   CaptureArtifact,
@@ -92,15 +93,15 @@ export async function persist(
   const staging = `${path}.partial`;
   const body = `${JSON.stringify(active.artifact(), null, 2)}\n`;
   try {
-    await Deno.writeTextFile(staging, body);
+    await platform.writeTextFile(staging, body);
   } catch (error) {
-    await Deno.remove(staging).catch(() => undefined);
+    await platform.remove(staging).catch(() => undefined);
     throw error;
   }
   try {
-    await Deno.rename(staging, path);
+    await platform.rename(staging, path);
   } catch (error) {
-    await Deno.remove(staging).catch(() => undefined);
+    await platform.remove(staging).catch(() => undefined);
     throw error;
   }
 }

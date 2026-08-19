@@ -1,7 +1,7 @@
 import type { CheckResult } from "../check/mod.ts";
 import type { ContractChange } from "../generate/mod.ts";
 
-export const DEPLOY_TARGET_KINDS = ["deno-deploy"] as const;
+export const DEPLOY_TARGET_KINDS = ["fly"] as const;
 
 export type DeployTargetKind = (typeof DEPLOY_TARGET_KINDS)[number];
 

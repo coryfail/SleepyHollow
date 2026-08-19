@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F018
 title: Repository evidence loader
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "3.6"
@@ -182,7 +182,7 @@ selection, and delivery rules shall remain unchanged.
   SH-F008, SH-F013, and SH-F016.
 - Adding a verification phase or diagnostic category.
 - Network access, remote evidence, or a hosted evidence service.
-- A Deno Deploy adapter implementation, which remains SH-F013 and OPEN-011.
+- A live deployment-provider implementation, which remains SH-F013.
 - Caching, incremental discovery, or a persistent index.
 
 ## Dependencies and assumptions
@@ -448,3 +448,14 @@ readability; no other digest normalization is permitted.
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F018.
+- Governed-content digest:
+  `sha256:a9c477022d0f218ddccd8589a32b2cfae0cb7ce29aff935450e249241e8c77be`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

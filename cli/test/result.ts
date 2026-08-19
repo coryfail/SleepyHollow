@@ -1,4 +1,5 @@
-import { createHash } from "node:crypto";
+import { platform } from "#platform";
+import { createHash } from "crypto";
 
 import { createTraceabilityReport } from "../../core/testing/mod.ts";
 import type {
@@ -165,7 +166,7 @@ export function normalizeRunnerResult(
     diagnostics.push({
       code: "SH_TEST_RUNNER_FAILED",
       severity: "error",
-      summary: "The native Deno test runner did not complete successfully.",
+      summary: "The native platform test runner did not complete successfully.",
       correction:
         "Inspect bounded test diagnostics and retry after correction.",
     });

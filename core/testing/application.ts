@@ -1,4 +1,4 @@
-import { openKvTestContext } from "../kv/mod.ts";
+import { openEmbeddedSqlite } from "../database/mod.ts";
 import type { NormalizedRoute } from "../routing/mod.ts";
 import { composeProjectSecurity } from "../security/mod.ts";
 import { testingDiagnostic, TestingError } from "./error.ts";
@@ -142,7 +142,7 @@ async function secured(
 export async function testApplication<Principal, Credentials>(
   options: TestApplicationOptions<Principal, Credentials>,
 ): Promise<TestApplicationContext> {
-  const kvContext = await openKvTestContext();
+  const database = openEmbeddedSqlite({ filename: ":memory:" });
   let closed = false;
   const cleanup = async () => {
     if (closed) return;
@@ -150,13 +150,13 @@ export async function testApplication<Principal, Credentials>(
     try {
       await options.cleanup?.();
     } finally {
-      kvContext.close();
+      database.close();
     }
   };
   try {
     const application = options.routes === undefined
       ? await required(options.create)({
-        kv: kvContext.kv,
+        database,
         principal: options.principal === undefined
           ? undefined
           : structuredClone(options.principal),
@@ -165,7 +165,7 @@ export async function testApplication<Principal, Credentials>(
           : structuredClone(options.credentials),
       })
       : await secured(options.routes, options.security);
-    await options.seed?.({ kv: kvContext.kv, application });
+    await options.seed?.({ database, application });
     const origin = new URL(options.origin ?? "http://sleepy-hollow.test");
     const fetchApplication = async (
       input: RequestInfo | URL,
@@ -177,7 +177,7 @@ export async function testApplication<Principal, Credentials>(
       return await application.fetch(request);
     };
     const context: TestApplicationContext = {
-      kv: kvContext.kv,
+      database,
       application,
       fetch: fetchApplication,
       async request<RequestBody = undefined, ResponseBody = unknown>(

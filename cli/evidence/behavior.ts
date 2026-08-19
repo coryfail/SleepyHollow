@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import type { CaptureArtifact } from "../../core/capture/mod.ts";
 import { discoverRoutes } from "../../core/routing/mod.ts";
 import { EvidenceError } from "./evidence_error.ts";
@@ -16,7 +17,7 @@ export async function capture(
   const path =
     `${project.projectRoot}/${project.generatedDirectory}/${CAPTURE_FILE}`;
   const read = options.readTextFile ??
-    ((target: string) => Deno.readTextFile(target));
+    ((target: string) => platform.readTextFile(target));
   let source: string;
   try {
     source = await read(path);

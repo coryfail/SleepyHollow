@@ -117,7 +117,7 @@ export async function deployLoader(
   projectRoot: string,
   options: {
     readonly revision: string;
-    readonly target: { readonly kind: "deno-deploy"; readonly project: string };
+    readonly target: { readonly kind: "fly"; readonly project: string };
   },
 ): Promise<DeployInventory> {
   const project = await locations({ projectRoot });

@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 
 import type { ContractChange } from "../generate/mod.ts";
 import {
@@ -122,8 +122,8 @@ function inventory(): VerificationInventory {
       declaredIndexes: ["byOwner"],
       limit: 25,
     }],
-    typecheck: { status: "passed", evidence: "deno check passed" },
-    testRunner: { status: "passed", evidence: "deno test passed" },
+    typecheck: { status: "passed", evidence: "TypeScript check passed" },
+    testRunner: { status: "passed", evidence: "Vitest passed" },
     configurationDiagnostics: [],
     generation: {
       ok: true,
@@ -150,7 +150,7 @@ function codes(result: CheckResult): string[] {
   return result.diagnostics.map((item) => item.code);
 }
 
-Deno.test("AC-F008-001 · conforming projects pass and required failures are nonzero", () => {
+test("AC-F008-001 · conforming projects pass and required failures are nonzero", () => {
   const passing = verifyProject(inventory());
   assert.equal(passing.ok, true);
   assert.equal(exitCodeForCheck(passing), 0);
@@ -162,7 +162,7 @@ Deno.test("AC-F008-001 · conforming projects pass and required failures are non
   assert.equal(exitCodeForCheck(failing), 1);
 });
 
-Deno.test("AC-F008-002 · human diagnostics name affected evidence", () => {
+test("AC-F008-002 · human diagnostics name affected evidence", () => {
   const result = verifyProject({
     ...inventory(),
     routes: [{ ...inventory().routes[0], method: "POST" }],
@@ -173,7 +173,7 @@ Deno.test("AC-F008-002 · human diagnostics name affected evidence", () => {
   assert.match(output, /\/items/);
 });
 
-Deno.test("AC-F008-003 · JSON diagnostics use one versioned stable shape", () => {
+test("AC-F008-003 · JSON diagnostics use one versioned stable shape", () => {
   const result = verifyProject({
     ...inventory(),
     configurationDiagnostics: [{
@@ -210,7 +210,7 @@ Deno.test("AC-F008-003 · JSON diagnostics use one versioned stable shape", () =
   assert.doesNotMatch(JSON.stringify(parsed), /secret-value/);
 });
 
-Deno.test("AC-F008-004 · approved route and method drift fails", () => {
+test("AC-F008-004 · approved route and method drift fails", () => {
   const result = verifyProject({
     ...inventory(),
     routes: [{ ...inventory().routes[0], method: "POST", path: "/renamed" }],
@@ -224,7 +224,7 @@ Deno.test("AC-F008-004 · approved route and method drift fails", () => {
   );
 });
 
-Deno.test("AC-F008-005 · uncovered request and response boundaries fail", () => {
+test("AC-F008-005 · uncovered request and response boundaries fail", () => {
   const result = verifyProject({
     ...inventory(),
     routes: [{
@@ -238,7 +238,7 @@ Deno.test("AC-F008-005 · uncovered request and response boundaries fail", () =>
   assert.ok(codes(result).includes("SH_CHECK_RESPONSE_SCHEMA_MISSING"));
 });
 
-Deno.test("AC-F008-006 · missing mappings and failed tests block eligibility", () => {
+test("AC-F008-006 · missing mappings and failed tests block eligibility", () => {
   const missing = verifyProject({
     ...inventory(),
     testManifest: { schema: "sleepy-hollow-test-manifest/v1", tests: [] },
@@ -257,7 +257,7 @@ Deno.test("AC-F008-006 · missing mappings and failed tests block eligibility", 
   assert.equal(failed.ok, false);
 });
 
-Deno.test("AC-F008-007 · unsafe data operations identify their operation", () => {
+test("AC-F008-007 · unsafe data operations identify their operation", () => {
   const result = verifyProject({
     ...inventory(),
     dataOperations: [
@@ -286,7 +286,7 @@ Deno.test("AC-F008-007 · unsafe data operations identify their operation", () =
   );
 });
 
-Deno.test("AC-F008-008 · missing declared authorization guard fails", () => {
+test("AC-F008-008 · missing declared authorization guard fails", () => {
   const result = verifyProject({
     ...inventory(),
     routes: [{
@@ -299,7 +299,7 @@ Deno.test("AC-F008-008 · missing declared authorization guard fails", () => {
   assert.ok(codes(result).includes("SH_CHECK_AUTHORIZATION_MISSING"));
 });
 
-Deno.test("AC-F008-009 · stale artifacts and breaking changes fail before release", () => {
+test("AC-F008-009 · stale artifacts and breaking changes fail before release", () => {
   const change: ContractChange = {
     code: "SH_CONTRACT_ROUTE_REMOVED",
     severity: "breaking",
@@ -327,7 +327,7 @@ Deno.test("AC-F008-009 · stale artifacts and breaking changes fail before relea
   assert.ok(codes(result).includes("SH_CHECK_BREAKING_CHANGE_UNREVIEWED"));
 });
 
-Deno.test("AC-F008-010 · targeted scope closes dependencies or escalates safely", () => {
+test("AC-F008-010 · targeted scope closes dependencies or escalates safely", () => {
   const targeted = verifyProject({
     ...inventory(),
     requestedScope: { kind: "requirement", requirementId: "REQ-ITEMS" },
@@ -344,7 +344,7 @@ Deno.test("AC-F008-010 · targeted scope closes dependencies or escalates safely
   assert.ok(codes(escalated).includes("SH_CHECK_SCOPE_ESCALATED"));
 });
 
-Deno.test("AC-F008-011 · source self-certification cannot override fixed failures", () => {
+test("AC-F008-011 · source self-certification cannot override fixed failures", () => {
   const result = verifyProject({
     ...inventory(),
     sourceClaims: { passed: true, checks: "all-green", verified: true },
@@ -369,7 +369,7 @@ function captured(
   };
 }
 
-Deno.test("AC-F008-012 · an unobserved route with approved criteria fails", () => {
+test("AC-F008-012 · an unobserved route with approved criteria fails", () => {
   const base = captured();
   const result = verifyProject({
     ...base,
@@ -391,7 +391,7 @@ Deno.test("AC-F008-012 · an unobserved route with approved criteria fails", () 
   assert.match(renderHumanCheckResult(result), /SH_CHECK_ROUTE_UNOBSERVED/);
 });
 
-Deno.test("AC-F008-013 · a criterion verified below the transport boundary does not fail", () => {
+test("AC-F008-013 · a criterion verified below the transport boundary does not fail", () => {
   const result = verifyProject(captured());
   assert.equal(result.ok, true);
   assert.ok(
@@ -401,7 +401,7 @@ Deno.test("AC-F008-013 · a criterion verified below the transport boundary does
   );
 });
 
-Deno.test("AC-F008-014 · a recorded justification accepts an unobserved route", () => {
+test("AC-F008-014 · a recorded justification accepts an unobserved route", () => {
   const base = captured();
   const result = verifyProject({
     ...base,
@@ -423,7 +423,7 @@ Deno.test("AC-F008-014 · a recorded justification accepts an unobserved route",
   );
 });
 
-Deno.test("AC-F008-015 · a missing or stale capture artifact fails verification", () => {
+test("AC-F008-015 · a missing or stale capture artifact fails verification", () => {
   for (
     const capture of [
       { present: false, uncapturedRoutes: [] },

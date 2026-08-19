@@ -25,8 +25,8 @@ Halloween decoration (governed by AC-HOME-008).
   list in a 14–16rem column at ≥60rem, collapsing above the article below that.
   Bodies are generated from the canonical Markdown under `docs/`, so the
   selectors below are generic on purpose — nothing hand-authors that markup.
-- Generated reference (`/api/`): outside this system. Produced by `deno doc
-  --html`; the Deno toolchain owns its markup and theme. It is labeled as a
+- Generated reference (`/api/`): outside this system. Produced by TypeDoc; the
+  Node toolchain owns its markup and theme. It is labeled as a
   generated reference wherever it is linked so its different appearance does
   not read as a broken page.
 

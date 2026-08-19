@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import { createTraceabilityReport } from "../../core/testing/mod.ts";
 import type { TestManifest } from "../../core/testing/mod.ts";
 import { resolveScope } from "./scope.ts";
@@ -163,10 +164,10 @@ export function verify(inventory: VerificationInventory): CheckResult {
     diagnostics.push(diagnostic(
       "SH_CHECK_TYPECHECK_FAILED",
       "runner",
-      "The bounded Deno type-check runner failed",
+      "The bounded platform type-check runner failed",
       { path: inventory.projectRootDisplay },
       {
-        runner: "deno-check",
+        runner: "tsc",
         result: safeRunnerEvidence(inventory.typecheck.evidence),
       },
       "Correct the reported type errors and rerun the complete applicable check.",
@@ -176,10 +177,10 @@ export function verify(inventory: VerificationInventory): CheckResult {
     diagnostics.push(diagnostic(
       "SH_CHECK_TEST_RUNNER_FAILED",
       "runner",
-      "The native Deno test runner failed",
+      "The native platform test runner failed",
       { path: inventory.projectRootDisplay },
       {
-        runner: "deno-test",
+        runner: "vitest",
         result: safeRunnerEvidence(inventory.testRunner.evidence),
       },
       "Correct the runner or test failure without weakening governed tests.",

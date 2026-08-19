@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: framework-documentation
 title: Framework documentation set
-status: draft
+status: approved
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -104,7 +104,7 @@ competing procedure.
   canonical algorithm in the root `repository.req.md`.
 - AC-FWDOC-005: Given a guide names an installable artifact, then that artifact
   resolves: the skill name matches a directory under `skills/`, and the
-  framework and CLI install commands match the package name in `deno.json`.
+  framework and CLI install commands match the root `package.json` artifact.
 - AC-FWDOC-006: Given the skill install command appears in more than one
   surface, then `README.md`, `docs/framework/`, and `website/src/site.ts` state
   it identically, character for character.
@@ -251,3 +251,25 @@ entries to make stale evidence appear current.
 
 - Status: pending. Not committed, merged, tagged, or published at the time this
   record was written.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F019.
+- Governed-content digest:
+  `sha256:047aa96cc8be08da70a51f8ecab33a1fa38da3d0e0fdc7f70f30b9f4363836a9`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Approval, Node/Bun migration final sweep
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F019.
+- Governed-content digest:
+  `sha256:e0b1631b66160c8563ce73cb85043f626662264a410a45f2469aa05311adacd4`.
+- Decision source: owner direct response `approve it all` for the Node/Bun
+  migration, including its final Deno-removal sweep.

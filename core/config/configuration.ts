@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import { z } from "zod";
 
 import {
@@ -205,7 +206,7 @@ export async function resolveConfiguration<
     ?.[options.mode as "development" | "test"];
   if (filePath) {
     const reader = options.readTextFile ??
-      ((path: string) => Deno.readTextFile(path));
+      ((path: string) => platform.readTextFile(path));
     try {
       fileValues = parseEnvFile(await reader(filePath), options.mode);
     } catch (error) {
@@ -214,7 +215,7 @@ export async function resolveConfiguration<
     }
   }
 
-  const environment = options.environment ?? Deno.env.toObject();
+  const environment = options.environment ?? platform.env.toObject();
   const input: Record<string, string> = {};
   for (const key of keys) {
     if (fileValues[key] !== undefined) input[key] = fileValues[key];

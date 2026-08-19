@@ -1,4 +1,5 @@
-import { pathToFileURL } from "node:url";
+import { platform } from "#platform";
+import { pathToFileURL } from "url";
 
 import { EvidenceError } from "./evidence_error.ts";
 import type {
@@ -31,7 +32,7 @@ async function readConfiguration(
 ): Promise<Record<string, unknown>> {
   const path = `${projectRoot}/${CONFIG_FILE}`;
   try {
-    await Deno.stat(path);
+    await platform.stat(path);
   } catch {
     throw new EvidenceError([issue(
       "SH_EVIDENCE_PROJECT_CONFIG_MISSING",
@@ -71,7 +72,7 @@ async function readServices(
   const path = `${projectRoot}/${SERVICES_FILE}`;
   let source: string;
   try {
-    source = await Deno.readTextFile(path);
+    source = await platform.readTextFile(path);
   } catch {
     return [];
   }

@@ -1,5 +1,5 @@
 /**
- * Sleepy Hollow, a Deno-native framework for building HTTP services whose
+ * Sleepy Hollow, a Node and Bun framework for building HTTP services whose
  * behaviour is derived from reviewable specifications.
  *
  * This entry point re-exports the runtime a generated project imports:
@@ -8,8 +8,9 @@
  * reached through their own entry points so a project pays only for what it
  * uses.
  *
- * The framework targets Deno and depends on Deno KV, Deno Deploy, and Deno
- * runtime APIs. It does not support Node or Bun.
+ * The framework targets Node.js 24 LTS and verifies the same built public API
+ * under Bun. SQLite is embedded by default and PostgreSQL is an explicit
+ * external profile.
  *
  * ```ts
  * import { defineRoute, z } from "@sleepy-hollow/framework";
@@ -38,3 +39,4 @@ export * from "./core/routing/mod.ts";
 export * from "./core/validation/mod.ts";
 export * from "./core/security/mod.ts";
 export * from "./core/config/mod.ts";
+export * from "./core/database/mod.ts";

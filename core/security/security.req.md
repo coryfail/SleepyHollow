@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F005
 title: Security and authorization boundaries
-status: verified
+status: approved
 risk: high
 source_sections:
   - "7"
@@ -128,8 +128,8 @@ policy whose positive integer `limit` and `windowMs`, key function, and
 development and test behavior with bounded key cardinality and
 `scope: "process"`. It shall evict expired windows before admitting a new key
 and fail closed when the active-key bound is exhausted. Production shall reject
-a declared route policy backed by a process-scoped limiter because Deno Deploy
-may run isolated application instances concurrently. A production adapter must
+a declared route policy backed by a process-scoped limiter when the deployment
+plan permits multiple application instances. A production adapter must
 declare `scope: "shared"`; the framework shall not pretend that process memory
 is a global quota.
 
@@ -237,8 +237,8 @@ application requirements. The framework trusts an injected provider only at its
 boundary and validates the returned neutral shape. The process-local limiter is
 appropriate only for deterministic tests, local development, and explicitly
 single-process environments. A shared limiter's correctness and availability
-remain the adapter owner's responsibility. Deno Deploy can run multiple isolated
-instances of one application, so process memory is not a production-global
+remain the adapter owner's responsibility. Multi-instance deployments use
+isolated process memory, so process memory is not a production-global
 security boundary.
 
 ## Governance record
@@ -441,3 +441,14 @@ readability; no other digest normalization is permitted.
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F005.
+- Governed-content digest:
+  `sha256:4f7fb4aacfcc68a24ae651d6c87da654e0f4d4e6a784a99288f0a582fd34770a`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
