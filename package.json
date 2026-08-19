@@ -3,6 +3,10 @@
   "version": "0.3.0",
   "description": "A specification-governed Node and Bun framework for HTTP services.",
   "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coryfail/SleepyHollow"
+  },
   "type": "module",
   "imports": {
     "#platform": "./platform.ts"
