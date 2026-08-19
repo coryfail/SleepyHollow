@@ -83,6 +83,6 @@ jobs:
       # AC-F020-008: publishing refuses a dirty tree. A fresh checkout is clean
       # by construction, so this asserts nothing above generated a change.
       - name: Publish to npm
-        run: npm publish --provenance
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
