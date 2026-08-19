@@ -1,3 +1,4 @@
+import { rename, writeFile } from "fs/promises";
 const records = {
   requests: [] as unknown[],
   dataOperations: [] as unknown[],
@@ -6,17 +7,9 @@ const records = {
 
 export const CAPTURE_ARTIFACT = "generated/capture.json";
 
-function revision(): string {
-  try {
-    return Deno.env.get("SLEEPY_HOLLOW_REVISION") ?? "workspace";
-  } catch {
-    return "workspace";
-  }
-}
-
 export const session = {
-  runner: "deno test",
-  revision: revision(),
+  runner: "vitest",
+  revision: process.env.SLEEPY_HOLLOW_REVISION ?? "workspace",
   artifact() {
     return {
       schema: "sleepy-hollow-capture/v1",
@@ -29,9 +22,6 @@ export const session = {
 
 export async function persist(): Promise<void> {
   const staging = CAPTURE_ARTIFACT + ".partial";
-  await Deno.writeTextFile(
-    staging,
-    JSON.stringify(session.artifact(), null, 2) + "\n",
-  );
-  await Deno.rename(staging, CAPTURE_ARTIFACT);
+  await writeFile(staging, JSON.stringify(session.artifact(), null, 2) + "\n", { flag: "wx" });
+  await rename(staging, CAPTURE_ARTIFACT);
 }

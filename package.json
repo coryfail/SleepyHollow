@@ -1,0 +1,80 @@
+{
+  "name": "@sleepy-hollow/framework",
+  "version": "0.3.0",
+  "description": "A specification-governed Node and Bun framework for HTTP services.",
+  "license": "MPL-2.0",
+  "type": "module",
+  "imports": {
+    "#platform": "./platform.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./database": {
+      "types": "./dist/database.d.ts",
+      "import": "./dist/database.js"
+    },
+    "./routing": {
+      "types": "./dist/routing.d.ts",
+      "import": "./dist/routing.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js"
+    },
+    "./security": {
+      "types": "./dist/security.d.ts",
+      "import": "./dist/security.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    }
+  },
+  "bin": {
+    "hollow": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepack": "npm run build",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:node": "vitest run",
+    "test:bun": "bunx vitest run",
+    "test:baseline": "node --test tests/platform-migration-baseline.test.mjs",
+    "verify": "npm run check && npm run test:node && npm run test:bun && npm run build && npm run test:baseline",
+    "pack:check": "npm pack --dry-run"
+  },
+  "dependencies": {
+    "better-sqlite3": "13.0.3",
+    "drizzle-orm": "0.45.2",
+    "pg": "8.23.0",
+    "yaml": "2.9.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "9.6.0",
+    "@types/node": "26.2.0",
+    "@types/pg": "8.23.1",
+    "bun": "^1.3.14",
+    "drizzle-kit": "0.31.10",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

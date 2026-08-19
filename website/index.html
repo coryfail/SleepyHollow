@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta
       name="description"
-      content="Sleepy Hollow is an agentic-first API framework for Deno with Specification-Governed Agentic Development built in: build endpoints with AI rapidly, under the requirements, procedures, and review a senior engineer would expect."
+      content="Sleepy Hollow is an agentic-first API framework for Node.js and Bun with Specification-Governed Agentic Development built in."
     />
     <meta property="og:title" content="Sleepy Hollow · Endpoints at agent speed. Standards at senior level." />
     <meta
       property="og:description"
-      content="An agentic-first API framework for Deno with SGAD built in — the method that gives an AI the requirements, procedures, and proof of work you would expect from a senior engineer."
+      content="An agentic-first API framework for Node.js and Bun with SGAD built in."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sleepyhollow.io/" />
     <link rel="canonical" href="https://sleepyhollow.io/" />
-    <title>Sleepy Hollow · Agentic-first API framework for Deno</title>
+    <title>Sleepy Hollow · Agentic-first API framework for Node.js and Bun</title>
   </head>
   <body data-page="sleepy-hollow">
     <div id="root"></div>
@@ -23,10 +23,8 @@
       <main>
         <h1>Sleepy Hollow</h1>
         <p>
-          Sleepy Hollow is an agentic-first headless API framework for Deno, the
-          runtime that runs JavaScript and TypeScript outside the browser, with
-          Specification-Governed Agentic Development built in. It is in
-          development and published to JSR; the API is pre-1.0 and may change.
+          Sleepy Hollow is an agentic-first headless API framework for Node.js
+          and Bun with Specification-Governed Agentic Development built in.
         </p>
         <p>
           Just like any human developer, an AI agent needs a set of procedures,
@@ -35,16 +33,16 @@
           the review you would demand from any other developer.
         </p>
         <p>
-          It provides file-based routing, schema validation, typed Deno KV
-          access, per-route security declarations, generated API contracts, and
+          It provides file-based routing, schema validation, embedded SQLite,
+          optional PostgreSQL, per-route security declarations, generated API contracts, and
           deployment. While your tests run it records what each handler actually
           did, and <code>hollow check</code> refuses to certify a route that
           carries approved criteria but that no test ever exercised.
         </p>
         <p>Add the framework to a project:</p>
-        <pre><code>deno add jsr:@sleepy-hollow/framework</code></pre>
+        <pre><code>npm install @sleepy-hollow/framework</code></pre>
         <p>Install the CLI as hollow:</p>
-        <pre><code>deno install -A --global --name hollow jsr:@sleepy-hollow/framework/cli</code></pre>
+        <pre><code>npm install -g @sleepy-hollow/framework</code></pre>
         <p>
           Sleepy Hollow is built through Specification-Governed Agentic
           Development, a method in which a human approves reviewed requirements,
@@ -54,7 +52,7 @@
         <a href="/docs/">Read the documentation</a>
         <a href="/api/">Browse the API reference</a>
         <a href="/sgad/">Read how SGAD works</a>
-        <a href="https://jsr.io/@sleepy-hollow/framework">View the package on JSR</a>
+        <a href="https://www.npmjs.com/package/@sleepy-hollow/framework">View the package on npm</a>
         <a href="https://github.com/coryfail/SleepyHollow">View Sleepy Hollow on GitHub</a>
       </main>
     </noscript>

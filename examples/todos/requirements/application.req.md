@@ -67,7 +67,7 @@ one hundred. Ownership failures reveal nothing about the todo's contents.
 
 ## Deployment model
 
-One deployable API on Deno Deploy.
+One deployable API on Fly.io with embedded SQLite on a durable volume.
 
 ## Service architecture
 
@@ -105,3 +105,14 @@ depends on the collection for creation.
   `sha256:793c3305c9f59d685638b281a9abfa712114a2ea2004fc6736b0be883eda714b`.
 - Decision source: direct response confirming the presented digests after
   authentication was revised to an explicit none decision.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by the todos example.
+- Governed-content digest:
+  `sha256:50ebc8b5a54c464650a09999aebe9b634c234df2daa2813700fb7e470fc467e7`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

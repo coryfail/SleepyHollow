@@ -1,5 +1,5 @@
-import { basename } from "node:path";
-import { fileURLToPath } from "node:url";
+import { Command, platform } from "#platform";
+import { basename } from "path";
 
 import {
   type ActiveDevRuntime,
@@ -83,26 +83,15 @@ async function readFirstLine(
 function workerCommand(
   options: DevPrepareOptions,
   intent: "validate" | "serve",
-): Deno.Command {
-  const entry = fileURLToPath(new URL("../main.ts", import.meta.url));
-  const frameworkRoot = fileURLToPath(new URL("../../", import.meta.url));
-  const denoRuntime = /^deno(?:\.exe)?$/i.test(basename(Deno.execPath()));
-  const runtimeArgs = denoRuntime
-    ? [
-      "run",
-      "--no-prompt",
-      "--cached-only",
-      `--allow-read=${options.projectRoot},${frameworkRoot}`,
-      `--allow-write=${options.projectRoot}`,
-      "--allow-net",
-      "--allow-env=SLEEPY_HOLLOW_MODE,SLEEPY_HOLLOW_INTERNAL_DEV_WORKER",
-      "--unstable-kv",
-      entry,
-    ]
-    : [];
-  return new Deno.Command(Deno.execPath(), {
+): Command {
+  // The CLI entry is stable after bundling; a source-relative URL is not.
+  // `process.argv[1]` is the executable module for both `node dist/cli.js` and
+  // the npm-installed `hollow` binary.
+  const entry = process.argv[1];
+  if (!entry) throw new Error("The Node CLI entry module is unavailable.");
+  return new platform.Command(platform.execPath(), {
     args: [
-      ...runtimeArgs,
+      entry,
       WORKER,
       intent,
       options.projectRoot,
@@ -216,7 +205,7 @@ async function startWorker(
 }
 
 class LocalWatcher implements DevWatcher {
-  #watcher: Deno.FsWatcher;
+  #watcher: ReturnType<typeof platform.watchFs>;
   #closed = false;
   #pending = new Set<string>();
   #batches: (readonly string[])[] = [];
@@ -229,7 +218,7 @@ class LocalWatcher implements DevWatcher {
   #done = false;
 
   constructor(root: string) {
-    this.#watcher = Deno.watchFs(root, { recursive: true });
+    this.#watcher = platform.watchFs(root, { recursive: true });
     void this.#collect();
   }
 
@@ -297,8 +286,8 @@ export function createLocalDevDependencies(): DevDependencies {
   const controller = new AbortController();
   const interrupt = () => controller.abort("interrupt");
   const termination = () => controller.abort("termination");
-  Deno.addSignalListener("SIGINT", interrupt);
-  Deno.addSignalListener("SIGTERM", termination);
+  platform.addSignalListener("SIGINT", interrupt);
+  platform.addSignalListener("SIGTERM", termination);
   return {
     signal: controller.signal,
     async prepare(options): Promise<PreparedDevRuntime> {
@@ -310,8 +299,8 @@ export function createLocalDevDependencies(): DevDependencies {
     },
     watch: ({ projectRoot }) => new LocalWatcher(projectRoot),
     dispose() {
-      Deno.removeSignalListener("SIGINT", interrupt);
-      Deno.removeSignalListener("SIGTERM", termination);
+      platform.removeSignalListener("SIGINT", interrupt);
+      platform.removeSignalListener("SIGTERM", termination);
     },
   };
 }

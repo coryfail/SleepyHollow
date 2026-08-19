@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import { failedWithoutRunner, normalizeRunnerResult } from "./result.ts";
 import { runNative } from "./runner.ts";
 import { plan } from "./scope.ts";
@@ -206,8 +207,7 @@ export async function execute(
     runnerResult = await (runner ?? ((selected, source) =>
       runNative(selected, source, {
         projectRoot: io.cwd,
-        denoExecutable: source.denoExecutable,
-        permissions: source.permissions,
+        nodeExecutable: source.nodeExecutable,
         timeoutMs: source.timeoutMs,
       })))(testPlan, inventory);
   } catch {
@@ -221,7 +221,7 @@ export async function execute(
   const normalized = normalizeRunnerResult(testPlan, inventory, runnerResult);
   let persisted = true;
   try {
-    await Deno.stat(capturePath);
+    await platform.stat(capturePath);
   } catch {
     persisted = false;
   }

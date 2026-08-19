@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 import { z } from "zod";
 
 import type {
@@ -89,7 +89,7 @@ async function rejection(
   throw new assert.AssertionError({ message: "composition did not fail" });
 }
 
-Deno.test("AC-F005-001 · explicit none exposes null without invoking a provider", async () => {
+test("AC-F005-001 · explicit none exposes null without invoking a provider", async () => {
   let providerCalls = 0;
   let observed: unknown = "unset";
   const app = createSecurityRouter([
@@ -115,7 +115,7 @@ Deno.test("AC-F005-001 · explicit none exposes null without invoking a provider
   assert.equal(providerCalls, 0);
 });
 
-Deno.test("AC-F005-002 · a neutral provider supplies principal without changing route inputs", async () => {
+test("AC-F005-002 · a neutral provider supplies principal without changing route inputs", async () => {
   let observed: unknown;
   const app = createSecurityRouter([
     route(required(), ({ params, principal }) => {
@@ -168,7 +168,7 @@ Deno.test("AC-F005-002 · a neutral provider supplies principal without changing
   assert.doesNotMatch(JSON.stringify(diagnostics), /provider-secret/);
 });
 
-Deno.test("AC-F005-003 · missing identity returns declared 401 and challenge", async () => {
+test("AC-F005-003 · missing identity returns declared 401 and challenge", async () => {
   let handled = 0;
   const app = createSecurityRouter([
     route(required(), () => {
@@ -200,7 +200,7 @@ Deno.test("AC-F005-003 · missing identity returns declared 401 and challenge", 
   assert.doesNotMatch(JSON.stringify(body), /missing/);
 });
 
-Deno.test("AC-F005-004 · a denied guard returns declared 403", async () => {
+test("AC-F005-004 · a denied guard returns declared 403", async () => {
   let handled = 0;
   const app = createSecurityRouter([
     route(
@@ -234,7 +234,7 @@ Deno.test("AC-F005-004 · a denied guard returns declared 403", async () => {
   assert.equal(handled, 0);
 });
 
-Deno.test("AC-F005-005 · protections complete in order before handler effects", async () => {
+test("AC-F005-005 · protections complete in order before handler effects", async () => {
   const events: string[] = [];
   const limiter = {
     scope: "shared" as const,
@@ -295,7 +295,7 @@ Deno.test("AC-F005-005 · protections complete in order before handler effects",
   assert.deepEqual(events, ["rate", "authenticate", "authorize", "handler"]);
 });
 
-Deno.test("AC-F005-006 · production configuration closes CORS and process-local gaps", async (test) => {
+test("AC-F005-006 · production configuration closes CORS and process-local gaps", async (test) => {
   const base = route(none(), () => Response.json({ ok: true }));
 
   await test.step("missing production CORS fails", () => {
@@ -430,7 +430,7 @@ Deno.test("AC-F005-006 · production configuration closes CORS and process-local
   });
 });
 
-Deno.test("AC-F005-007 · redaction is recursive, cycle-safe, and request-safe", () => {
+test("AC-F005-007 · redaction is recursive, cycle-safe, and request-safe", () => {
   const value: Record<string, unknown> = {
     safe: "route-context",
     authorization: "Bearer top-secret",
@@ -450,7 +450,7 @@ Deno.test("AC-F005-007 · redaction is recursive, cycle-safe, and request-safe",
   assert.match(serialized, /\[REDACTED\]|\[Circular\]/);
 });
 
-Deno.test("AC-F005-008 · fixed-window limiting is deterministic, bounded, and fail closed", async () => {
+test("AC-F005-008 · fixed-window limiting is deterministic, bounded, and fail closed", async () => {
   let now = 1_000;
   const limiter = createMemoryRateLimiter({ maxKeys: 1, clock: () => now });
   const input = {
@@ -580,7 +580,7 @@ Deno.test("AC-F005-008 · fixed-window limiting is deterministic, bounded, and f
   assert.equal(rawKeyHandler, 0);
 });
 
-Deno.test("AC-F005-009 · startup diagnostics and metadata expose every protection", () => {
+test("AC-F005-009 · startup diagnostics and metadata expose every protection", () => {
   const diagnostics: SecurityDiagnostic[] = [];
   const secure = required({
     authorization: {
@@ -652,7 +652,7 @@ Deno.test("AC-F005-009 · startup diagnostics and metadata expose every protecti
   });
 });
 
-Deno.test("AC-F005-010 · the framework security surface remains identity-model neutral", () => {
+test("AC-F005-010 · the framework security surface remains identity-model neutral", () => {
   const app = createSecurityRouter([
     route(none(), () => Response.json({ ok: true })),
   ], { mode: "test" });
@@ -664,7 +664,7 @@ Deno.test("AC-F005-010 · the framework security surface remains identity-model 
   );
 });
 
-Deno.test("AC-F005-011 · all responses carry secure headers and safe request IDs", async () => {
+test("AC-F005-011 · all responses carry secure headers and safe request IDs", async () => {
   const ids: string[] = [];
   const app = createSecurityRouter([
     route(none(), ({ requestId }) => {
@@ -716,7 +716,7 @@ Deno.test("AC-F005-011 · all responses carry secure headers and safe request ID
   );
 });
 
-Deno.test("AC-F005-012 · a declared security module supplies frozen composition inputs", async () => {
+test("AC-F005-012 · a declared security module supplies frozen composition inputs", async () => {
   const declaration = defineSecurity({
     providers: {
       "project-auth": {
@@ -773,7 +773,7 @@ Deno.test("AC-F005-012 · a declared security module supplies frozen composition
   assert.equal(app.routes[0].corsMode, "deny");
 });
 
-Deno.test("AC-F005-013 · an absent module composes and an unresolvable one fails", async () => {
+test("AC-F005-013 · an absent module composes and an unresolvable one fails", async () => {
   const open = await composeProjectSecurity([
     route(none(), () => Response.json({ ok: true })),
   ], { mode: "test", root: "/projects/vault" });
@@ -799,7 +799,7 @@ Deno.test("AC-F005-013 · an absent module composes and an unresolvable one fail
   assert.match(reported, /security\/missing\.ts/);
 });
 
-Deno.test("AC-F005-014 · a required route without a resolvable provider fails at composition", async () => {
+test("AC-F005-014 · a required route without a resolvable provider fails at composition", async () => {
   let handlerCalls = 0;
   const failure = await rejection(() =>
     composeProjectSecurity([

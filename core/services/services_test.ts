@@ -1,12 +1,13 @@
-import assert from "node:assert/strict";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { platform } from "#platform";
+import assert from "assert/strict";
+import { join } from "path";
+import { pathToFileURL } from "url";
 
 import { renderContractArtifacts } from "../../cli/generate/mod.ts";
 import {
   createServiceClientOptions,
   normalizeServiceArchitecture,
-  openOwnedServiceKv,
+  openOwnedServiceDatabase,
   scaffoldServiceWorkspaces,
   ServiceArchitectureError,
   ServiceBoundaryError,
@@ -50,7 +51,7 @@ function service(
     testsRoot: `${root}/tests`,
     generatedRoot: `${root}/generated`,
     deploymentConfigPath: `${root}/deployment.json`,
-    kvBinding: `${id}-kv`,
+    databaseBinding: `${id}-database`,
     dependencies,
   };
 }
@@ -68,11 +69,11 @@ function singleArchitecture(): ServiceArchitecture {
 }
 
 async function temporary<T>(run: (path: string) => Promise<T>): Promise<T> {
-  const path = await Deno.makeTempDir({ prefix: "sleepy-hollow-services-" });
+  const path = await platform.makeTempDir({ prefix: "sleepy-hollow-services-" });
   try {
     return await run(path);
   } finally {
-    await Deno.remove(path, { recursive: true });
+    await platform.remove(path, { recursive: true });
   }
 }
 
@@ -117,16 +118,16 @@ async function generatedClient(): Promise<Record<string, unknown>> {
   });
   const source =
     artifacts.artifacts.find((item) => item.path === "client.ts")!.content;
-  const directory = await Deno.makeTempDir({
+  const directory = await platform.makeTempDir({
     prefix: "sleepy-hollow-service-client-",
   });
   const path = join(directory, "client.ts");
-  await Deno.writeTextFile(path, source);
+  await platform.writeTextFile(path, source);
   importSequence += 1;
   return await import(`${pathToFileURL(path).href}?service=${importSequence}`);
 }
 
-Deno.test("AC-F014-001 · architecture choices are normalized and justified", () => {
+test("AC-F014-001 · architecture choices are normalized and justified", () => {
   const normalized = normalizeServiceArchitecture(multiArchitecture());
   assert.deepEqual(normalized.services.map((item) => item.id), [
     "accounts",
@@ -143,7 +144,7 @@ Deno.test("AC-F014-001 · architecture choices are normalized and justified", ()
   );
 });
 
-Deno.test("AC-F014-002 · approved service workspaces are separate and atomic", () =>
+test("AC-F014-002 · approved service workspaces are separate and atomic", () =>
   temporary(async (projectRoot) => {
     const architecture = multiArchitecture();
     const result = await scaffoldServiceWorkspaces({
@@ -170,14 +171,14 @@ Deno.test("AC-F014-002 · approved service workspaces are separate and atomic", 
         ]
       ) {
         assert.ok(
-          (await Deno.stat(join(projectRoot, path))).isFile ||
-            (await Deno.stat(join(projectRoot, path))).isDirectory,
+          (await platform.stat(join(projectRoot, path))).isFile ||
+            (await platform.stat(join(projectRoot, path))).isDirectory,
         );
       }
     }
 
     const collisionRoot = join(projectRoot, "collision");
-    await Deno.mkdir(join(collisionRoot, "services", "ledger"), {
+    await platform.mkdir(join(collisionRoot, "services", "ledger"), {
       recursive: true,
     });
     await assert.rejects(
@@ -190,12 +191,12 @@ Deno.test("AC-F014-002 · approved service workspaces are separate and atomic", 
       ServiceArchitectureError,
     );
     await assert.rejects(
-      () => Deno.stat(join(collisionRoot, "services", "accounts")),
-      Deno.errors.NotFound,
+      () => platform.stat(join(collisionRoot, "services", "accounts")),
+      platform.errors.NotFound,
     );
   }));
 
-Deno.test("AC-F014-003 · static and runtime boundaries reject foreign persistence", async () => {
+test("AC-F014-003 · static and runtime boundaries reject foreign persistence", async () => {
   const architecture = normalizeServiceArchitecture(multiArchitecture());
   assert.deepEqual(verifyServiceBoundaries({ architecture, sources: [] }), {
     ok: true,
@@ -210,7 +211,7 @@ Deno.test("AC-F014-003 · static and runtime boundaries reject foreign persisten
           serviceId: "accounts",
           path: "services/accounts/api/route.ts",
           content:
-            'import "../../ledger/core/kv.ts";\nawait Deno.openKv("ledger-kv");',
+            'import "../../ledger/core/database.ts";\nawait openEmbeddedSqlite("ledger-database");',
         }],
       }),
     ServiceBoundaryError,
@@ -218,11 +219,11 @@ Deno.test("AC-F014-003 · static and runtime boundaries reject foreign persisten
   let opened = 0;
   await assert.rejects(
     () =>
-      openOwnedServiceKv({
+      openOwnedServiceDatabase({
         architecture,
         ownerServiceId: "ledger",
         requesterServiceId: "accounts",
-        bindingId: "ledger-kv",
+        bindingId: "ledger-database",
         open: () => ++opened,
       }),
     ServiceBoundaryError,
@@ -230,7 +231,7 @@ Deno.test("AC-F014-003 · static and runtime boundaries reject foreign persisten
   assert.equal(opened, 0);
 });
 
-Deno.test("AC-F014-004 · declared generated-client calls compose neutral authentication", async () => {
+test("AC-F014-004 · declared generated-client calls compose neutral authentication", async () => {
   const module = await generatedClient();
   let request: Request | undefined;
   const options = createServiceClientOptions({
@@ -258,7 +259,7 @@ Deno.test("AC-F014-004 · declared generated-client calls compose neutral authen
   assert.equal(request?.headers.get("x-request-id"), "req-service-1");
 });
 
-Deno.test("AC-F014-005 · service transport propagates request IDs, deadline, and cancellation", async () => {
+test("AC-F014-005 · service transport propagates request IDs, deadline, and cancellation", async () => {
   let callback: (() => void) | undefined;
   let cleared = 0;
   const scheduler: DeadlineScheduler = {
@@ -297,7 +298,7 @@ Deno.test("AC-F014-005 · service transport propagates request IDs, deadline, an
   assert.ok(callback);
 });
 
-Deno.test("AC-F014-006 · caller evidence and transport failures remain distinct", async () => {
+test("AC-F014-006 · caller evidence and transport failures remain distinct", async () => {
   const architecture = normalizeServiceArchitecture(multiArchitecture());
   assert.equal(
     architecture.services[0].dependencies[0].failureCriteria.timeout,
@@ -359,7 +360,7 @@ Deno.test("AC-F014-006 · caller evidence and transport failures remain distinct
   );
 });
 
-Deno.test("AC-F014-007 · partial failures preserve caller-owned recovery semantics", async () => {
+test("AC-F014-007 · partial failures preserve caller-owned recovery semantics", async () => {
   const architecture = normalizeServiceArchitecture(multiArchitecture());
   assert.equal(
     architecture.services[0].dependencies[0].partialFailure.atomic,
@@ -384,7 +385,7 @@ Deno.test("AC-F014-007 · partial failures preserve caller-owned recovery semant
   assert.equal(localState, "compensated");
 });
 
-Deno.test("AC-F014-008 · service tests and contracts require no unrelated runtime", () =>
+test("AC-F014-008 · service tests and contracts require no unrelated runtime", () =>
   temporary(async (projectRoot) => {
     const architecture = multiArchitecture();
     await scaffoldServiceWorkspaces({
@@ -401,7 +402,7 @@ Deno.test("AC-F014-008 · service tests and contracts require no unrelated runti
     assert.ok(rendered.artifacts.some((item) => item.path === "openapi.json"));
   }));
 
-Deno.test("AC-F014-009 · single-service projects activate no distributed infrastructure", () => {
+test("AC-F014-009 · single-service projects activate no distributed infrastructure", () => {
   const architecture = normalizeServiceArchitecture(singleArchitecture());
   assert.equal(architecture.choice, "single-service");
   assert.equal(architecture.rationale, undefined);

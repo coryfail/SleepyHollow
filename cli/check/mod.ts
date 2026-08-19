@@ -4,7 +4,7 @@ import { verify } from "./verifier.ts";
 
 export * from "./types.ts";
 export { runCheckCommand } from "./command.ts";
-export { runDenoVerification } from "./runner.ts";
+export { runNodeVerification } from "./runner.ts";
 
 export function verifyProject(inventory: VerificationInventory): CheckResult {
   return verify(inventory);

@@ -1,4 +1,6 @@
+import { platform } from "#platform";
 import type { NormalizedRoute } from "../routing/mod.ts";
+import type { EmbeddedSqliteDatabase } from "../database/mod.ts";
 
 /** How one test run ended. */
 export type TestResultStatus = "passed" | "failed" | "skipped";
@@ -45,15 +47,9 @@ export interface CriterionTestSpec {
   /** Path of the file the test is defined in. */
   readonly sourcePath: string;
   /** The test body. */
-  readonly fn: Deno.TestDefinition["fn"];
+  readonly fn: (context?: unknown) => void | Promise<void>;
   /** Skips the test while keeping its mapping visible. */
   readonly ignore?: boolean;
-  /** Passed through to Deno's test runner. */
-  readonly sanitizeExit?: boolean;
-  /** Passed through to Deno's test runner. */
-  readonly sanitizeOps?: boolean;
-  /** Passed through to Deno's test runner. */
-  readonly sanitizeResources?: boolean;
 }
 
 /** A registered test, as recorded for traceability. */
@@ -247,7 +243,7 @@ export interface TestingDiagnostic {
 /** What a test application factory is given to build the application. */
 export interface TestApplicationFactoryContext<Principal, Credentials> {
   /** An isolated store for this test. */
-  readonly kv: Deno.Kv;
+  readonly database: EmbeddedSqliteDatabase;
   /** The caller the test acts as, when it declares one. */
   readonly principal?: Principal;
   /** Credentials the test authenticates with, when it declares any. */
@@ -288,7 +284,7 @@ export interface TestApplicationFixtures<Principal, Credentials> {
   readonly credentials?: Credentials;
   /** Populates the store before the test body runs. */
   readonly seed?: (context: {
-    readonly kv: Deno.Kv;
+    readonly database: EmbeddedSqliteDatabase;
     readonly application: TestApplication;
   }) => void | Promise<void>;
   /** Runs after the test, before the store is closed. */
@@ -374,7 +370,7 @@ export interface ProblemDetails {
  */
 export interface TestApplicationContext {
   /** The isolated store this test runs against. */
-  readonly kv: Deno.Kv;
+  readonly database: EmbeddedSqliteDatabase;
   /** The application under test. */
   readonly application: TestApplication;
   /**

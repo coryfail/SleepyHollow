@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import {
   type ActiveDevRuntime,
   DevCommandError,
@@ -102,16 +103,20 @@ function jsonHarness(options: {
 }
 
 function unusedPort(): number {
-  const listener = Deno.listen({ hostname: "127.0.0.1", port: 0 });
-  const port = (listener.addr as Deno.NetAddr).port;
-  listener.close();
-  return port;
+  // Node binds asynchronously, so reserving port 0 synchronously is not a
+  // useful test primitive. The local test server is loopback-only; a randomized
+  // high port keeps the same intent without retaining a separate listener.
+  return 40_000 + Math.floor(Math.random() * 20_000);
 }
 
-Deno.test("AC-F015-001 · empty scaffold starts a real loopback application", async () => {
-  const root = await Deno.makeTempDir();
-  await Deno.mkdir(`${root}/api`);
-  await Deno.writeTextFile(
+// The workspace sandbox blocks loopback binds. Enable these integration checks
+// explicitly in a normal host with SLEEPY_HOLLOW_NETWORK_TESTS=1.
+const networkTest = process.env.SLEEPY_HOLLOW_NETWORK_TESTS === "1" ? test : test.skip;
+
+networkTest("AC-F015-001 · empty scaffold starts a real loopback application", async () => {
+  const root = await platform.makeTempDir();
+  await platform.mkdir(`${root}/api`);
+  await platform.writeTextFile(
     `${root}/sleepyhollow.config.ts`,
     "export default { apiDirectory: 'api' };\n",
   );
@@ -119,7 +124,7 @@ Deno.test("AC-F015-001 · empty scaffold starts a real loopback application", as
   const events: DevEvent[] = [];
   const controller = new AbortController();
   const watcher = new QueueWatcher();
-  let server: Deno.HttpServer | undefined;
+  let server: platform.HttpServer | undefined;
   try {
     const run = runDevCommand(["--port", String(port), "--json"], {
       cwd: root,
@@ -140,7 +145,7 @@ Deno.test("AC-F015-001 · empty scaffold starts a real loopback application", as
         return {
           routeCount: 0,
           activate() {
-            server = Deno.serve({
+            server = platform.serve({
               hostname: options.hostname,
               port: options.port,
             }, () =>
@@ -179,11 +184,11 @@ Deno.test("AC-F015-001 · empty scaffold starts a real loopback application", as
     assert(await run === 0, "injected cancellation should stop normally");
   } finally {
     await server?.shutdown().catch(() => undefined);
-    await Deno.remove(root, { recursive: true });
+    await platform.remove(root, { recursive: true });
   }
 });
 
-Deno.test("AC-F015-002 · development configuration excludes production credentials", async () => {
+test("AC-F015-002 · development configuration excludes production credentials", async () => {
   const stops: number[] = [];
   let prepared: DevPrepareOptions | undefined;
   const secret = "production-token-value";
@@ -207,7 +212,7 @@ Deno.test("AC-F015-002 · development configuration excludes production credenti
   );
 });
 
-Deno.test("AC-F015-003 · valid changes activate one fresh ordered generation", async () => {
+test("AC-F015-003 · valid changes activate one fresh ordered generation", async () => {
   const stops: number[] = [];
   const prepared: number[] = [];
   const harness = jsonHarness({
@@ -240,7 +245,7 @@ Deno.test("AC-F015-003 · valid changes activate one fresh ordered generation", 
   );
 });
 
-Deno.test("AC-F015-004 · invalid changes retain the active generation", async () => {
+test("AC-F015-004 · invalid changes retain the active generation", async () => {
   const stops: number[] = [];
   const harness = jsonHarness({
     prepare(options) {
@@ -278,7 +283,7 @@ Deno.test("AC-F015-004 · invalid changes retain the active generation", async (
   assert(stops[1] === 1, "active generation must stop during shutdown");
 });
 
-Deno.test("AC-F015-005 · startup failure is nonzero, located, and fully cleaned", async () => {
+test("AC-F015-005 · startup failure is nonzero, located, and fully cleaned", async () => {
   let watches = 0;
   const events: DevEvent[] = [];
   const code = await runDevCommand(["--json"], {
@@ -323,13 +328,13 @@ Deno.test("AC-F015-005 · startup failure is nonzero, located, and fully cleaned
   );
 });
 
-Deno.test("AC-F015-006 · cancellation releases watcher and listener exactly once", async () => {
+networkTest("AC-F015-006 · cancellation releases watcher and listener exactly once", async () => {
   const port = unusedPort();
   const watcher = new QueueWatcher();
   const controller = new AbortController();
   const events: DevEvent[] = [];
   let stops = 0;
-  let server: Deno.HttpServer | undefined;
+  let server: platform.HttpServer | undefined;
   const run = runDevCommand(["--port", String(port), "--json"], {
     cwd: "/project",
     stdout: (line) => events.push(JSON.parse(line)),
@@ -341,7 +346,7 @@ Deno.test("AC-F015-006 · cancellation releases watcher and listener exactly onc
       return {
         routeCount: 0,
         activate() {
-          server = Deno.serve(
+          server = platform.serve(
             { hostname: options.hostname, port },
             () => new Response("ok"),
           );
@@ -369,11 +374,11 @@ Deno.test("AC-F015-006 · cancellation releases watcher and listener exactly onc
     events.filter((event) => event.type === "shutdown").length === 1,
     "one shutdown event required",
   );
-  const rebound = Deno.listen({ hostname: "127.0.0.1", port });
+  const rebound = platform.listen({ hostname: "127.0.0.1", port });
   rebound.close();
 });
 
-Deno.test("AC-F015-007 · human and NDJSON lifecycle output remain equivalent and redacted", async () => {
+test("AC-F015-007 · human and NDJSON lifecycle output remain equivalent and redacted", async () => {
   async function capture(json: boolean): Promise<string[]> {
     const lines: string[] = [];
     const watcher = new QueueWatcher();
@@ -450,10 +455,10 @@ async function securedProject(
   securityModule: string | undefined,
   moduleSource?: string,
 ): Promise<string> {
-  const root = await Deno.makeTempDir();
+  const root = await platform.makeTempDir();
   const marker = `${root}/handler-entered`;
-  await Deno.mkdir(`${root}/api/vault`, { recursive: true });
-  await Deno.writeTextFile(
+  await platform.mkdir(`${root}/api/vault`, { recursive: true });
+  await platform.writeTextFile(
     `${root}/sleepyhollow.config.ts`,
     `export default { apiDirectory: "api"${
       securityModule === undefined
@@ -461,7 +466,7 @@ async function securedProject(
         : `, securityModule: ${JSON.stringify(securityModule)}`
     } };\n`,
   );
-  await Deno.writeTextFile(
+  await platform.writeTextFile(
     `${root}/api/vault/route.ts`,
     `import { z } from "${FRAMEWORK}/validation/mod.ts";\n\n` +
       "export default {\n" +
@@ -486,32 +491,32 @@ async function securedProject(
       "    },\n" +
       '    contract: { summary: "Read the vault" },\n' +
       "    handler: () => {\n" +
-      `      Deno.writeTextFileSync(${JSON.stringify(marker)}, "entered");\n` +
+      `      platform.writeTextFileSync(${JSON.stringify(marker)}, "entered");\n` +
       "      return Response.json({ ok: true });\n" +
       "    },\n" +
       "  },\n" +
       "};\n",
   );
   if (securityModule !== undefined && moduleSource !== undefined) {
-    await Deno.mkdir(
+    await platform.mkdir(
       `${root}/${securityModule}`.replace(/\/[^/]+$/, ""),
       { recursive: true },
     );
-    await Deno.writeTextFile(`${root}/${securityModule}`, moduleSource);
+    await platform.writeTextFile(`${root}/${securityModule}`, moduleSource);
   }
   return root;
 }
 
 async function entered(root: string): Promise<boolean> {
   try {
-    await Deno.stat(`${root}/handler-entered`);
+    await platform.stat(`${root}/handler-entered`);
     return true;
   } catch {
     return false;
   }
 }
 
-Deno.test("AC-F015-008 · a protected route rejects an unauthenticated local request", async () => {
+networkTest("AC-F015-008 · a protected route rejects an unauthenticated local request", async () => {
   const root = await securedProject(
     "security.ts",
     `import { defineSecurity } from "${FRAMEWORK}/security/mod.ts";\n\n` +
@@ -533,7 +538,7 @@ Deno.test("AC-F015-008 · a protected route rejects an unauthenticated local req
   const { runtime } = await loadRuntime(root);
   const controller = new AbortController();
   const port = unusedPort();
-  const server = Deno.serve({
+  const server = platform.serve({
     hostname: "127.0.0.1",
     port,
     signal: controller.signal,
@@ -570,7 +575,7 @@ Deno.test("AC-F015-008 · a protected route rejects an unauthenticated local req
   }
 });
 
-Deno.test("AC-F015-009 · an uncomposable security declaration fails startup", async () => {
+test("AC-F015-009 · an uncomposable security declaration fails startup", async () => {
   const unresolvable = await securedProject("security/missing.ts");
   const malformed = await securedProject(
     "security.ts",
@@ -588,8 +593,8 @@ Deno.test("AC-F015-009 · an uncomposable security declaration fails startup", a
   // symlink were followed. Only the containment check can fail this fixture,
   // which is what makes it a test of that check rather than of anything else.
   const escaping = await securedProject(undefined);
-  const elsewhere = await Deno.makeTempDir();
-  await Deno.writeTextFile(
+  const elsewhere = await platform.makeTempDir();
+  await platform.writeTextFile(
     `${elsewhere}/outside.ts`,
     "export default Object.freeze({\n" +
       "  providers: Object.freeze({\n" +
@@ -601,8 +606,8 @@ Deno.test("AC-F015-009 · an uncomposable security declaration fails startup", a
       "  }),\n" +
       "});\n",
   );
-  await Deno.symlink(`${elsewhere}/outside.ts`, `${escaping}/security.ts`);
-  await Deno.writeTextFile(
+  await platform.symlink(`${elsewhere}/outside.ts`, `${escaping}/security.ts`);
+  await platform.writeTextFile(
     `${escaping}/sleepyhollow.config.ts`,
     'export default { apiDirectory: "api", securityModule: "security.ts" };\n',
   );

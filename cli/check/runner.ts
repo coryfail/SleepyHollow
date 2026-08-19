@@ -1,9 +1,9 @@
-import { isAbsolute, relative, resolve, sep } from "node:path";
+import { platform } from "#platform";
+import { isAbsolute, relative, resolve, sep } from "path";
 
 import type {
-  DenoVerificationRunnerOptions,
-  DenoVerificationRunnerResult,
-  VerificationPermissions,
+  NodeVerificationRunnerOptions,
+  NodeVerificationRunnerResult,
 } from "./types.ts";
 
 const MAX_OUTPUT = 1024 * 1024;
@@ -23,52 +23,6 @@ function projectPath(root: string, path: string): string {
     throw new TypeError(`Verification path escapes the project root: ${path}`);
   }
   return local;
-}
-
-function permissionArgs(
-  root: string,
-  permissions: VerificationPermissions,
-): string[] {
-  const args: string[] = [];
-  for (
-    const [flag, paths] of [
-      ["--allow-read", permissions.read],
-      ["--allow-write", permissions.write],
-    ] as const
-  ) {
-    if (!paths?.length) continue;
-    args.push(
-      `${flag}=${
-        paths.map((path) => projectPath(root, path)).sort().join(",")
-      }`,
-    );
-  }
-  if (permissions.run?.length) {
-    if (permissions.run.some((value) => !program.test(value))) {
-      throw new TypeError(
-        "Verification run permissions must name bounded programs",
-      );
-    }
-    args.push(`--allow-run=${[...permissions.run].sort().join(",")}`);
-  }
-  if (permissions.env?.length) {
-    if (permissions.env.some((value) => !name.test(value))) {
-      throw new TypeError(
-        "Verification environment permissions must name exact keys",
-      );
-    }
-    args.push(`--allow-env=${[...permissions.env].sort().join(",")}`);
-  }
-  if (permissions.net?.length) {
-    if (permissions.net.some((value) => !host.test(value))) {
-      throw new TypeError(
-        "Verification network permissions must name exact hostnames",
-      );
-    }
-    args.push(`--allow-net=${[...permissions.net].sort().join(",")}`);
-  }
-  if (permissions.unstableKv) args.push("--unstable-kv");
-  return args;
 }
 
 async function readLimited(stream: ReadableStream<Uint8Array>): Promise<{
@@ -110,7 +64,7 @@ async function run(
   timeoutMs: number,
   signal?: AbortSignal,
 ): Promise<{ success: boolean; evidence: string; stdout: string }> {
-  const child = new Deno.Command(executable, {
+  const child = new platform.Command(executable, {
     cwd,
     args: [...args],
     stdout: "piped",
@@ -158,9 +112,9 @@ async function run(
   };
 }
 
-export async function runDenoVerification(
-  options: DenoVerificationRunnerOptions,
-): Promise<DenoVerificationRunnerResult> {
+export async function runNodeVerification(
+  options: NodeVerificationRunnerOptions,
+): Promise<NodeVerificationRunnerResult> {
   const root = resolve(options.projectRoot);
   const timeoutMs = options.timeoutMs ?? MAX_TIMEOUT;
   if (
@@ -182,26 +136,18 @@ export async function runDenoVerification(
       "Verification requires explicit typecheck and test files",
     );
   }
-  const executable = options.denoExecutable ?? Deno.execPath();
+  const executable = options.nodeExecutable ?? platform.execPath();
   const typecheck = await run(
     executable,
     root,
-    ["check", "--frozen", "--deny-import", ...typecheckFiles],
+    ["./node_modules/typescript/bin/tsc", "--noEmit", ...typecheckFiles],
     timeoutMs,
     options.signal,
   );
   const tests = await run(
     executable,
     root,
-    [
-      "test",
-      "--cached-only",
-      "--frozen",
-      "--no-prompt",
-      "--reporter=tap",
-      ...permissionArgs(root, options.permissions ?? {}),
-      ...testFiles,
-    ],
+    ["./node_modules/vitest/vitest.mjs", "run", "--reporter=verbose", ...testFiles],
     timeoutMs,
     options.signal,
   );

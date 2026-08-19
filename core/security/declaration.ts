@@ -1,5 +1,6 @@
-import { isAbsolute, resolve, sep } from "node:path";
-import { pathToFileURL } from "node:url";
+import { platform } from "#platform";
+import { isAbsolute, resolve, sep } from "path";
+import { pathToFileURL } from "url";
 
 import type { NormalizedRoute } from "../routing/mod.ts";
 import { createSecurityRouter } from "./security_router.ts";
@@ -152,7 +153,7 @@ async function declared(
   if (options.load === undefined) {
     let real: string;
     try {
-      real = await Deno.realPath(target);
+      real = await platform.realPath(target);
     } catch {
       throw failure(
         "SH_SECURITY_MODULE_UNRESOLVED",
@@ -161,7 +162,7 @@ async function declared(
         named,
       );
     }
-    const realRoot = await Deno.realPath(root).catch(() => root);
+    const realRoot = await platform.realPath(root).catch(() => root);
     if (real !== realRoot && !real.startsWith(realRoot + sep)) {
       throw failure(
         "SH_SECURITY_MODULE_ESCAPE",

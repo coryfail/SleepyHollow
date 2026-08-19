@@ -1,4 +1,5 @@
-import assert from "node:assert/strict";
+import { platform } from "#platform";
+import assert from "assert/strict";
 
 import { gateRelease } from "./mod.ts";
 import type {
@@ -10,10 +11,14 @@ import type {
 const SEMVER = /^\d+\.\d+\.\d+$/;
 
 async function manifest(): Promise<
-  { name?: string; version?: string; exports?: Record<string, string> }
+  {
+    name?: string;
+    version?: string;
+    exports?: Record<string, { readonly import?: string; readonly types?: string }>;
+  }
 > {
   return JSON.parse(
-    await Deno.readTextFile(new URL("../deno.json", import.meta.url)),
+    await platform.readTextFile(new URL("../package.json", import.meta.url)),
   );
 }
 
@@ -28,7 +33,7 @@ function identity(overrides: Partial<PackageIdentity> = {}): PackageIdentity {
 
 /**
  * A registry that answers with the given versions. The seam keeps the suite
- * hermetic: no test reaches jsr.io, and the live query happens only when a
+ * hermetic: no test reaches the npm registry, and the live query happens only when a
  * release is attempted.
  */
 function listing(...versions: readonly string[]): RegistryTransport {
@@ -51,7 +56,7 @@ function request(overrides: Partial<ReleaseRequest> = {}): ReleaseRequest {
   };
 }
 
-Deno.test("AC-F020-001 · the declared version is checked against the registry listing", async () => {
+test("AC-F020-001 · the declared version is checked against the registry listing", async () => {
   const declared = await manifest();
   assert.equal(typeof declared.name, "string");
   assert.ok(declared.name && declared.name.length > 0);
@@ -74,7 +79,7 @@ Deno.test("AC-F020-001 · the declared version is checked against the registry l
   );
   assert.equal(result.name, declared.name);
   assert.equal(result.version, declared.version);
-  assert.deepEqual(result.registries, ["jsr"]);
+  assert.deepEqual(result.registries, ["npm"]);
   assert.equal(result.ok, true);
 
   // The same declared version, now present in the listing, must be refused.
@@ -90,20 +95,22 @@ Deno.test("AC-F020-001 · the declared version is checked against the registry l
   );
 });
 
-Deno.test("AC-F020-002 · every declared export entry point resolves", async () => {
+test("AC-F020-002 · every declared export entry point resolves", async () => {
   const declared = await manifest();
   const entries = Object.entries(declared.exports ?? {});
   assert.ok(entries.length > 0);
-  for (const [name, target] of entries) {
+  for (const [name, targets] of entries) {
+    const target = targets.import;
+    assert.equal(typeof target, "string", `${name} must have an ESM import target`);
     const url = new URL(`../${target.replace(/^\.\//, "")}`, import.meta.url);
-    const stat = await Deno.stat(url);
+    const stat = await platform.stat(url);
     assert.ok(stat.isFile, `${name} -> ${target} does not resolve`);
   }
 });
 
-Deno.test("AC-F020-003 · an internal module is not named in the export map", async () => {
+test("AC-F020-003 · an internal module is not named in the export map", async () => {
   const declared = await manifest();
-  const targets = Object.values(declared.exports ?? {});
+  const targets = Object.values(declared.exports ?? {}).flatMap((entry) => [entry.import, entry.types]);
   for (
     const internal of [
       "./cli/evidence/mod.ts",
@@ -118,20 +125,20 @@ Deno.test("AC-F020-003 · an internal module is not named in the export map", as
   }
 });
 
-Deno.test("AC-F020-004 · the release result declares the Deno runtime target", async () => {
-  assert.equal((await gateRelease(request())).runtime, "deno");
+test("AC-F020-004 · the release result declares the platform runtime target", async () => {
+  assert.equal((await gateRelease(request())).runtime, "node-bun");
 });
 
-Deno.test("AC-F020-005 · documented installation resolves against the declared package", async () => {
+test("AC-F020-005 · documented installation resolves against the declared package", async () => {
   const declared = await manifest();
-  const readme = await Deno.readTextFile(
+  const readme = await platform.readTextFile(
     new URL("../README.md", import.meta.url),
   );
   assert.ok(
     readme.includes(declared.name ?? "\u0000"),
     "installation documentation must name the declared package",
   );
-  const specifiers = [...readme.matchAll(/(?:jsr|npm):(@[\w.-]+\/[\w.-]+)/g)]
+  const specifiers = [...readme.matchAll(/(?:npm install(?: -g)?|bun add) (@[\w.-]+\/[\w.-]+)/g)]
     .map((match) => match[1]);
   assert.ok(
     specifiers.length > 0,
@@ -147,7 +154,7 @@ Deno.test("AC-F020-005 · documented installation resolves against the declared 
   const entries = Object.keys(declared.exports ?? {});
   for (
     const sub of [
-      ...readme.matchAll(/(?:jsr|npm):@[\w.-]+\/[\w.-]+(\/[\w-]+)/g),
+      ...readme.matchAll(/(?:npm install(?: -g)?|bun add) @[\w.-]+\/[\w.-]+(\/[\w-]+)/g),
     ]
   ) {
     assert.ok(
@@ -157,13 +164,13 @@ Deno.test("AC-F020-005 · documented installation resolves against the declared 
   }
 });
 
-Deno.test("release gate · a clean verified release is permitted", async () => {
+test("release gate · a clean verified release is permitted", async () => {
   const result = await gateRelease(request());
   assert.equal(result.ok, true);
   assert.deepEqual(result.diagnostics, []);
 });
 
-Deno.test("AC-F020-006 · a release from a failing tree is refused with evidence", async () => {
+test("AC-F020-006 · a release from a failing tree is refused with evidence", async () => {
   const result = await gateRelease(request({
     verificationPassed: false,
     verificationEvidence: ["verify:check failed with 1 failed test"],
@@ -178,7 +185,7 @@ Deno.test("AC-F020-006 · a release from a failing tree is refused with evidence
   );
 });
 
-Deno.test("AC-F020-007 · reusing a published version is refused", async () => {
+test("AC-F020-007 · reusing a published version is refused", async () => {
   const result = await gateRelease(request({
     registry: listing("0.0.9", "0.1.0"),
   }));
@@ -193,9 +200,9 @@ Deno.test("AC-F020-007 · reusing a published version is refused", async () => {
   );
 });
 
-Deno.test("AC-F020-009 · a release is refused when the registry cannot be read", async () => {
+test("AC-F020-009 · a release is refused when the registry cannot be read", async () => {
   const result = await gateRelease(request({
-    registry: unreachable("GET https://jsr.io/... responded 503"),
+    registry: unreachable("GET https://registry.npmjs.org/... responded 503"),
   }));
   assert.equal(
     result.ok,
@@ -212,9 +219,9 @@ Deno.test("AC-F020-009 · a release is refused when the registry cannot be read"
   );
 });
 
-Deno.test("AC-F020-008 · a release from a dirty tree is refused", async () => {
+test("AC-F020-008 · a release from a dirty tree is refused", async () => {
   const result = await gateRelease(request({
-    uncommittedPaths: ["cli/main.ts", "deno.json"],
+    uncommittedPaths: ["cli/main.ts", "package.json"],
   }));
   assert.equal(result.ok, false);
   const diagnostic = result.diagnostics.find((item) =>
@@ -224,9 +231,9 @@ Deno.test("AC-F020-008 · a release from a dirty tree is refused", async () => {
   assert.ok(diagnostic.evidence.includes("cli/main.ts"));
 });
 
-Deno.test("release gate · the scaffolded framework pin matches the declared version", async () => {
+test("release gate · the scaffolded framework pin matches the declared version", async () => {
   const declared = await manifest();
-  const source = await Deno.readTextFile(
+  const source = await platform.readTextFile(
     new URL("../cli/create/create.ts", import.meta.url),
   );
   const pinned = source.match(/FRAMEWORK_VERSION = "([^"]+)"/)?.[1];

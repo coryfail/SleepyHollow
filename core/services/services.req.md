@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F014
 title: Optional multi-service projects
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "9"
@@ -31,7 +31,7 @@ platform.
   independently deployed services.
 - Collision-safe service workspace scaffolding from an approved manifest.
 - Separate requirements, runtime configuration, API, tests, generated contract,
-  deployment configuration, and Deno KV ownership per service.
+  deployment configuration, and database ownership per service.
 - Static import/source checks and runtime capabilities that enforce service data
   ownership within the supported framework path.
 - Cross-service access through SH-F010 generated clients and project-approved
@@ -58,9 +58,9 @@ hypothetical future scale, and code organization alone are insufficient.
 
 Every service entry shall have a stable lowercase service ID, relative workspace
 root, owning application-requirement path, configuration path, API root, test
-root, generated-contract root, deployment-configuration path, and unique Deno KV
-binding ID. Multi-service entries shall also declare their outbound service
-dependencies. Absolute paths, overlapping roots, duplicate IDs or KV bindings,
+root, generated-contract root, deployment-configuration path, and unique
+database binding ID. Multi-service entries shall also declare their outbound service
+dependencies. Absolute paths, overlapping roots, duplicate IDs or database bindings,
 path traversal, undeclared dependencies, circular dependencies without an
 approved rationale, and an architecture choice inconsistent with its service
 count shall fail normalization with actionable diagnostics. Normalization shall
@@ -100,7 +100,7 @@ service's KV binding, or receive another service's repository or raw-KV
 capability. The boundary verifier shall inspect the normalized service roots and
 the complete local TypeScript source/import inventory. It shall fail on
 cross-root implementation imports, another service's generated persistence
-adapter, direct `Deno.openKv` use inside any service workspace, or a repository/KV
+adapter, direct ORM-driver use inside any service workspace, or a repository/database
 capability whose declared owner differs from the requesting service. Diagnostics
 shall name both services, the source, the forbidden target or binding, and the
 generated-client correction.
@@ -108,7 +108,7 @@ generated-client correction.
 The runtime service-KV capability shall bind an immutable service ID and KV
 binding before the database opener is invoked. Owner/requester mismatch shall
 fail closed without opening a database. This guard and the static verifier cover
-the supported framework path; they do not claim to sandbox arbitrary Deno code.
+the supported framework path; they do not claim to sandbox arbitrary runtime code.
 SH-F004 remains the only persistence API inside an owning service.
 
 ### Cross-service calls and failures
@@ -155,9 +155,9 @@ SH-F013 when that component is approved.
   and the evidence justifying any multi-service choice.
 - AC-F014-002: Scaffolding two approved services gives each separate application
   requirements, configuration, API structure, tests, contract output, deployment
-  configuration, and Deno KV database.
+  configuration, and database profile.
 - AC-F014-003: Static and runtime verification prevent or flag one service's
-  direct access to another service's Deno KV database.
+  direct access to another service's database.
 - AC-F014-004: A service calls another through its generated typed client using
   the authentication mechanism approved in project requirements.
 - AC-F014-005: An outbound service request propagates the request ID and applies
@@ -177,7 +177,7 @@ SH-F013 when that component is approved.
 - Token exchange or a central identity service.
 - Circuit breakers, sagas, event infrastructure, distributed transactions, and
   distributed tracing infrastructure.
-- A security sandbox for arbitrary Deno programs that bypass the supported
+- A security sandbox for arbitrary programs that bypass the supported
   framework source, verification, and capability paths.
 
 ## Dependencies and assumptions
@@ -278,3 +278,14 @@ other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, deployment, or external
   mutation was authorized or attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F014.
+- Governed-content digest:
+  `sha256:f7e573fb370e60bc0bc0a93a076ce24eb40b9b51b5defca9e845aaf8ee31e196`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

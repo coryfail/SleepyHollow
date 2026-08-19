@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-website
 title: Sleepy Hollow public website
-status: draft
+status: approved
 risk: standard
 depends_on:
   - sleepy-hollow-application
@@ -47,7 +47,7 @@ accurate it is.
   generated at build time from the exact Markdown files under `docs/` in the
   same revision.
 - Publish a generated API reference beneath a stable `/api/` path, produced by
-  the Deno toolchain from the framework's own source documentation comments.
+  TypeDoc from the framework's own source comments.
 - State how to install the published package and CLI, using the real commands
   for the version that is actually published.
 - Provide clear navigation among the pages and to the canonical GitHub
@@ -89,7 +89,7 @@ constraints.
 
 The generated API reference at `/api/` has no narrative of its own. It is build
 output governed by this file, not a hand-authored page, and it is exempt from
-the shared visual system because the Deno toolchain controls its markup.
+the shared visual system because TypeDoc controls its markup.
 
 ## Shared experience
 
@@ -228,7 +228,7 @@ the shared visual system because the Deno toolchain controls its markup.
   `docs/` in the same revision, and no second copy of that prose is maintained
   under `website/`.
 - AC-SITE-013: Given the production build completes, then a generated API
-  reference is published beneath `/api/`, produced by the Deno toolchain from
+  reference is published beneath `/api/`, produced by TypeDoc from
   the framework's own source documentation comments, and reachable by a
   descriptive link from the documentation section.
 - AC-SITE-014: Given the repository is inspected, then no documentation entry
@@ -240,7 +240,7 @@ the shared visual system because the Deno toolchain controls its markup.
   stale prose.
 - AC-SITE-016: Given the site states how to install Sleepy Hollow, then the
   stated package name, commands, and version claim match the package actually
-  published to JSR and the install instructions in `README.md`.
+  packed for npm and the install instructions in `README.md`.
 
 ## Change history and approval boundary
 
@@ -258,8 +258,8 @@ each is a deliberate reversal rather than an extension:
    authorized scope, because the framework is now published and readers need
    documentation on the site rather than in a code host's file viewer.
 2. Installation instructions moved from out of scope to authorized scope,
-   because `@sleepy-hollow/framework` is published to JSR and stating how to
-   install it is now a fact rather than a claim.
+   because the locally packed npm artifact makes the commands independently
+   verifiable before publication.
 3. Comprehension became a governed property rather than an implicit one,
    because the delivered copy satisfied every prior criterion while leaving a
    first-time reader unable to say what the framework does.
@@ -618,3 +618,14 @@ otherwise healthy runner.
 - The embedded record contains no independent post-delivery result; the earlier
   verification entry stated that DNS activation remained externally pending.
 - No delivery is authorized by the current repository consistency requirement.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by the website.
+- Governed-content digest:
+  `sha256:5636854fe3dd65285040439d9e9210d3266069ab2dacf3cc0f6f5ab6b9e64350`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

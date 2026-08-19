@@ -1,4 +1,6 @@
-import { createHash } from "node:crypto";
+import { platform } from "#platform";
+import { createHash } from "crypto";
+import { test } from "vitest";
 
 import { testingDiagnostic, TestingError } from "./error.ts";
 import type {
@@ -32,10 +34,10 @@ function validateRequirements(
 
 export function createRegistry(options: {
   readonly requirements: readonly RequirementEvidence[];
-  readonly register?: (definition: Deno.TestDefinition) => void;
+  readonly register?: (definition: { readonly name: string; readonly fn: (context?: unknown) => void | Promise<void>; readonly skip?: boolean }) => void;
 }): CriterionTestRegistry {
   const requirements = validateRequirements(options.requirements);
-  const register = options.register ?? ((definition) => Deno.test(definition));
+  const register = options.register ?? ((definition) => test(definition.name, { skip: definition.skip }, definition.fn));
   const descriptors = new Map<string, CriterionTestDescriptor>();
 
   return Object.freeze({
@@ -142,10 +144,7 @@ export function createRegistry(options: {
       register({
         name: registeredName,
         fn: spec.fn,
-        ignore: spec.ignore,
-        sanitizeExit: spec.sanitizeExit,
-        sanitizeOps: spec.sanitizeOps,
-        sanitizeResources: spec.sanitizeResources,
+        skip: spec.ignore,
       });
       descriptors.set(spec.id, descriptor);
       return descriptor;

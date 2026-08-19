@@ -2,7 +2,7 @@
 schema: sgad-application/v0.2
 id: sleepy-hollow-application
 title: Sleepy Hollow requirements and architecture specification
-status: draft
+status: approved
 risk: standard
 depends_on: []
 owners:
@@ -11,13 +11,13 @@ owners:
 
 # Sleepy Hollow Requirements and Architecture Specification
 
-**Version:** 0.5.0
+**Version:** 0.3.0
 
-**Date:** August 8, 2026
+**Date:** August 18, 2026
 
 ## 1. Executive summary
 
-Sleepy Hollow is an agentic-first, simple headless framework for rapidly designing, prototyping, testing, and deploying APIs on Deno.
+Sleepy Hollow is an agentic-first, simple headless framework for rapidly designing, prototyping, testing, and deploying APIs on Node.js and Bun.
 
 Its defining feature is the official Sleepy Hollow AI skill. The skill guides a user from a plain-language application idea to a reviewed API design, creates requirements beside every proposed endpoint, develops each approved endpoint through test-driven development, verifies the result with deterministic framework tooling, and deploys the finished application.
 
@@ -26,7 +26,7 @@ skill. It helps developers adopt Specification-Governed Agentic Development in
 any repository without requiring the Sleepy Hollow runtime, CLI, or application
 skill.
 
-The framework is the small, reliable runtime beneath that experience. It provides file-based routing, schemas, validation, Deno KV integration, security defaults, tests, API contracts, generated clients, and fast deployment. It remains usable by a human without the skill, but it is intentionally designed so an agent can understand and operate it reliably.
+The framework is the small, reliable runtime beneath that experience. It provides file-based routing, schemas, validation, relational repositories, embedded SQLite, optional PostgreSQL, security defaults, tests, API contracts, generated clients, and portable container deployment. It remains usable by a human without the skill, but it is intentionally designed so an agent can understand and operate it reliably.
 
 The primary product promise is:
 
@@ -44,7 +44,7 @@ Microservices are optional. A project may be one deployable API, several indepen
 
 ### 2.1 Product category
 
-Sleepy Hollow is an agentic-first headless application framework and development workflow. The AI skill is the primary development experience. The Deno framework and CLI provide the deterministic application runtime, checks, contracts, and deployment path that make the agentic workflow trustworthy.
+Sleepy Hollow is an agentic-first headless application framework and development workflow. The AI skill is the primary development experience. The Node and Bun framework and CLI provide the deterministic application runtime, checks, contracts, database, and deployment path that make the agentic workflow trustworthy.
 
 Sleepy Hollow is not primarily:
 
@@ -52,7 +52,7 @@ Sleepy Hollow is not primarily:
 - A backend-as-a-service
 - An autonomous agent host
 - An identity provider
-- An ORM for many databases
+- A general-purpose ORM or universal database abstraction
 - A microservice control plane
 - An enterprise requirements-management system
 
@@ -79,7 +79,7 @@ The user should receive:
 - Endpoint-by-endpoint human approval
 - Acceptance tests derived from approved criteria
 - TDD-based implementation
-- Deno KV persistence
+- Zero-configuration SQLite persistence with optional PostgreSQL
 - Security-aware defaults and checks
 - OpenAPI documentation
 - A typed TypeScript client
@@ -98,7 +98,7 @@ The user should receive:
 8. **Secure behavior should be difficult to forget.** Validation and basic protections are framework defaults.
 9. **Authentication is application-defined.** The planning workflow selects the right approach for each application.
 10. **Microservices are optional.** A single deployable API is the default unless independent services are justified.
-11. **One strong deployment path comes first.** Fast, repeatable deployment matters more than broad platform support.
+11. **One portable deployment boundary comes first.** A deterministic container bundle and provider adapter contract prevent hosting lock-in; Fly.io is the first live adapter.
 12. **Escape hatches are explicit.** Custom behavior is allowed without making the common path ambiguous.
 
 ## 3. Primary user workflow
@@ -308,7 +308,7 @@ The framework and CLI own:
 - Application runtime
 - Routing and method dispatch
 - Schema validation
-- Deno KV access
+- Relational database and repository access
 - Index and pagination rules
 - Error normalization
 - Security defaults
@@ -331,7 +331,7 @@ sleepyhollow/
 │   ├── requirements-format.md
 │   ├── endpoint-tdd.md
 │   ├── security-and-auth.md
-│   ├── deno-kv.md
+│   ├── database.md
 │   ├── service-design.md
 │   └── deployment.md
 └── scripts/
@@ -541,34 +541,39 @@ The framework shall:
 
 ### 6.3 Data access
 
-The first release shall use Deno KV as its supported persistence system.
+The first release shall use Drizzle ORM behind a framework-owned relational
+resource and repository API. Embedded SQLite is the zero-configuration default
+for development, tests, and production with a durable volume. PostgreSQL is an
+optional explicitly configured external profile for applications that require
+multiple writable instances or independently operated storage.
 
 The framework shall provide:
 
-- Typed key and value access
-- Resource-oriented repositories or equivalent small primitives
-- Declared secondary indexes
-- Cursor pagination
-- Bounded list operations
-- Uniqueness enforcement using atomic checks where supported
-- Atomic operations where Deno KV permits them
-- Test database isolation
-- Explicit raw-KV escape hatch
+- Typed resource fields and repository operations
+- Declared primary, unique, secondary, and relationship indexes
+- Deterministic cursor pagination and bounded list operations
+- Database-enforced uniqueness and transactions
+- Version-checked optimistic concurrency
+- Isolated in-memory test databases
+- Versioned, planned, and locked schema migrations
+- An explicit requirement-bound and dialect-declaring raw-SQL escape hatch
 
-The framework shall detect or warn about:
+The framework shall detect or refuse:
 
 - Unbounded reads
 - Filtering without a compatible declared index
 - Unsafe read-modify-write patterns
-- Production code directly using raw Deno KV without an explicit escape hatch
+- Raw SQL without an approved requirement, reason, and dialect
+- Production SQLite without a durable path or with multiple writable instances
+- PostgreSQL without valid explicit connection and TLS configuration
 
 ### 6.4 Relationships
 
-The first release shall support simple references and indexed lookups, including a basic `belongsTo` pattern. It shall not promise SQL-style joins, automatic cascading behavior, or distributed transactions.
+The first release shall support simple foreign-key relationships and indexed lookups, including a basic `belongsTo` pattern. Portable repositories shall not promise arbitrary joins, automatic cascading behavior, database-specific extensions, or distributed transactions.
 
 ### 6.5 Error format
 
-API errors shall use RFC 9457 Problem Details. Production responses shall not expose stack traces, secrets, internal KV keys, or implementation details.
+API errors shall use RFC 9457 Problem Details. Production responses shall not expose stack traces, secrets, connection strings, internal database state, or implementation details.
 
 ### 6.6 Custom behavior
 
@@ -667,7 +672,7 @@ The skill should recommend one API unless independent ownership, scaling, deploy
 
 ### 9.2 Structure
 
-When multiple services are approved, each service shall have its own application requirements, endpoint requirements, runtime configuration, contract, tests, deployment, and Deno KV database.
+When multiple services are approved, each service shall have its own application requirements, endpoint requirements, runtime configuration, contract, tests, deployment, and database profile.
 
 ```text
 services/
@@ -688,7 +693,7 @@ services/
 ### 9.3 Service rules
 
 - Each service owns its data.
-- A service shall not read another service's Deno KV database.
+- A service shall not read another service's database directly.
 - Cross-service access occurs through an API contract and generated client.
 - Service authentication is defined by the approved project requirements.
 - Request deadlines and cancellation shall be supported.
@@ -745,7 +750,7 @@ Contract generation shall derive from the same normalized route and schema defin
 Sleepy Hollow shall provide utilities for:
 
 - Starting an application in test mode
-- Isolated Deno KV databases
+- Isolated relational test databases
 - Typed request helpers
 - Seeding and cleaning data
 - Supplying a project-defined principal or credentials
@@ -830,18 +835,20 @@ Fast deployment is part of the primary product experience.
 
 The first release shall support:
 
-- Local Deno development
-- One excellent hosted production target, initially Deno Deploy
-- Environment validation before deployment
+- Local Node and Bun development
+- Deterministic Node and Bun production container bundles
+- One live provider adapter, initially Fly.io
+- A capability-declaring provider registry for future adapters
+- Environment, credential, database, migration, and topology validation
 - Full verification before deployment
-- Deployment preview or plan
+- Deployment preview and plan-digest confirmation
 - Deployment through `hollow deploy`
 - Post-deployment health and smoke tests
-- Clear live URL and contract output
+- Clear live URL, provider revision, source revision, and contract output
 
 The skill shall guide deployment, but the CLI shall perform the deterministic build, validation, upload, and smoke-test steps.
 
-Standalone executables and additional cloud adapters are deferred until the initial path is reliable.
+Additional live cloud adapters are deferred until the portable bundle and Fly.io path are reliable; the provider boundary shall not require application rewrites when they are added.
 
 ## 15. First-release scope
 
@@ -859,7 +866,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 - File-based routes
 - Custom route handlers
 - Request and response schemas
-- Deno KV persistence
+- Embedded SQLite persistence and optional PostgreSQL
 - Declared indexes and cursor pagination
 - Basic relationships
 - RFC 9457 errors
@@ -870,7 +877,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 - Independent `hollow check`
 - Human and JSON CLI output
 - Local development
-- One hosted deployment target
+- Fly.io deployment through a provider-neutral container boundary
 - Optional multi-service project structure
 - Generated cross-service clients
 
@@ -884,12 +891,12 @@ Standalone executables and additional cloud adapters are deferred until the init
 - Agent runtime, model routing, and token accounting
 - Cryptographically locked tests
 - Complex requirements state machines
-- Full migration automation
-- Additional databases
+- Automatic cross-dialect data migration
+- Databases other than SQLite and PostgreSQL
 - File and object storage
 - Background jobs and cron
 - Universal extension marketplace
-- Multiple deployment adapters
+- Additional live deployment adapters
 - Standalone executable deployment
 - Full microservice orchestration
 - User token exchange and shared identity infrastructure
@@ -914,7 +921,7 @@ Standalone executables and additional cloud adapters are deferred until the init
 | SH-F001 | `cli/create/create.req.md` | Installation and safe project creation |
 | SH-F002 | `core/routing/routing.req.md` | File-based HTTP routing runtime |
 | SH-F003 | `core/validation/validation.req.md` | Schemas, validation, and Problem Details |
-| SH-F004 | `core/kv/kv.req.md` | Typed, bounded Deno KV access |
+| SH-F004 | `core/database/database.req.md` | SQLite, PostgreSQL, migrations, and typed relational repositories |
 | SH-F005 | `core/security/security.req.md` | Security, authentication, and authorization boundaries |
 | SH-F006 | `skills/sleepy-hollow/planning/planning.req.md` | Application planning, decomposition, and approval |
 | SH-F007 | `core/testing/testing.req.md` | Test utilities and criterion traceability |
@@ -923,25 +930,25 @@ Standalone executables and additional cloud adapters are deferred until the init
 | SH-F010 | `cli/generate/generate.req.md` | OpenAPI and typed-client generation |
 | SH-F011 | `cli/cli.req.md` | Shared CLI behavior and diagnostics |
 | SH-F012 | `core/config/config.req.md` | Configuration and observability |
-| SH-F013 | `cli/deploy/deploy.req.md` | Verified Deno Deploy delivery |
+| SH-F013 | `cli/deploy/deploy.req.md` | Portable container deployment and Fly.io delivery |
 | SH-F014 | `core/services/services.req.md` | Optional multi-service projects |
 | SH-F015 | `cli/dev/dev.req.md` | Local development server |
 | SH-F016 | `cli/test/test.req.md` | Test execution and criterion results |
 | SH-F017 | `skills/sgad-workflow/sgad-workflow.req.md` | Framework-independent SGAD workflow skill |
 | SH-F018 | `cli/evidence/evidence.req.md` | Repository evidence loading for check, test, and deploy |
 | SH-F019 | `core/capture/capture.req.md` | Runtime evidence capture during test execution |
-| SH-F020 | `packaging/packaging.req.md` | Distribution and public API surface |
+| SH-F020 | `packaging/packaging.req.md` | npm distribution and public API surface |
+| SH-F021 | `runtime/platform.req.md` | Node and Bun runtime platform |
 
 ### 15.5 Distribution
 
 Sleepy Hollow is distributed as one package with a declared name, semantic
 version, and explicit export map. Only exported entry points are public API.
 
-It publishes to JSR as the primary registry for Deno consumers and to npm for
-reach, both from the same verified revision at the same version. The framework
-targets Deno and depends on Deno KV, Deno runtime APIs, and Deno Deploy. npm
-publication is a distribution channel for Deno consumers, not a claim of Node
-support, and the published metadata states this plainly.
+It publishes one compiled ESM package with declarations and an installable
+`hollow` executable to npm. Node 24 LTS is the canonical runtime and Bun is a
+verified compatible runtime. Package metadata and packed-artifact conformance
+state that support plainly.
 
 Publication requires that verification pass for the revision being published.
 
@@ -959,7 +966,7 @@ The first release is complete when all of the following are demonstrated:
 8. The skill runs the tests before implementation and recognizes the expected failure.
 9. The skill implements the endpoint and obtains passing tests without weakening approved behavior.
 10. `hollow check` independently verifies the endpoint.
-11. The application persists and queries data through Deno KV with declared indexes and bounded pagination.
+11. The application persists and queries data through embedded SQLite without a connection string, or through explicitly configured PostgreSQL, with declared indexes and bounded pagination.
 12. Invalid input and unknown fields are rejected consistently.
 13. Errors use RFC 9457 without leaking sensitive implementation details.
 14. The skill can plan an application with no authentication.
@@ -970,9 +977,9 @@ The first release is complete when all of the following are demonstrated:
 19. Human-readable and JSON diagnostics identify actionable failures.
 20. The skill can deploy a verified application and return its live URL.
 21. A deployment smoke test verifies the live health endpoint and one representative API operation.
-22. The skill can optionally scaffold two independent services with separate requirements and Deno KV stores.
+22. The skill can optionally scaffold two independent services with separate requirements and database profiles.
 23. One service can call another through a generated client using the authentication approach approved in that project's requirements.
-24. No service reads another service's Deno KV data directly.
+24. No service reads another service's database directly.
 25. A developer can use the standalone SGAD skill in a non-Sleepy Hollow
     repository to establish governance, create reviewable requirements, preserve
     approval and red-state gates, and produce an evidence-based verification
@@ -986,7 +993,7 @@ The first release is complete when all of the following are demonstrated:
 
 - File-based routing
 - Schemas and validation
-- Deno KV primitives
+- Relational resource, repository, SQLite, and migration primitives
 - Errors and basic security
 - Test utilities
 - Human-readable and JSON diagnostics
@@ -1030,7 +1037,7 @@ The first release is complete when all of the following are demonstrated:
 
 ### Phase 5: Deployment
 
-- Deno Deploy target
+- Portable container bundle and Fly.io target
 - Environment validation
 - Deployment plan
 - Smoke tests
@@ -1057,7 +1064,9 @@ The first release is complete when all of the following are demonstrated:
 | The standalone SGAD skill drifts from the methodology | Developers receive contradictory governance guidance | Keep methodology documents authoritative and validate the skill's gates, references, and templates against them |
 | Framework API becomes too broad for agents | Lower implementation reliability | Maintain a small canonical API and explicit escape hatches |
 | Microservices add premature complexity | Slow prototypes and operational burden | Default to one API and require planning justification for multiple services |
-| Deno KV limits future workloads | Rework for advanced data needs | Keep data access behind stable primitives and document the escape hatch |
+| Embedded SQLite limits write concurrency and horizontal scale | Unsafe scaling or a later database migration | Enforce one writable instance and offer explicit PostgreSQL from the same repository contract |
+| Supporting two JavaScript runtimes causes behavioral drift | Runtime-specific defects and weak verification | Keep Web-standard core contracts, isolate adapters, and run Node and Bun conformance in CI |
+| Provider-specific deployment logic recreates hosting lock-in | Rework for every host | Build one deterministic OCI boundary and keep provider capabilities behind a registry |
 | Fast deployment bypasses review | Unsafe production changes | Require verification, plans, confirmation for first or risky deployment, and smoke tests |
 
 ## 19. Open implementation decisions
@@ -1068,15 +1077,15 @@ The following decisions require prototypes or focused evaluation before their ex
 |---|---|---|
 | OPEN-001 | Route module API | Proposed resolution in SH-F002: one default `defineRoute` method-map export per endpoint directory, with the filesystem as the sole path source |
 | OPEN-002 | Schema library | Proposed resolution in SH-F003: pinned Zod 4 schemas with fail-closed JSON Schema/OpenAPI normalization from the same runtime definitions |
-| OPEN-003 | Deno KV index encoding | Proposed resolution in SH-F004: native tuple keys, pointer indexes, versionstamp checks, and native opaque cursors behind bounded declared-index queries |
+| OPEN-003 | Relational storage profiles | Proposed resolution in SH-F004: Drizzle repositories, embedded SQLite by default, optional PostgreSQL, database constraints, optimistic versions, and validated portable cursors |
 | OPEN-004 | Requirement parser | Proposed resolution in SH-F006: strict YAML 1.2 core frontmatter plus ordinary Markdown headings and stable acceptance-criterion list items, with deterministic source diagnostics and no proprietary authoring syntax |
-| OPEN-005 | Criterion-to-test metadata | Proposed resolution in SH-F007: a transparent `criterionTest` wrapper registers native Deno tests with stable test, requirement, and criterion IDs while exposing the same frozen metadata for manifests and reports |
+| OPEN-005 | Criterion-to-test metadata | Proposed resolution in SH-F007: a transparent runner-neutral `criterionTest` wrapper registers tests with stable test, requirement, and criterion IDs while exposing the same frozen metadata for manifests and reports |
 | OPEN-006 | Endpoint-local verification | Proposed resolution in SH-F007: targeted checks close transitively over both requirement dependencies and dependents, then escalate to the full relevant suite whenever ownership or graph safety is uncertain |
 | OPEN-007 | Auth-provider interface | Proposed resolution in SH-F005: named project providers return a validated neutral principal, while routes explicitly declare none or required authentication and optional guards |
 | OPEN-008 | Rate limiting | Proposed resolution in SH-F005: bounded process-local fixed windows for test/development and a pluggable shared-scope adapter requirement for protected production routes |
 | OPEN-009 | Generated client shape | Proposed resolution in SH-F010: one dependency-free Web Standards TypeScript module with required base URL, injectable fetch and neutral authentication hook, optional fail-closed response validation, and no persistence or framework-runtime access |
 | OPEN-010 | Skill portability | Rich Codex skill plus useful Claude and generic-agent guidance |
-| OPEN-011 | Deno Deploy integration | Fast setup with safe credential handling and reliable smoke tests |
+| OPEN-011 | Portable deployment | Resolved in SH-F013: deterministic container bundles, capability-declaring provider adapters, Fly.io first, safe credential handling, storage topology checks, and reliable smoke tests |
 | OPEN-012 | Discoverable project locations | Resolved in SH-F018: the SH-F001 project configuration is the sole source of discoverable locations, scoped per service through SH-F014 |
 
 ## 20. Definition of done for an endpoint
@@ -1102,7 +1111,7 @@ An endpoint is done when:
 
 ## 21. Final product statement
 
-Sleepy Hollow is an agentic-first platform for rapidly building and deploying headless applications. Its official AI skill plans the complete application, creates reviewable requirements beside every endpoint, develops approved behavior through TDD, and deploys the result on a simple Deno framework that independently verifies the work. Its separate SGAD workflow skill makes the underlying methodology usable by developers in any software repository.
+Sleepy Hollow is an agentic-first platform for rapidly building and deploying headless applications. Its official AI skill plans the complete application, creates reviewable requirements beside every endpoint, develops approved behavior through TDD, and deploys the result on a portable Node and Bun framework with an included relational database that independently verifies the work. Its separate SGAD workflow skill makes the underlying methodology usable by developers in any software repository.
 
 The shortest expression of the product is:
 
@@ -1182,3 +1191,36 @@ other digest normalization is permitted.
 
 - Status: not applicable. No release has been authorized or attempted, and
   SH-F020 records that no publication has occurred.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all current application-level acceptance criteria.
+- Governed-content digest:
+  `sha256:added734cf750996a32e5337ac66ae9526886bb77363f30d508e83b888a3dc2d`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Approval, Node/Bun migration final sweep
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all current application-level acceptance criteria.
+- Governed-content digest:
+  `sha256:ed2986a6f68e92dc1dcefe4bce278b47e78a61ce88ab661d2acd8fdeefde7d3b`.
+- Decision source: owner direct response `approve it all` for the Node/Bun
+  migration, including its final Deno-removal sweep.
+
+### Approval, 0.3.0 release version
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all current application-level acceptance criteria.
+- Governed-content digest:
+  `sha256:2db5eb91fb708e0436c5c3584dd75f3a38bb02de09898b0e2811db2f6c026a3b`.
+- Decision source: owner direct response that the next minor release is
+  `0.3.0`.

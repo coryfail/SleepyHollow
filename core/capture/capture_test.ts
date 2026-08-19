@@ -1,4 +1,5 @@
-import assert from "node:assert/strict";
+import { platform } from "#platform";
+import assert from "assert/strict";
 
 import type { NormalizedRoute } from "../routing/mod.ts";
 import {
@@ -12,7 +13,7 @@ import type { CaptureSession } from "./types.ts";
 
 function newSession(): CaptureSession {
   return createCaptureSession({
-    runner: "deno test",
+    runner: "vitest",
     revision: "916d706",
   });
 }
@@ -89,7 +90,7 @@ async function invoke(
   );
 }
 
-Deno.test("AC-F019-001 · a wrapped repository preserves values, errors, and versionstamps", async () => {
+test("AC-F019-001 · a wrapped repository preserves values, errors, and versionstamps", async () => {
   const active = newSession();
   const target = fakeRepository();
   const wrapped = captureRepository(target, active);
@@ -109,7 +110,7 @@ Deno.test("AC-F019-001 · a wrapped repository preserves values, errors, and ver
   );
 });
 
-Deno.test("AC-F019-002 · a wrapped route returns the handler response unchanged", async () => {
+test("AC-F019-002 · a wrapped route returns the handler response unchanged", async () => {
   const active = newSession();
   const expected = new Response('{"ok":true}', {
     status: 201,
@@ -125,7 +126,7 @@ Deno.test("AC-F019-002 · a wrapped route returns the handler response unchanged
   assert.equal(await actual.text(), '{"ok":true}');
 });
 
-Deno.test("AC-F019-003 · a bounded indexed query records resource, index, and limit", async () => {
+test("AC-F019-003 · a bounded indexed query records resource, index, and limit", async () => {
   const active = newSession();
   const wrapped = captureRepository(fakeRepository(), active);
   await wrapped.list({ index: "owner", value: "u1", limit: 25 });
@@ -137,7 +138,7 @@ Deno.test("AC-F019-003 · a bounded indexed query records resource, index, and l
   assert.equal(recorded[0].limit, 25);
 });
 
-Deno.test("AC-F019-004 · a read-modify-write records versionstamp and atomicity", async () => {
+test("AC-F019-004 · a read-modify-write records versionstamp and atomicity", async () => {
   const active = newSession();
   const wrapped = captureRepository(fakeRepository(), active);
   await wrapped.update("one", "value", "v1");
@@ -147,7 +148,7 @@ Deno.test("AC-F019-004 · a read-modify-write records versionstamp and atomicity
   assert.equal(recorded[0].atomic, true);
 });
 
-Deno.test("AC-F019-005 · a raw operation records its caller justification", async () => {
+test("AC-F019-005 · a raw operation records its caller justification", async () => {
   const active = newSession();
   const wrapped = captureRepository(fakeRepository(), active);
   await wrapped.raw("bulk migration outside declared primitives");
@@ -159,7 +160,7 @@ Deno.test("AC-F019-005 · a raw operation records its caller justification", asy
   );
 });
 
-Deno.test("AC-F019-006 · only locations the handler reads are recorded", async () => {
+test("AC-F019-006 · only locations the handler reads are recorded", async () => {
   const active = newSession();
   const wrapped = captureRoute(
     fakeRoute((ctx) => {
@@ -173,7 +174,7 @@ Deno.test("AC-F019-006 · only locations the handler reads are recorded", async 
   assert.deepEqual(request.readLocations, ["body"]);
 });
 
-Deno.test("AC-F019-007 · the returned response status is recorded as observed", async () => {
+test("AC-F019-007 · the returned response status is recorded as observed", async () => {
   const active = newSession();
   const wrapped = captureRoute(
     fakeRoute(() => Promise.resolve(new Response(null, { status: 422 }))),
@@ -183,7 +184,7 @@ Deno.test("AC-F019-007 · the returned response status is recorded as observed",
   assert.equal(active.artifact().requests[0].responseStatus, 422);
 });
 
-Deno.test("AC-F019-008 · records inside a criterion test carry its attribution", async () => {
+test("AC-F019-008 · records inside a criterion test carry its attribution", async () => {
   const active = newSession();
   const wrapped = captureRepository(fakeRepository(), active);
   active.enter({
@@ -199,7 +200,7 @@ Deno.test("AC-F019-008 · records inside a criterion test carry its attribution"
   });
 });
 
-Deno.test("AC-F019-009 · records outside a criterion test are retained unattributed", async () => {
+test("AC-F019-009 · records outside a criterion test are retained unattributed", async () => {
   const active = newSession();
   const wrapped = captureRepository(fakeRepository(), active);
   await wrapped.get("one");
@@ -215,7 +216,7 @@ Deno.test("AC-F019-009 · records outside a criterion test are retained unattrib
   assert.equal(recorded[1].attribution?.criterionId, "AC-EP-001");
 });
 
-Deno.test("AC-F019-010 · an unexercised route is reported as uncaptured", async () => {
+test("AC-F019-010 · an unexercised route is reported as uncaptured", async () => {
   const active = newSession();
   active.declareRoute({ method: "POST", path: "/bookmarks" });
   active.declareRoute({ method: "GET", path: "/bookmarks" });
@@ -232,7 +233,7 @@ Deno.test("AC-F019-010 · an unexercised route is reported as uncaptured", async
   assert.equal(artifact.requests.length, 1);
 });
 
-Deno.test("AC-F019-011 · identical runs produce byte-identical artifacts", async () => {
+test("AC-F019-011 · identical runs produce byte-identical artifacts", async () => {
   const run = async () => {
     const active = newSession();
     active.declareRoute({ method: "POST", path: "/bookmarks" });
@@ -254,50 +255,50 @@ Deno.test("AC-F019-011 · identical runs produce byte-identical artifacts", asyn
   assert.equal(await run(), await run());
 });
 
-Deno.test("AC-F019-012 · the artifact records its runner and revision", () => {
+test("AC-F019-012 · the artifact records its runner and revision", () => {
   const artifact = newSession().artifact();
   assert.equal(artifact.schema, "sleepy-hollow-capture/v1");
-  assert.equal(artifact.runner, "deno test");
+  assert.equal(artifact.runner, "vitest");
   assert.equal(artifact.revision, "916d706");
 });
 
-Deno.test("AC-F019-013 · persisting writes the complete artifact to the supplied location", async () => {
+test("AC-F019-013 · persisting writes the complete artifact to the supplied location", async () => {
   const active = newSession();
   active.declareRoute({ method: "POST", path: "/bookmarks" });
   const repo = captureRepository(fakeRepository(), active);
   await repo.list({ index: "owner", value: "u1", limit: 25 });
-  const directory = await Deno.makeTempDir({ prefix: "sh-capture-" });
+  const directory = await platform.makeTempDir({ prefix: "sh-capture-" });
   const target = `${directory}/capture.json`;
 
   await persistCaptureSession(active, target);
 
-  const written = await Deno.readTextFile(target);
+  const written = await platform.readTextFile(target);
   assert.deepEqual(
     JSON.parse(written),
     JSON.parse(JSON.stringify(active.artifact())),
   );
-  await Deno.remove(directory, { recursive: true });
+  await platform.remove(directory, { recursive: true });
 });
 
-Deno.test("AC-F019-014 · a persistence failure leaves no partial artifact", async () => {
+test("AC-F019-014 · a persistence failure leaves no partial artifact", async () => {
   const active = newSession();
-  const directory = await Deno.makeTempDir({ prefix: "sh-capture-" });
+  const directory = await platform.makeTempDir({ prefix: "sh-capture-" });
   const target = `${directory}/missing/capture.json`;
 
   await assert.rejects(() => persistCaptureSession(active, target));
 
   let present = true;
   try {
-    await Deno.stat(target);
+    await platform.stat(target);
   } catch {
     present = false;
   }
   assert.equal(present, false);
-  assert.deepEqual([...Deno.readDirSync(directory)].map((e) => e.name), []);
-  await Deno.remove(directory, { recursive: true });
+  assert.deepEqual([...platform.readDirSync(directory)].map((e) => e.name), []);
+  await platform.remove(directory, { recursive: true });
 });
 
-Deno.test("AC-F019-015 · criterion tests attribute records without a caller-managed scope", async () => {
+test("AC-F019-015 · criterion tests attribute records without a caller-managed scope", async () => {
   const active = newSession();
   const repo = captureRepository(fakeRepository(), active);
   const spec = captureCriterionTest({

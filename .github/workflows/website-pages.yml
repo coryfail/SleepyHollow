@@ -14,8 +14,8 @@ on:
       - "models/**"
       - "cli/**"
       - "core/**"
-      - "deno.json"
-      - "deno.lock"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/website-pages.yml"
   pull_request:
     paths:
@@ -29,8 +29,8 @@ on:
       - "models/**"
       - "cli/**"
       - "core/**"
-      - "deno.json"
-      - "deno.lock"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/website-pages.yml"
   workflow_dispatch:
 
@@ -58,51 +58,16 @@ jobs:
           cache: npm
           cache-dependency-path: website/package-lock.json
 
-      - name: Use Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: 2.9.5
-          cache: true
-          cache-hash: ${{ hashFiles('deno.json', 'deno.lock') }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify governed approvals bind their content
+      - name: Install framework dependencies
         working-directory: .
-        run: deno task check:governance
+        run: npm ci
 
       - name: Verify framework
         working-directory: .
-        run: deno task verify:framework
+        run: npm run verify
 
-      - name: Verify project creation
-        working-directory: .
-        run: deno task verify:create
-
-      - name: Verify API contract generation
-        working-directory: .
-        run: deno task verify:generate
-
-      - name: Verify independent project checking
-        working-directory: .
-        run: deno task verify:check
-
-      - name: Verify CLI dispatch and diagnostics
-        working-directory: .
-        run: deno task verify:cli
-
-      - name: Verify test command
-        working-directory: .
-        run: deno task verify:test-command
-
-      - name: Verify development command
-        working-directory: .
-        run: deno task verify:dev
-
-      - name: Verify planning workflow
-        working-directory: .
-        run: deno task verify:planning
+      - name: Install website dependencies
+        run: npm ci
 
       - name: Install browser
         run: npx playwright install --with-deps chromium firefox webkit

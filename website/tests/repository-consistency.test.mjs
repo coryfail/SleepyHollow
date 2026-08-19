@@ -394,8 +394,8 @@ test("AC-REPO-008 AC-REPO-009 · browser and Pages verification use the canonica
       "models/**",
       "cli/**",
       "core/**",
-      "deno.json",
-      "deno.lock",
+      "package.json",
+      "package-lock.json",
     ]
   ) {
     assert.match(
@@ -403,7 +403,7 @@ test("AC-REPO-008 AC-REPO-009 · browser and Pages verification use the canonica
       new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
     );
   }
-  assert.match(workflow, /deno task verify:framework/);
+  assert.match(workflow, /npm run verify/);
   assert.match(workflow, /run:\s*npm run verify/);
   assert.match(workflow, /if:\s*github\.event_name == 'push'/);
 });
@@ -465,18 +465,18 @@ test("AC-NRF-002 AC-NRF-009 · every current governed artifact has a named requi
   assert.ok(requirementPaths().includes("named-requirement-files.req.md"));
 });
 
-test("AC-NRF-012 · release surfaces report 0.2.0", () => {
-  assert.equal(JSON.parse(read("deno.json")).version, "0.2.0");
+test("AC-NRF-012 · framework release surfaces report 0.3.0", () => {
+  assert.equal(JSON.parse(read("package.json")).version, "0.3.0");
   assert.equal(JSON.parse(read("website/package.json")).version, "0.2.0");
-  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.2\.0"/);
-  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.2\.0"/);
+  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.3\.0"/);
+  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.3\.0"/);
   assert.match(
     read("cli/generate/artifacts.ts"),
-    /generatorVersion: "0\.2\.0"/,
+    /generatorVersion: "0\.3\.0"/,
   );
   assert.match(
     read("cli/generate/inventory.ts"),
-    /options\.version \?\? "0\.2\.0"/,
+    /options\.version \?\? "0\.3\.0"/,
   );
   assert.match(
     read("docs/sgad/README.md"),

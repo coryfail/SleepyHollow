@@ -1,4 +1,5 @@
-import { dirname, join } from "node:path";
+import { platform } from "#platform";
+import { dirname, join } from "path";
 
 import { normalizeArchitecture } from "./architecture.ts";
 import { ServiceArchitectureError } from "./errors.ts";
@@ -10,10 +11,10 @@ import type {
 
 async function exists(path: string): Promise<boolean> {
   try {
-    await Deno.lstat(path);
+    await platform.lstat(path);
     return true;
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return false;
+    if (platform.isNotFound(error)) return false;
     throw error;
   }
 }
@@ -41,8 +42,8 @@ async function writeFile(
   content: string,
 ): Promise<void> {
   const target = join(root, path);
-  await Deno.mkdir(dirname(target), { recursive: true });
-  await Deno.writeTextFile(target, content, { createNew: true });
+  await platform.mkdir(dirname(target), { recursive: true });
+  await platform.writeTextFile(target, content, { createNew: true });
 }
 
 export async function scaffoldWorkspaces(options: {
@@ -72,8 +73,8 @@ export async function scaffoldWorkspaces(options: {
     }
   }
 
-  await Deno.mkdir(options.projectRoot, { recursive: true });
-  const stage = await Deno.makeTempDir({
+  await platform.mkdir(options.projectRoot, { recursive: true });
+  const stage = await platform.makeTempDir({
     dir: options.projectRoot,
     prefix: ".sleepy-hollow-services-",
   });
@@ -102,7 +103,7 @@ export async function scaffoldWorkspaces(options: {
           JSON.stringify(
             service.deploymentConfigPath.slice(service.root.length + 1),
           )
-        },\n  kvBinding: ${JSON.stringify(service.kvBinding)},\n});\n`,
+        },\n  databaseBinding: ${JSON.stringify(service.databaseBinding)},\n});\n`,
       );
       for (
         const directory of [
@@ -131,19 +132,19 @@ export async function scaffoldWorkspaces(options: {
     for (const service of architecture.services) {
       const source = join(stage, service.root);
       const target = join(options.projectRoot, service.root);
-      await Deno.mkdir(dirname(target), { recursive: true });
-      await Deno.rename(source, target);
+      await platform.mkdir(dirname(target), { recursive: true });
+      await platform.rename(source, target);
       moved.push({ source, target });
     }
-    await Deno.remove(stage, { recursive: true });
+    await platform.remove(stage, { recursive: true });
   } catch (error) {
     for (const item of moved.reverse()) {
       if (await exists(item.target)) {
-        await Deno.mkdir(dirname(item.source), { recursive: true });
-        await Deno.rename(item.target, item.source);
+        await platform.mkdir(dirname(item.source), { recursive: true });
+        await platform.rename(item.target, item.source);
       }
     }
-    if (await exists(stage)) await Deno.remove(stage, { recursive: true });
+    if (await exists(stage)) await platform.remove(stage, { recursive: true });
     if (error instanceof ServiceArchitectureError) throw error;
     throw failure(
       "SH_SERVICE_SCAFFOLD_FAILED",

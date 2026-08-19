@@ -31,13 +31,13 @@ matches the approval recorded inside it. An exact-content approval authorizes
 exact bytes, so a change as small as a rewrapped paragraph detaches an
 `approved` or `verified` requirement from the content it claims to authorize.
 That has happened, caused by a formatting command run over a directory.
-`deno.json` excludes requirement Markdown from `deno fmt` to prevent that
-specific cause; the hook is cause-independent and catches any edit.
+The project keeps requirement Markdown separate from source formatting to
+prevent that specific cause; the hook is cause-independent and catches any edit.
 
 Run the same check by hand at any time:
 
 ```sh
-deno task check:governance
+npm run check
 ```
 
 Drafts are exempt, because a draft is expected to change before it is approved.

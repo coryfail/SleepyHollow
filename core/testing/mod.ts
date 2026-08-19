@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 /**
  * Test utilities that bind tests to acceptance criteria.
  *
@@ -47,7 +48,7 @@ export * from "./types.ts";
  */
 export function createCriterionRegistry(options: {
   readonly requirements: readonly RequirementEvidence[];
-  readonly register?: (definition: Deno.TestDefinition) => void;
+  readonly register?: (definition: { readonly name: string; readonly fn: (context?: unknown) => void | Promise<void>; readonly skip?: boolean }) => void;
 }): CriterionTestRegistry {
   return createRegistry(options);
 }
@@ -64,7 +65,7 @@ export function criterionTest(
   spec: CriterionTestSpec,
   options: {
     readonly requirements: readonly RequirementEvidence[];
-    readonly register?: (definition: Deno.TestDefinition) => void;
+    readonly register?: (definition: { readonly name: string; readonly fn: (context?: unknown) => void | Promise<void>; readonly skip?: boolean }) => void;
   },
 ): CriterionTestDescriptor {
   return createRegistry(options).criterionTest(spec);

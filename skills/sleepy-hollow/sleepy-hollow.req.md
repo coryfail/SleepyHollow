@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F009
 title: Official Sleepy Hollow agent skill
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "3"
@@ -51,7 +51,7 @@ implementation failures without changing approved behavior, and rely on
 `hollow check` before declaring verification.
 
 `SKILL.md` shall remain concise and route to directly relevant references for
-planning, requirement formats, TDD, security, Deno KV, service design, and
+planning, requirement formats, TDD, security, relational databases, service design, and
 deployment. Portable `AGENTS.md`, `CLAUDE.md`, or Copilot guidance may summarize
 conventions but shall not replace the official workflow.
 
@@ -207,3 +207,14 @@ other digest normalization is permitted.
 ### Delivery
 
 - Status: not applicable until delivery is authorized and attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F009.
+- Governed-content digest:
+  `sha256:066e40e039176f056367fe5be646b4c28424143d0e09c522b36eff8b6c70b707`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

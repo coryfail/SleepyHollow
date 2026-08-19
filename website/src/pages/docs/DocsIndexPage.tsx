@@ -40,7 +40,7 @@ export default function DocsIndexPage() {
           <h2 id="group-api">Reference</h2>
           <p>
             Every exported symbol, its type, and its documentation comment —
-            generated from the framework source by the Deno toolchain, so it
+            generated from the framework source by the Node.js toolchain, so it
             describes the code as it is rather than as it was written up.
           </p>
         </div>

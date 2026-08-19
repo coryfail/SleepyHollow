@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 
 import {
   CLI_COMMANDS,
@@ -70,7 +70,7 @@ async function invoke(
   return { ...output, code };
 }
 
-Deno.test("AC-F011-001 · help exposes exactly the fixed command surface", async () => {
+test("AC-F011-001 · help exposes exactly the fixed command surface", async () => {
   let calls = 0;
   const commandHandlers = handlers(
     Object.fromEntries(CLI_COMMANDS.map((name) => [
@@ -98,7 +98,7 @@ Deno.test("AC-F011-001 · help exposes exactly the fixed command surface", async
   assert.equal(calls, 0);
 });
 
-Deno.test("AC-F011-002 · exit status distinguishes success, failure, and usage", async () => {
+test("AC-F011-002 · exit status distinguishes success, failure, and usage", async () => {
   const commandHandlers = handlers({
     create: () => ({ result: result("create") }),
     check: () => ({
@@ -124,7 +124,7 @@ Deno.test("AC-F011-002 · exit status distinguishes success, failure, and usage"
   assert.doesNotMatch(thrown.stderr[0], /\bat\s+.*:\d+/);
 });
 
-Deno.test("AC-F011-003 · every command supports a versioned JSON result", async () => {
+test("AC-F011-003 · every command supports a versioned JSON result", async () => {
   for (const command of CLI_COMMANDS) {
     const output = await invoke([command, "--json"]);
     assert.equal(output.code, 0, command);
@@ -141,7 +141,7 @@ Deno.test("AC-F011-003 · every command supports a versioned JSON result", async
   assert.equal(parsed.diagnostics[0].code, "SH_CLI_COMMAND_UNKNOWN");
 });
 
-Deno.test("AC-F011-004 · human and JSON render the same normalized evidence", async () => {
+test("AC-F011-004 · human and JSON render the same normalized evidence", async () => {
   const diagnostic: CliDiagnostic = {
     code: "SH_ROUTE_UNCOVERED",
     severity: "warning",
@@ -166,7 +166,7 @@ Deno.test("AC-F011-004 · human and JSON render the same normalized evidence", a
   assert.deepEqual(parsed.diagnostics, [diagnostic]);
 });
 
-Deno.test("AC-F011-005 · diagnostics retain every sorted affected object", async () => {
+test("AC-F011-005 · diagnostics retain every sorted affected object", async () => {
   const commandHandlers = handlers({
     check: () => ({
       result: result("check", {
@@ -209,7 +209,7 @@ Deno.test("AC-F011-005 · diagnostics retain every sorted affected object", asyn
   assert.deepEqual(location.configuration, ["A_KEY", "Z_KEY"]);
 });
 
-Deno.test("AC-F011-006 · invalid usage cannot reach a command effect", async () => {
+test("AC-F011-006 · invalid usage cannot reach a command effect", async () => {
   let effects = 0;
   const commandHandlers = handlers(
     Object.fromEntries(CLI_COMMANDS.map((name) => [
@@ -228,7 +228,7 @@ Deno.test("AC-F011-006 · invalid usage cannot reach a command effect", async ()
   assert.equal(effects, 0);
 });
 
-Deno.test("AC-F011-007 · destructive application requires the exact preview digest", async () => {
+test("AC-F011-007 · destructive application requires the exact preview digest", async () => {
   let applied = 0;
   const deploy: CliCommandHandler = ({ args }): CliCommandResponse => {
     const confirmationIndex = args.indexOf("--confirm");
@@ -274,7 +274,7 @@ Deno.test("AC-F011-007 · destructive application requires the exact preview dig
   assert.equal(applied, 1);
 });
 
-Deno.test("AC-F011-008 · dispatch invokes exactly one canonical adapter", async () => {
+test("AC-F011-008 · dispatch invokes exactly one canonical adapter", async () => {
   const calls = Object.fromEntries(
     CLI_COMMANDS.map((name) => [name, 0]),
   ) as Record<CliCommandName, number>;
@@ -301,7 +301,7 @@ Deno.test("AC-F011-008 · dispatch invokes exactly one canonical adapter", async
   }
 });
 
-Deno.test("AC-F011-009 · model and agent invocation stays outside the CLI", async () => {
+test("AC-F011-009 · model and agent invocation stays outside the CLI", async () => {
   let calls = 0;
   const commandHandlers = handlers(
     Object.fromEntries(CLI_COMMANDS.map((name) => [

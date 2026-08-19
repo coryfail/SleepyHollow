@@ -1,5 +1,6 @@
-import { isAbsolute, relative, resolve, sep } from "node:path";
-import { pathToFileURL } from "node:url";
+import { platform } from "#platform";
+import { isAbsolute, relative, resolve, sep } from "path";
+import { pathToFileURL } from "url";
 
 import { resolveConfiguration } from "../../core/config/mod.ts";
 import { discoverRoutes } from "../../core/routing/mod.ts";
@@ -67,8 +68,8 @@ function safeDiagnostic(
   }
   if (
     intent === "serve" &&
-    (error instanceof Deno.errors.AddrInUse ||
-      error instanceof Deno.errors.PermissionDenied)
+    (error instanceof platform.errors.AddrInUse ||
+      error instanceof platform.errors.PermissionDenied)
   ) {
     return [{
       code: "SH_DEV_BIND_FAILED",
@@ -88,7 +89,7 @@ function safeDiagnostic(
 }
 
 export async function loadRuntime(projectRoot: string) {
-  const root = await Deno.realPath(resolve(projectRoot));
+  const root = await platform.realPath(resolve(projectRoot));
   const configPath = resolve(root, "sleepyhollow.config.ts");
   if (!contained(root, configPath)) {
     throw projectError(
@@ -125,7 +126,7 @@ export async function loadRuntime(projectRoot: string) {
       "Declare one project-contained API directory.",
     );
   }
-  const realApiRoot = await Deno.realPath(apiRoot);
+  const realApiRoot = await platform.realPath(apiRoot);
   if (!contained(root, realApiRoot)) {
     throw projectError(
       "SH_DEV_PROJECT_ESCAPE",
@@ -165,14 +166,12 @@ export async function runDevWorker(args: readonly string[]): Promise<number> {
       console.log(JSON.stringify({ ready: true, routeCount }));
       return 0;
     }
-    const server = Deno.serve({
-      hostname,
-      port,
-      onListen() {
-        console.log(JSON.stringify({ ready: true, routeCount }));
-      },
-    }, (request) => runtime.fetch(request));
-    await server.finished;
+    const server = platform.serve({ hostname, port }, (request) => runtime.fetch(request));
+    console.log(JSON.stringify({ ready: true, routeCount }));
+    await new Promise<void>((resolve, reject) => {
+      server.once("close", resolve);
+      server.once("error", reject);
+    });
     return 0;
   } catch (error) {
     console.error(

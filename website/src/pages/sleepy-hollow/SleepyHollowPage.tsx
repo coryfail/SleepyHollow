@@ -1,7 +1,7 @@
 import {
   cliInstallCommand,
   frameworkInstallCommand,
-  jsrPackageUrl,
+  npmPackageUrl,
   repositoryUrl,
   sitePaths,
 } from "../../site";
@@ -55,10 +55,10 @@ const method = [
 const capabilities = [
   ["Routing", "Routes are files. The directory is the path, so the URL surface cannot drift from the tree."],
   ["Validation", "Every request and response is checked against a Zod schema declared on the route itself."],
-  ["Data", "Typed Deno KV resources with declared indexes. Every query carries a bound."],
+  ["Data", "Embedded SQLite by default, with an optional PostgreSQL profile for managed SQL."],
   ["Security", "Each route states its authentication mode. There is no implicit default to forget."],
   ["Contracts", "OpenAPI documents and typed clients are generated from the schemas already on your routes."],
-  ["Deploy", "One command ships a verified revision to your own Deno Deploy account, on your own token."],
+  ["Deploy", "One command ships a verified revision to Fly.io, with room for additional providers."],
 ];
 
 export default function SleepyHollowPage() {
@@ -66,11 +66,10 @@ export default function SleepyHollowPage() {
     <main id="main-content" className="home-page">
       <section className="hero home-hero" aria-labelledby="home-title">
         <div className="hero__copy">
-          <p className="status-line">Sleepy Hollow · In development · Published to JSR</p>
+          <p className="status-line">Sleepy Hollow · In development · Published to npm</p>
           <h1 id="home-title">Endpoints at agent speed. Standards at senior level.</h1>
           <p className="hero__lede">
-            Sleepy Hollow is an agentic-first headless API framework for Deno, the runtime that
-            runs JavaScript and TypeScript outside the browser. It has
+            Sleepy Hollow is an agentic-first headless API framework for Node.js and Bun. It has
             Specification-Governed Agentic Development built in — the method that gives an
             AI the requirements, procedures, and proof of work you would expect from a senior
             engineer. Build endpoints rapidly, without giving up the review you would
@@ -80,8 +79,8 @@ export default function SleepyHollowPage() {
             <a className="text-action text-action--primary" href={sitePaths.docs}>
               Read the documentation <span aria-hidden="true">→</span>
             </a>
-            <a className="text-action" href={jsrPackageUrl}>
-              View the package on JSR <span aria-hidden="true">↗</span>
+            <a className="text-action" href={npmPackageUrl}>
+              View the package on npm <span aria-hidden="true">↗</span>
             </a>
           </div>
         </div>
@@ -216,9 +215,9 @@ export default function SleepyHollowPage() {
           <p className="eyebrow">Getting it</p>
           <h2 id="install-title">Install</h2>
           <p>
-            Sleepy Hollow targets Deno. It uses Deno KV, Deno runtime APIs, and
-            Deno Deploy, and does not support Node or Bun. The API is pre-1.0
-            and may still change.
+            Sleepy Hollow targets Node.js and Bun. SQLite ships with a service
+            by default, while PostgreSQL is an explicit optional profile. The
+            API is pre-1.0 and may still change.
           </p>
         </div>
         <div className="home-install__commands">

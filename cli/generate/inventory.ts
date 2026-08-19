@@ -1,4 +1,4 @@
-import { relative, sep } from "node:path";
+import { relative, sep } from "path";
 
 import type { NormalizedRoute } from "../../core/routing/mod.ts";
 import { normalizeRoutes } from "../../core/validation/mod.ts";
@@ -144,7 +144,7 @@ export function inventoryFromRoutes(
   return {
     serviceId: options.serviceId,
     title: options.title ?? options.serviceId,
-    version: options.version ?? "0.2.0",
+    version: options.version ?? "0.3.0",
     ...(options.description ? { description: options.description } : {}),
     operations,
     securitySchemes: options.securitySchemes ?? {},

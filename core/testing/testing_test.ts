@@ -1,4 +1,5 @@
-import assert from "node:assert/strict";
+import { platform } from "#platform";
+import assert from "assert/strict";
 import { z } from "zod";
 
 import type { NormalizedRoute, RouteOperation } from "../routing/mod.ts";
@@ -40,7 +41,7 @@ const approved = requirement("bookmarks", [
 ]);
 
 function descriptorFixture() {
-  const registered: Deno.TestDefinition[] = [];
+  const registered: platform.TestDefinition[] = [];
   const registry = createCriterionRegistry({
     requirements: [approved],
     register: (definition) => registered.push(definition),
@@ -64,7 +65,7 @@ function descriptorFixture() {
   return { registered, registry, first, second };
 }
 
-Deno.test("AC-F007-001 · draft and stale approvals refuse criterion tests", () => {
+test("AC-F007-001 · draft and stale approvals refuse criterion tests", () => {
   for (
     const candidate of [
       requirement("draft-bookmarks", ["AC-DRAFT-001"], "draft"),
@@ -102,7 +103,7 @@ Deno.test("AC-F007-001 · draft and stale approvals refuse criterion tests", () 
   }
 });
 
-Deno.test("AC-F007-002 · native names and manifests expose every mapping", () => {
+test("AC-F007-002 · native names and manifests expose every mapping", () => {
   const { registered, registry, first } = descriptorFixture();
   assert.match(registered[0].name, /AC-BOOKMARKS-001.*lists bookmarks/);
   assert.deepEqual(first.criteria, ["AC-BOOKMARKS-001"]);
@@ -120,7 +121,7 @@ Deno.test("AC-F007-002 · native names and manifests expose every mapping", () =
   assert.match(manifest.tests[0].sourceDigest, /^[a-f0-9]{64}$/);
 });
 
-Deno.test("AC-F007-003 · reports all trace states and selects affected tests safely", async (test) => {
+test("AC-F007-003 · reports all trace states and selects affected tests safely", async (test) => {
   await test.step("traceability categories", () => {
     const { registry } = descriptorFixture();
     const extraRequirement = requirement("collections", ["AC-COLLECTIONS-001"]);
@@ -185,7 +186,7 @@ Deno.test("AC-F007-003 · reports all trace states and selects affected tests sa
   });
 });
 
-Deno.test("AC-F007-004 · expected missing behavior produces bounded red evidence", () => {
+test("AC-F007-004 · expected missing behavior produces bounded red evidence", () => {
   const result = classifyRedState({
     requirement: approved,
     baselineChecks: [
@@ -213,7 +214,7 @@ Deno.test("AC-F007-004 · expected missing behavior produces bounded red evidenc
       },
     ],
     baselineRevision: "baseline-revision",
-    runner: "deno 2.9.5",
+    runner: "node 24",
     environment: "test/macos-arm64",
   });
   assert.equal(result.kind, "expected-red");
@@ -222,7 +223,7 @@ Deno.test("AC-F007-004 · expected missing behavior produces bounded red evidenc
   assert.deepEqual(result.criteria, ["AC-BOOKMARKS-001", "AC-BOOKMARKS-002"]);
 });
 
-Deno.test("AC-F007-005 · unrelated baseline failure cannot become red evidence", () => {
+test("AC-F007-005 · unrelated baseline failure cannot become red evidence", () => {
   const result = classifyRedState({
     requirement: approved,
     baselineChecks: [{
@@ -233,7 +234,7 @@ Deno.test("AC-F007-005 · unrelated baseline failure cannot become red evidence"
     }],
     tests: [],
     baselineRevision: "broken-revision",
-    runner: "deno 2.9.5",
+    runner: "node 24",
     environment: "test/macos-arm64",
   });
   assert.equal(result.kind, "broken-baseline");
@@ -243,15 +244,15 @@ Deno.test("AC-F007-005 · unrelated baseline failure cannot become red evidence"
   );
 });
 
-Deno.test("AC-F007-006 · test applications isolate KV and clean up deterministically", async () => {
+test("AC-F007-006 · test applications isolate SQLite and clean up deterministically", async () => {
   let cleanupCount = 0;
   const first = await createTestApplication({
-    create: ({ kv }) => ({
+    create: () => ({
       fetch: () => new Response("ok"),
-      kv,
     }),
-    seed: async ({ kv }) => {
-      await kv.set(["bookmark", "seed"], { title: "first" });
+    seed: async ({ database }) => {
+      database.client.exec("CREATE TABLE state (value TEXT NOT NULL)");
+      database.client.prepare("INSERT INTO state (value) VALUES (?)").run("first");
     },
     cleanup: () => {
       cleanupCount += 1;
@@ -260,18 +261,16 @@ Deno.test("AC-F007-006 · test applications isolate KV and clean up deterministi
   const second = await createTestApplication({
     create: () => ({ fetch: () => new Response("ok") }),
   });
-  assert.deepEqual((await first.kv.get(["bookmark", "seed"])).value, {
-    title: "first",
-  });
-  assert.equal((await second.kv.get(["bookmark", "seed"])).value, null);
+  assert.equal(first.database.client.prepare("SELECT value FROM state").get()?.value, "first");
+  assert.throws(() => second.database.client.prepare("SELECT value FROM state").get(), /no such table/);
   await first.close();
   await first.close();
   await second.close();
   assert.equal(cleanupCount, 1);
 
   // Setup failure must close every resource it already opened. Supplying
-  // neither an application factory nor a route inventory fails after the KV
-  // context is open but before any application exists. Deno's resource
+  // neither an application factory nor a route inventory fails after the SQLite
+  // context is open but before any application exists. platform's resource
   // sanitizer fails this test if that context is not closed on the way out.
   await assert.rejects(
     () =>
@@ -286,7 +285,7 @@ Deno.test("AC-F007-006 · test applications isolate KV and clean up deterministi
   );
 });
 
-Deno.test("AC-F007-007 · typed requests, fixtures, seeding, and Problem Details compose", async () => {
+test("AC-F007-007 · typed requests, fixtures, seeding, and Problem Details compose", async () => {
   const context = await createTestApplication({
     principal: { id: "user-1" },
     credentials: { token: "fixture-token" },
@@ -332,7 +331,7 @@ Deno.test("AC-F007-007 · typed requests, fixtures, seeding, and Problem Details
   await context.close();
 });
 
-Deno.test("AC-F007-008 · generated clients use the in-process application transport", async () => {
+test("AC-F007-008 · generated clients use the in-process application transport", async () => {
   const context = await createTestApplication({
     create: () => ({
       fetch: (request) =>
@@ -349,7 +348,7 @@ Deno.test("AC-F007-008 · generated clients use the in-process application trans
   await context.close();
 });
 
-Deno.test("AC-F007-009 · removed, changed, or weakened tests invalidate silent verification", () => {
+test("AC-F007-009 · removed, changed, or weakened tests invalidate silent verification", () => {
   const { registry } = descriptorFixture();
   const current = createTestManifest({
     descriptors: registry.descriptors().slice(0, 1),
@@ -378,7 +377,7 @@ Deno.test("AC-F007-009 · removed, changed, or weakened tests invalidate silent 
   assert.equal(report.eligibleForVerification, false);
 });
 
-Deno.test("AC-F007-010 · verification eligibility requires every criterion to pass", () => {
+test("AC-F007-010 · verification eligibility requires every criterion to pass", () => {
   const { registry } = descriptorFixture();
   const manifest = createTestManifest({
     descriptors: registry.descriptors(),
@@ -428,7 +427,7 @@ function securedRoute(
   };
 }
 
-Deno.test("AC-F007-011 · a protected route rejects an uncredentialed test request", async () => {
+test("AC-F007-011 · a protected route rejects an uncredentialed test request", async () => {
   let handlerCalls = 0;
   const context = await createTestApplication({
     routes: [
@@ -481,7 +480,7 @@ Deno.test("AC-F007-011 · a protected route rejects an uncredentialed test reque
   await context.close();
 });
 
-Deno.test("AC-F007-012 · an undeclared security module serves open routes unchanged", async () => {
+test("AC-F007-012 · an undeclared security module serves open routes unchanged", async () => {
   let handlerCalls = 0;
   const context = await createTestApplication({
     routes: [

@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 import type { NormalizedRoute } from "./types.ts";
 
 interface Match {
@@ -65,7 +66,7 @@ function problem(
 /**
  * Builds a request handler that dispatches to a discovered route table.
  *
- * The returned object exposes `fetch`, so it can be passed to `Deno.serve`
+ * The returned object exposes `fetch`, so it can be passed to `platform.serve`
  * directly. An unmatched path answers 404 and an unmatched method answers 405,
  * both as problem-details responses.
  *
@@ -73,11 +74,11 @@ function problem(
  * import { createRouter, discoverRoutes } from "@sleepy-hollow/framework";
  *
  * const router = createRouter(await discoverRoutes("./api"));
- * Deno.serve(router.fetch);
+ * platform.serve(router.fetch);
  * ```
  *
  * @param routes The route table, normally from {@linkcode discoverRoutes}.
- * @returns A handler suitable for `Deno.serve`.
+ * @returns A handler suitable for `platform.serve`.
  */
 export function createRouter(
   routes: readonly NormalizedRoute[],

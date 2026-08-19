@@ -1,7 +1,7 @@
 /**
  * Adds a route back to the site from the generated API reference.
  *
- * `deno doc --html` produces a self-contained documentation site with no
+ * The Node API documentation generator produces a self-contained site with no
  * knowledge of the pages that link to it: its wordmark points at its own index
  * and nothing points home. Linking to it from the documentation section would
  * therefore strand every visitor who followed that link.

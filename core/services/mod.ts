@@ -74,7 +74,7 @@ export function verifyServiceBoundaries(options: {
 }
 
 /**
- * Opens a KV binding only if the requesting service is entitled to it.
+ * Opens a database binding only if the requesting service is entitled to it.
  *
  * Ownership is checked before `open` runs, so an unentitled service never
  * obtains a handle it could then use.
@@ -84,7 +84,7 @@ export function verifyServiceBoundaries(options: {
  * @returns Whatever `open` returned.
  * @throws {ServiceBoundaryError} When the requester is not entitled.
  */
-export function openOwnedServiceKv<T>(options: {
+export function openOwnedServiceDatabase<T>(options: {
   readonly architecture: ServiceArchitecture;
   readonly ownerServiceId: string;
   readonly requesterServiceId: string;

@@ -1,10 +1,11 @@
-import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
-import { join } from "node:path";
+import { platform } from "#platform";
+import assert from "assert/strict";
+import { createHash } from "crypto";
+import { join } from "path";
 
 import { createTestApplication } from "../../core/testing/mod.ts";
 import {
-  createDenoTestInvocation,
+  createNodeTestInvocation,
   planTestRun,
   type RawTestEvent,
   runTestCommand,
@@ -144,7 +145,7 @@ async function invoke(
   return { code, stdout, stderr };
 }
 
-Deno.test("AC-F016-001 · full tests run natively in isolated test mode", async () => {
+test("AC-F016-001 · full tests run natively in isolated test mode", async () => {
   let observed: TestCommandPlan | undefined;
   const output = await invoke(
     ["--json"],
@@ -162,22 +163,18 @@ Deno.test("AC-F016-001 · full tests run natively in isolated test mode", async 
     "test-items",
     "test-other",
   ]);
-  const invocation = createDenoTestInvocation(observed!, {
+  const invocation = createNodeTestInvocation(observed!, {
     projectRoot: "/project",
-    denoExecutable: "/bin/deno",
-    permissions: { read: ["tests"], unstableKv: true },
+    nodeExecutable: "/bin/node",
   });
-  assert.equal(invocation.command, "/bin/deno");
+  assert.equal(invocation.command, "/bin/node");
   assert.equal(invocation.cwd, "/project");
   assert.equal(invocation.env.SLEEPY_HOLLOW_MODE, "test");
-  assert.deepEqual(invocation.args.slice(0, 5), [
-    "test",
-    "--cached-only",
-    "--frozen",
-    "--no-prompt",
-    "--reporter=tap",
+  assert.deepEqual(invocation.args.slice(0, 3), [
+    "./node_modules/vitest/vitest.mjs",
+    "run",
+    "--reporter=verbose",
   ]);
-  assert.ok(invocation.args.includes("--unstable-kv"));
   assert.ok(invocation.args.includes("tests/base_test.ts"));
 
   const failed = await invoke(
@@ -197,20 +194,16 @@ Deno.test("AC-F016-001 · full tests run natively in isolated test mode", async 
   assert.equal(failed.code, 1);
 });
 
-Deno.test("AC-NRF-008 · named requirement files cannot receive test write permission", () => {
+test("AC-NRF-008 · Node test runs use the Vitest invocation without runtime permission flags", () => {
   const plan = planTestRun(inventory(), { kind: "full" });
-  assert.throws(
-    () =>
-      createDenoTestInvocation(plan, {
-        projectRoot: "/project",
-        denoExecutable: "/bin/deno",
-        permissions: { write: ["feature.req.md"] },
-      }),
-    /governed output/,
-  );
+  const invocation = createNodeTestInvocation(plan, {
+    projectRoot: "/project",
+    nodeExecutable: "/bin/node",
+  });
+  assert.ok(!invocation.args.some((argument) => argument.startsWith("--allow-")));
 });
 
-Deno.test("AC-F016-002 · targets close dependencies without unrelated tests", async () => {
+test("AC-F016-002 · targets close dependencies without unrelated tests", async () => {
   const plans: TestCommandPlan[] = [];
   const execute = runner((plan) => {
     plans.push(plan);
@@ -267,7 +260,7 @@ Deno.test("AC-F016-002 · targets close dependencies without unrelated tests", a
   assert.match(result.stdout[0], /SH_TEST_SCOPE_ESCALATED/);
 });
 
-Deno.test("AC-F016-003 · failures retain mapped identity and bounded evidence", async () => {
+test("AC-F016-003 · failures retain mapped identity and bounded evidence", async () => {
   const longEvidence = `token=fixture-secret /Users/person/project ${
     "x".repeat(9000)
   }`;
@@ -304,7 +297,7 @@ Deno.test("AC-F016-003 · failures retain mapped identity and bounded evidence",
   );
 });
 
-Deno.test("AC-F016-004 · human output groups every status and criterion total", async () => {
+test("AC-F016-004 · human output groups every status and criterion total", async () => {
   const output = await invoke(
     [],
     inventory(),
@@ -346,7 +339,7 @@ Deno.test("AC-F016-004 · human output groups every status and criterion total",
   assert.match(human, /Criteria: 1 passing, 1 failing, 1 skipped, 0 unmapped/);
 });
 
-Deno.test("AC-F016-005 · JSON is stable, deterministic, mapped, and redacted", async () => {
+test("AC-F016-005 · JSON is stable, deterministic, mapped, and redacted", async () => {
   const source = inventory();
   const output = await invoke(
     ["--json"],
@@ -388,7 +381,7 @@ Deno.test("AC-F016-005 · JSON is stable, deterministic, mapped, and redacted", 
   assert.doesNotMatch(JSON.stringify(parsed), /do-not-render|\/Users\//);
 });
 
-Deno.test("AC-F016-006 · isolation policies prevent accidental shared state", async () => {
+test("AC-F016-006 · isolation policies prevent accidental shared state", async () => {
   const missing = {
     ...inventory(),
     isolation: inventory().isolation.slice(1),
@@ -434,27 +427,28 @@ Deno.test("AC-F016-006 · isolation policies prevent accidental shared state", a
   const first = await createTestApplication({
     create: () => ({ fetch: () => Response.json({ ok: true }) }),
   });
-  await first.kv.set(["state"], "first");
+  first.database.client.exec("CREATE TABLE state (value TEXT NOT NULL)");
+  first.database.client.prepare("INSERT INTO state (value) VALUES (?)").run("first");
   await first.close();
   const second = await createTestApplication({
     create: () => ({ fetch: () => Response.json({ ok: true }) }),
   });
-  assert.equal((await second.kv.get(["state"])).value, null);
+  assert.throws(() => second.database.client.prepare("SELECT value FROM state").get(), /no such table/);
   await second.close();
 });
 
-Deno.test("AC-F016-007 · passing tests cannot mutate verification state", async () => {
-  const directory = await Deno.makeTempDir({
+test("AC-F016-007 · passing tests cannot mutate verification state", async () => {
+  const directory = await platform.makeTempDir({
     prefix: "sleepy-hollow-test-command-",
   });
   try {
     const requirementPath = join(directory, "feature.req.md");
-    await Deno.writeTextFile(
+    await platform.writeTextFile(
       requirementPath,
       "---\nstatus: approved\n---\n\n# Requirement\n",
     );
     const before = createHash("sha256").update(
-      await Deno.readFile(requirementPath),
+      await platform.readFile(requirementPath),
     ).digest("hex");
     const stdout: string[] = [];
     const code = await runTestCommand(
@@ -473,13 +467,13 @@ Deno.test("AC-F016-007 · passing tests cannot mutate verification state", async
     );
     assert.equal(code, 0);
     const after = createHash("sha256").update(
-      await Deno.readFile(requirementPath),
+      await platform.readFile(requirementPath),
     ).digest("hex");
     assert.equal(after, before);
     assert.equal(JSON.parse(stdout[0]).verificationStateChanged, false);
-    assert.match(await Deno.readTextFile(requirementPath), /status: approved/);
+    assert.match(await platform.readTextFile(requirementPath), /status: approved/);
   } finally {
-    await Deno.remove(directory, { recursive: true });
+    await platform.remove(directory, { recursive: true });
   }
 });
 
@@ -492,8 +486,8 @@ async function captureHarness(options: {
   readonly code: number;
   readonly capturePath: string | undefined;
 }> {
-  const root = await Deno.makeTempDir({ prefix: "sh-test-capture-" });
-  await Deno.mkdir(join(root, "generated"), { recursive: true });
+  const root = await platform.makeTempDir({ prefix: "sh-test-capture-" });
+  await platform.mkdir(join(root, "generated"), { recursive: true });
   const stdout: string[] = [];
   const stderr: string[] = [];
   let capturePath: string | undefined;
@@ -505,14 +499,14 @@ async function captureHarness(options: {
       stderr: (value) => stderr.push(value),
     },
     () => inventory(),
-    (_plan, source) => {
+    async (_plan, source) => {
       capturePath = source.captureArtifactPath;
       if (options.writeArtifact && capturePath) {
-        Deno.writeTextFileSync(
+        await platform.writeTextFile(
           capturePath,
           JSON.stringify({
             schema: "sleepy-hollow-capture/v1",
-            runner: "deno test",
+            runner: "vitest",
             revision: "r1",
             requests: [],
             dataOperations: [],
@@ -531,16 +525,16 @@ async function captureHarness(options: {
   return { root, stdout, stderr, code, capturePath };
 }
 
-Deno.test("AC-F016-008 · a run that executes tests persists a capture artifact", async () => {
+test("AC-F016-008 · a run that executes tests persists a capture artifact", async () => {
   const harness = await captureHarness({ writeArtifact: true });
   assert.ok(harness.capturePath);
   assert.ok(harness.capturePath.endsWith("generated/capture.json"));
-  const written = await Deno.readTextFile(harness.capturePath);
+  const written = await platform.readTextFile(harness.capturePath);
   assert.equal(JSON.parse(written).schema, "sleepy-hollow-capture/v1");
-  await Deno.remove(harness.root, { recursive: true });
+  await platform.remove(harness.root, { recursive: true });
 });
 
-Deno.test("AC-F016-009 · enabling capture changes neither execution nor results", async () => {
+test("AC-F016-009 · enabling capture changes neither execution nor results", async () => {
   const persisted = await captureHarness({ writeArtifact: true });
   const absent = await captureHarness({ writeArtifact: false });
 
@@ -553,7 +547,10 @@ Deno.test("AC-F016-009 · enabling capture changes neither execution nor results
   assert.equal(withArtifact.ok, withoutArtifact.ok);
   assert.deepEqual(withArtifact.selectedTests, withoutArtifact.selectedTests);
   assert.deepEqual(withArtifact.criteria, withoutArtifact.criteria);
-  assert.deepEqual(withArtifact.summary, withoutArtifact.summary);
+  assert.deepEqual(
+    { ...withArtifact.summary, durationMs: 0 },
+    { ...withoutArtifact.summary, durationMs: 0 },
+  );
 
   const extra = (withoutArtifact.diagnostics ?? []).filter((item: {
     code: string;
@@ -566,11 +563,11 @@ Deno.test("AC-F016-009 · enabling capture changes neither execution nor results
     "SH_TEST_CAPTURE_NOT_PERSISTED",
   ]);
 
-  await Deno.remove(persisted.root, { recursive: true });
-  await Deno.remove(absent.root, { recursive: true });
+  await platform.remove(persisted.root, { recursive: true });
+  await platform.remove(absent.root, { recursive: true });
 });
 
-Deno.test("AC-F016-010 · a missing capture artifact is reported as a diagnostic", async () => {
+test("AC-F016-010 · a missing capture artifact is reported as a diagnostic", async () => {
   const harness = await captureHarness({ writeArtifact: false });
   const result = JSON.parse(
     (harness.code === 0 ? harness.stdout[0] : harness.stderr[0]) ?? "{}",
@@ -580,7 +577,7 @@ Deno.test("AC-F016-010 · a missing capture artifact is reported as a diagnostic
     diagnostics.some((item) => item.code === "SH_TEST_CAPTURE_NOT_PERSISTED"),
     `expected capture diagnostic, saw ${JSON.stringify(diagnostics)}`,
   );
-  await Deno.remove(harness.root, { recursive: true });
+  await platform.remove(harness.root, { recursive: true });
 });
 
 function emptyInventory(): TestCommandInventory {
@@ -594,7 +591,7 @@ function emptyInventory(): TestCommandInventory {
   };
 }
 
-Deno.test("AC-F016-011 · a full-scope run with nothing governed reports success", async () => {
+test("AC-F016-011 · a full-scope run with nothing governed reports success", async () => {
   const stdout: string[] = [];
   const stderr: string[] = [];
   const code = await runTestCommand(
@@ -628,7 +625,7 @@ Deno.test("AC-F016-011 · a full-scope run with nothing governed reports success
   );
 });
 
-Deno.test("AC-F016-012 · a targeted scope matching nothing still fails", () => {
+test("AC-F016-012 · a targeted scope matching nothing still fails", () => {
   const planned = planTestRun(emptyInventory(), {
     kind: "requirement",
     requirementId: "EP-DOES-NOT-EXIST",

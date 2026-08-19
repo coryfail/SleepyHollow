@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 import { z } from "zod";
 
 import { createSecurityRouter } from "../security/mod.ts";
@@ -42,7 +42,7 @@ function baseDefinition() {
 const json = async (response: Response) =>
   await response.json() as Record<string, unknown>;
 
-Deno.test("AC-F012-001 · all runtime modes resolve typed values and safe metadata", async () => {
+test("AC-F012-001 · all runtime modes resolve typed values and safe metadata", async () => {
   const definition = baseDefinition();
   const inputs: Readonly<Record<RuntimeMode, Record<string, string>>> = {
     development: {},
@@ -72,7 +72,7 @@ Deno.test("AC-F012-001 · all runtime modes resolve typed values and safe metada
   }
 });
 
-Deno.test("AC-F012-002 · invalid configuration fails with safe actionable diagnostics", async (test) => {
+test("AC-F012-002 · invalid configuration fails with safe actionable diagnostics", async (test) => {
   await test.step("missing and malformed values", async () => {
     const definition = baseDefinition();
     await assert.rejects(
@@ -124,7 +124,7 @@ Deno.test("AC-F012-002 · invalid configuration fails with safe actionable diagn
   });
 });
 
-Deno.test("AC-F012-003 · local files are bounded, deterministic, and local-only", async () => {
+test("AC-F012-003 · local files are bounded, deterministic, and local-only", async () => {
   const definition = defineConfiguration({
     modes: baseDefinition().modes,
     localEnvFiles: { development: ".env.local" },
@@ -176,7 +176,7 @@ PORT="9000"
   assert.equal(productionReads, 0);
 });
 
-Deno.test("AC-F012-004 · operational routes preserve or generate request IDs", async () => {
+test("AC-F012-004 · operational routes preserve or generate request IDs", async () => {
   const routes = createOperationalRoutes({ healthPath: "/_health" });
   const app = createSecurityRouter(routes, {
     mode: "test",
@@ -197,7 +197,7 @@ Deno.test("AC-F012-004 · operational routes preserve or generate request IDs", 
   assert.equal(accepted.headers.get("x-content-type-options"), "nosniff");
 });
 
-Deno.test("AC-F012-005 · logger records are deterministic structured JSON", () => {
+test("AC-F012-005 · logger records are deterministic structured JSON", () => {
   const lines: string[] = [];
   const logger = createJsonLogger({
     mode: "preview",
@@ -224,7 +224,7 @@ Deno.test("AC-F012-005 · logger records are deterministic structured JSON", () 
   });
 });
 
-Deno.test("AC-F012-006 · logging redacts standard and configured sensitive data", () => {
+test("AC-F012-006 · logging redacts standard and configured sensitive data", () => {
   const lines: string[] = [];
   const logger = createJsonLogger({
     mode: "production",
@@ -250,7 +250,7 @@ Deno.test("AC-F012-006 · logging redacts standard and configured sensitive data
   assert.match(serialized, /\[REDACTED\]|\[Circular\]/);
 });
 
-Deno.test("AC-F012-007 · health routes expose only healthy or unhealthy state", async () => {
+test("AC-F012-007 · health routes expose only healthy or unhealthy state", async () => {
   let healthy = true;
   const app = createSecurityRouter(
     createOperationalRoutes({
@@ -270,7 +270,7 @@ Deno.test("AC-F012-007 · health routes expose only healthy or unhealthy state",
   assert.doesNotMatch(JSON.stringify(unavailableBody), /config|secret/i);
 });
 
-Deno.test("AC-F012-008 · readiness is conditional, concurrent, sorted, and bounded", async () => {
+test("AC-F012-008 · readiness is conditional, concurrent, sorted, and bounded", async () => {
   assert.equal(
     createOperationalRoutes({ healthPath: "/_health" }).length,
     1,
@@ -344,7 +344,7 @@ Deno.test("AC-F012-008 · readiness is conditional, concurrent, sorted, and boun
   assert.equal(aborted, true);
 });
 
-Deno.test("AC-F012-009 · normalized metadata exposes no resolved values", async () => {
+test("AC-F012-009 · normalized metadata exposes no resolved values", async () => {
   const resolved = await resolveConfiguration(baseDefinition(), {
     mode: "production",
     environment: { PORT: "443", DATABASE_URL: "metadata-secret" },

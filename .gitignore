@@ -8,3 +8,10 @@ website/coverage/
 website/playwright-report/
 website/test-results/
 website/*.tsbuildinfo
+/node_modules
+**/node_modules/
+/dist
+/generated/capture.json
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

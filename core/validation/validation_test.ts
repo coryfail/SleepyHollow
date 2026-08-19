@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 import { z } from "zod";
 
 import type {
@@ -92,7 +92,7 @@ const validRequest = (body: unknown = {
 const json = async (response: Response) =>
   await response.json() as Record<string, unknown>;
 
-Deno.test("AC-F003-001 · typed request locations reach the handler", async () => {
+test("AC-F003-001 · typed request locations reach the handler", async () => {
   let handled = 0;
   const app = createValidatedRouter([
     route(validSchemas(), ({ params, query, headers, body }) => {
@@ -118,7 +118,7 @@ Deno.test("AC-F003-001 · typed request locations reach the handler", async () =
   });
 });
 
-Deno.test("AC-F003-002 · invalid input returns field-specific Problem Details before side effects", async () => {
+test("AC-F003-002 · invalid input returns field-specific Problem Details before side effects", async () => {
   let handled = 0;
   const app = createValidatedRouter([
     route(validSchemas(), () => {
@@ -152,7 +152,7 @@ Deno.test("AC-F003-002 · invalid input returns field-specific Problem Details b
   }]);
 });
 
-Deno.test("AC-F003-003 · unknown application fields are rejected by default", async () => {
+test("AC-F003-003 · unknown application fields are rejected by default", async () => {
   const app = createValidatedRouter([
     route(validSchemas(), () => Response.json({}, { status: 201 })),
   ]);
@@ -173,7 +173,7 @@ Deno.test("AC-F003-003 · unknown application fields are rejected by default", a
   assert.doesNotMatch(JSON.stringify(problem), /true/);
 });
 
-Deno.test("AC-F003-004 · body limits reject declared and streamed overflow", async (test) => {
+test("AC-F003-004 · body limits reject declared and streamed overflow", async (test) => {
   let handled = 0;
   const schemas = validSchemas();
   const body = schemas.body!;
@@ -200,6 +200,7 @@ Deno.test("AC-F003-004 · body limits reject declared and streamed overflow", as
         method: "POST",
         headers: { "content-type": "application/json", "content-length": "99" },
         body: stream,
+        duplex: "half",
       },
     );
     const response = await app.fetch(request);
@@ -226,6 +227,7 @@ Deno.test("AC-F003-004 · body limits reject declared and streamed overflow", as
         method: "POST",
         headers: { "content-type": "application/json" },
         body: stream,
+        duplex: "half",
       },
     );
     const response = await app.fetch(request);
@@ -236,7 +238,7 @@ Deno.test("AC-F003-004 · body limits reject declared and streamed overflow", as
   assert.equal(handled, 0);
 });
 
-Deno.test("AC-F003-005 · invalid handler responses become internal failures", async () => {
+test("AC-F003-005 · invalid handler responses become internal failures", async () => {
   const diagnostics: ValidationDiagnostic[] = [];
   const app = createValidatedRouter([
     route(
@@ -257,7 +259,7 @@ Deno.test("AC-F003-005 · invalid handler responses become internal failures", a
   assert.equal(diagnostics[0]?.schemaLocation, "response.201");
 });
 
-Deno.test("AC-F003-006 · production failures redact implementation and secret data", async () => {
+test("AC-F003-006 · production failures redact implementation and secret data", async () => {
   const app = createValidatedRouter([
     route(validSchemas(), () => {
       throw new Error(
@@ -272,7 +274,7 @@ Deno.test("AC-F003-006 · production failures redact implementation and secret d
   assert.doesNotMatch(serialized, /secret-token|kv:|users|stack|Bearer/);
 });
 
-Deno.test("AC-F003-006 · schema-authored messages cannot reflect rejected secrets", async () => {
+test("AC-F003-006 · schema-authored messages cannot reflect rejected secrets", async () => {
   const secret = "private-customer-token";
   const schemas = validSchemas();
   const app = createValidatedRouter([
@@ -302,7 +304,7 @@ Deno.test("AC-F003-006 · schema-authored messages cannot reflect rejected secre
   assert.match(serialized, /Value does not satisfy the declared schema/);
 });
 
-Deno.test("AC-F003-007 · human and JSON diagnostics identify safe correction context", async () => {
+test("AC-F003-007 · human and JSON diagnostics identify safe correction context", async () => {
   const diagnostics: ValidationDiagnostic[] = [];
   const app = createValidatedRouter([
     route(
@@ -330,7 +332,7 @@ Deno.test("AC-F003-007 · human and JSON diagnostics identify safe correction co
   assert.deepEqual(structured.diagnostics, diagnostics);
 });
 
-Deno.test("AC-F003-008 · runtime and contracts share one normalized schema inventory", async () => {
+test("AC-F003-008 · runtime and contracts share one normalized schema inventory", async () => {
   const Body = z.strictObject({ title: z.string() });
   const app = createValidatedRouter([
     route({
@@ -369,7 +371,7 @@ Deno.test("AC-F003-008 · runtime and contracts share one normalized schema inve
   assert.deepEqual(await json(response), { title: "shared" });
 });
 
-Deno.test("AC-F003-008 · unrepresentable schemas fail normalization", () => {
+test("AC-F003-008 · unrepresentable schemas fail normalization", () => {
   assert.throws(
     () =>
       createValidatedRouter([

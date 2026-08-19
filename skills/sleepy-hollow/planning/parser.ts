@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
-import { parse } from "@std/yaml";
+import { createHash } from "crypto";
+import { parse } from "yaml";
 
 import { PlanningError } from "./planning_error.ts";
 import type {
@@ -103,7 +103,7 @@ function frontmatterOf(source: string, path: string): {
   let metadata: unknown;
   try {
     metadata = parse(yamlSource, {
-      allowDuplicateKeys: false,
+      uniqueKeys: true,
       schema: "core",
     });
   } catch (error) {

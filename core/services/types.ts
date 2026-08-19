@@ -63,8 +63,8 @@ export interface ServiceDefinition {
   readonly generatedRoot: string;
   /** Path to the service's deployment configuration. */
   readonly deploymentConfigPath: string;
-  /** The KV binding this service owns; no other service may open it. */
-  readonly kvBinding: string;
+  /** The database binding this service owns; no other service may open it. */
+  readonly databaseBinding: string;
   /** The other services this one may call. */
   readonly dependencies: readonly ServiceDependency[];
 }

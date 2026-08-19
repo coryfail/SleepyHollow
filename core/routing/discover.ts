@@ -1,5 +1,6 @@
-import { dirname, relative, resolve, sep } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { platform, type PlatformDirEntry } from "#platform";
+import { dirname, relative, resolve, sep } from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 
 import {
   HTTP_METHODS,
@@ -27,9 +28,9 @@ const portablePath = (path: string) => path.split(sep).join("/");
 
 async function collectRouteFiles(directory: string): Promise<string[]> {
   const files: string[] = [];
-  const entries: Deno.DirEntry[] = [];
+  const entries: PlatformDirEntry[] = [];
 
-  for await (const entry of Deno.readDir(directory)) entries.push(entry);
+  for await (const entry of platform.readDir(directory)) entries.push(entry);
   entries.sort((left, right) => left.name.localeCompare(right.name));
 
   for (const entry of entries) {

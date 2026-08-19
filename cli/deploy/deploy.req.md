@@ -1,135 +1,204 @@
 ---
 schema: sgad-component/v0.2
 id: SH-F013
-title: Deno Deploy delivery
-status: verified
-risk: standard
+title: Portable container deployment and Fly.io delivery
+status: approved
+risk: high
 source_sections:
   - "3.7"
   - "14"
 depends_on:
+  - SH-F004
   - SH-F008
   - SH-F010
   - SH-F011
   - SH-F012
-open_decisions:
-  - OPEN-011
+  - SH-F020
+  - SH-F021
+open_decisions: []
 owners:
   - Sleepy Hollow maintainers
 ---
 
-# Deno Deploy delivery
+# Portable container deployment and Fly.io delivery
 
 ## Purpose
 
-Provide one excellent, deterministic path from a verified Sleepy Hollow
-application to a live Deno Deploy service with post-deployment evidence.
+Deploy a verified Sleepy Hollow application through a provider-neutral
+production bundle and adapter contract, with Fly.io as the first supported live
+provider and without coupling verification, credentials, storage, or smoke tests
+to one hosting platform.
 
-## In scope
+## Authorized scope
 
-- Local Deno development compatibility.
-- Environment and credential validation.
-- Deployment preview or plan.
-- Full verification before upload.
-- Deployment through `hollow deploy`.
-- Health and representative-operation smoke tests.
-- Live URL, contract locations, and structured deployment results.
+- Deterministic production bundles for Node and Bun containing compiled
+  application code, package metadata, an OCI-compatible Dockerfile, health
+  configuration, schema migrations, and a start command.
+- A deployment-provider registry with explicit capability metadata and injected
+  command, transport, clock, credential, and filesystem seams.
+- Fly.io application deployment through the official `flyctl` executable.
+- Provider-neutral verification, plan, confirmation, idempotence, result,
+  credential redaction, health, and representative-operation smoke behavior.
+- Storage-aware deployment planning for embedded SQLite and external
+  PostgreSQL.
+- A stable boundary for future providers without claiming that an unimplemented
+  provider is supported.
 
-## Requirements
+## Production bundle
 
-### Operator-supplied credentials
+The same verified source revision shall produce a deterministic production
+bundle for the selected Node or Bun runtime. The bundle shall contain no secret,
+local database file, development dependency, unapproved generated change, or
+host-specific absolute path. It shall listen on `0.0.0.0` at the configured
+internal port, use production configuration and security composition, expose a
+health endpoint, handle termination cleanly, and run the exact validated router
+and repository contract verified before deployment.
 
-Sleepy Hollow is a framework its users deploy their own applications with. It
-holds no credentials of its own and shall never require any to be present in
-this repository.
+Container packaging is the portability boundary. A provider adapter may supply
+provider configuration and execute provider tooling, but it shall not rewrite
+application behavior, schemas, migrations, contracts, or verification evidence.
+The adapter registry shall identify provider name, supported runtimes,
+persistent-volume support, secret support, health-check support, multi-instance
+support, deployment command requirements, and provider revision semantics.
 
-The deployment adapter shall read the operator's Deno Deploy access token from
-a documented environment variable at the moment of deployment. A missing,
-empty, or malformed token shall fail closed before any network request is
-attempted, with a diagnostic naming the variable the operator must set. The
-token shall be sent only as an authorization header to the configured Deno
-Deploy API origin, and never to another host, another header, a log, a
-generated artifact, or a command result.
+## Deployment configuration and plan
 
-### Verifiable request construction
+Application configuration shall select one provider explicitly. `hollow deploy`
+shall not infer a provider from an installed executable or credential. An
+unknown or unimplemented provider fails before build or mutation and lists only
+implemented providers.
 
-The adapter shall accept an injectable transport so that request construction,
-credential placement, response interpretation, and failure handling are
-verifiable without an account, a token, or a network. Verification of this
-component establishes that the adapter forms correct requests and interprets
-responses correctly. It does not establish that the remote platform accepts
-them.
+Before external mutation, the deployment plan shall identify:
 
-OPEN-011 is resolved on that boundary. Live platform behavior is validated by
-the operator's own first deployment, which already requires explicit
-confirmation, rather than by a credential held in this repository. The
-deployment result reports live evidence when that deployment runs.
+- Provider, application, region, selected runtime, source revision, bundle
+  digest, prior provider revision, and intended instance count.
+- Database profile and required storage topology.
+- Environment-key and secret-name changes without values.
+- Contract and migration changes, destructive migration or backup requirements,
+  and compatibility impact.
+- Build, upload, health, and representative smoke checks.
+- Whether confirmation is required and the exact plan digest it authorizes.
 
-The CLI shall own deterministic build, validation, upload, and smoke-test steps.
-The official skill may guide and interpret them but shall not bypass them. A
-deployment plan shall identify the target, application revision, environment
-changes, contract changes, and checks before external mutation.
+Full independent verification must pass before bundle construction or upload.
+The first external deployment, a breaking contract, a destructive migration, a
+database-profile change, a storage-topology change, or another materially risky
+production change requires explicit confirmation bound to the plan digest.
 
-The first external deployment and materially risky production changes require
-explicit user confirmation in the guided workflow. Credentials and environment
-values shall be handled without inclusion in logs, generated files, or command
-results. A deployment is not successful until required smoke tests pass.
+## Fly.io adapter
+
+The Fly adapter shall require a configured Fly application name and the
+official `flyctl` executable. Noninteractive authentication shall use an
+operator-supplied, app-scoped token from `FLY_API_TOKEN`. A missing, empty, or
+malformed token or executable fails before a remote command. The token shall be
+passed only in the child-process environment for the bounded Fly invocation and
+shall never appear in arguments, URLs, logs, plans, generated files,
+diagnostics, evidence, or results.
+
+The adapter shall generate or validate bounded Fly configuration from the
+provider-neutral plan and invoke `flyctl deploy --remote-only` without a shell.
+It shall use structured status output after deployment to identify the live URL,
+release or Machine revision, instance state, and health. Command output shall be
+bounded, normalized, and redacted before it becomes evidence.
+
+Embedded SQLite requires a named Fly volume mounted at `/data`, a database path
+within that mount, and exactly one writable Machine. The plan shall refuse an
+ephemeral root filesystem, absent volume, path outside the mount, or multiple
+writable Machines. PostgreSQL requires no application volume and may permit
+multiple Machines after connection and migration readiness pass.
+
+The framework shall not create an account, organization, paid resource, app,
+volume, database, token, or secret without a separate explicit confirmation of
+that external mutation and any spend. The first implementation may require the
+operator to provision the Fly app and volume and shall report exact setup
+commands without executing them.
+
+## Results and failure handling
+
+A successful upload is followed by a live health check and every configured
+representative smoke test. Required failure returns a failed deployment result
+that still identifies the live provider revision and URL. Transport, command,
+authentication, build, upload, status, migration, health, or smoke failure shall
+be actionable and shall never become partial success by rendering differently.
+
+Results distinguish source revision, bundle digest, and provider revision.
+Repeating an unchanged verified source, bundle, environment-key set, contract,
+migration set, and provider configuration shall return a predictable unchanged
+result or a provider-confirmed idempotent release rather than an unnecessary
+upload.
 
 ## Acceptance criteria
 
-- AC-F013-001: `hollow deploy` refuses to upload when required full verification
-  fails and reports the blocking check evidence.
-- AC-F013-002: A deployment plan identifies the Deno Deploy target, revision,
-  environment-key changes without values, contract changes, and planned smoke
-  tests before upload.
-- AC-F013-003: The guided first external deployment pauses for explicit
-  confirmation after presenting the plan.
-- AC-F013-004: Valid deployment credentials are consumed without appearing in
-  logs, generated artifacts, diagnostics, or structured output.
-- AC-F013-005: A successful upload is followed by a live health check and one
-  configured representative API smoke test.
-- AC-F013-006: A failed required smoke test returns a failed deployment result
-  that includes the live revision and actionable failure evidence rather than a
-  false success.
-- AC-F013-007: Successful human and JSON results include the live URL, deployed
-  revision, OpenAPI location, documentation location, smoke-test evidence, and
-  completion time.
-- AC-F013-008: Repeating deployment for an unchanged verified revision produces
-  a predictable no-change or idempotent deployment result.
-- AC-F013-009: The first-release deployment API exposes Deno Deploy as its sole
-  production adapter and does not imply support for unimplemented targets.
-- AC-F013-010: A missing, empty, or malformed access token fails closed before
-  any network request, with a diagnostic naming the environment variable the
-  operator must set.
-- AC-F013-011: The token is sent only as an authorization header to the
-  configured Deno Deploy API origin, and appears in no other header, host, log,
-  artifact, or result.
-- AC-F013-012: Request construction, response interpretation, and failure
-  handling are exercised through an injected transport with no account, token,
-  or network available.
-- AC-F013-013: A transport failure or a non-success platform response is
-  reported as a failed deployment with actionable evidence rather than a
-  partial success.
+- AC-F013-001: `hollow deploy` refuses bundle construction and upload when full
+  verification fails and reports the blocking evidence.
+- AC-F013-002: The plan contains every declared provider, runtime, source,
+  bundle, database, topology, environment-name, contract, migration, and smoke
+  field without exposing a secret value.
+- AC-F013-003: Every first or materially risky deployment pauses after the plan
+  and accepts only confirmation bound to the current plan digest.
+- AC-F013-004: Node and Bun production bundles are deterministic for the same
+  inputs, contain the required runtime and migration artifacts, and contain no
+  secret, local data file, development-only input, or absolute host path.
+- AC-F013-005: Provider selection is explicit; unsupported providers fail before
+  build or mutation, while the registry can accept a test provider without
+  changing provider-neutral orchestration.
+- AC-F013-006: A missing Fly executable, app name, or valid `FLY_API_TOKEN`
+  fails before remote execution and names the safe corrective action.
+- AC-F013-007: The Fly token reaches only the bounded child-process environment
+  and never appears in arguments, generated configuration, output, evidence,
+  diagnostics, or results.
+- AC-F013-008: The Fly adapter constructs the non-shell remote deployment and
+  structured status commands through an injected runner and interprets success,
+  authentication failure, platform refusal, timeout, malformed output, and
+  process failure without an account or network.
+- AC-F013-009: Embedded SQLite deployment requires a `/data` volume and one
+  writable Machine, while PostgreSQL deployment requires no application volume
+  and may plan multiple Machines.
+- AC-F013-010: A successful provider upload runs health and representative smoke
+  tests, and a required failure returns a failed result with the live URL,
+  provider revision, and actionable evidence.
+- AC-F013-011: Human and JSON results contain equivalent provider, URL, source
+  revision, bundle digest, provider revision, contract locations, migration,
+  smoke, and completion evidence.
+- AC-F013-012: An unchanged verified deployment returns a predictable unchanged
+  or provider-confirmed idempotent outcome without redundant upload.
+- AC-F013-013: The active deployment implementation and documentation contain no
+  removed platform adapter or credential contract.
 
 ## Out of scope
 
-- Additional cloud adapters.
-- Standalone executable deployment.
-- Coordinated multi-service deployment.
-- Automatic rollback behavior not supported by the selected target.
+- Implementing providers other than Fly.io in this change.
+- Creating or purchasing hosting accounts, applications, volumes, databases,
+  domains, certificates, or paid plans.
+- Automatic rollback unsupported by the provider.
+- Multi-region writable embedded SQLite.
+- Coordinated atomic deployment of multiple services.
+- A Kubernetes operator or general infrastructure-as-code engine.
 
 ## Dependencies and assumptions
 
-OPEN-011 is resolved in the requirements above. The framework verifies token
-sourcing, request construction, response interpretation, and failure handling
-through an injected transport. It does not hold an account or a token, and it
-does not verify that the remote platform accepts a request. The operator's own
-first deployment, gated by explicit confirmation, is where live platform
-behavior is established.
+SH-F004 owns database topology and migrations, SH-F008 supplies independent
+verification, SH-F010 supplies generated contracts, SH-F012 supplies redacted
+configuration, SH-F020 supplies the package and production artifacts, and
+SH-F021 supplies Node and Bun runtime adapters. Fly live acceptance remains
+unproven without operator credentials; the injected runner proves construction
+and interpretation, while the first authorized deployment must record actual
+platform evidence.
 
-The operator supplies the access token through the documented environment
-variable. Setup of a Deno Deploy account and project is the operator's
-responsibility and is outside this framework.
+## Change impact
+
+This requirement removes the old provider-specific API adapter and generic
+single-token request shape. It changes deploy target types, credentials,
+inventory loading, production server behavior, result schemas, docs, skill
+guidance, CLI integration, tests, and generated project configuration. Prior
+approval and verification below remain historical and are invalid for this
+content.
+
+## Approval scope
+
+Approval authorizes AC-F013-001 through AC-F013-013, deterministic container
+packaging, the provider registry, and the non-mutating/injected Fly adapter
+implementation. It does not authorize installing Fly tooling globally, creating
+external resources, spending money, publishing, or performing a live deploy.
 
 ## Governance record
 
@@ -264,3 +333,22 @@ other digest normalization is permitted.
 
 - Status: not applicable. No deployment has been authorized or attempted, and
   no Deno Deploy adapter exists to attempt one.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F013.
+- Governed-content digest:
+  `sha256:fae69fd6cd8942b587a814544f7a53f5574ca2c07628271ae2424b20b8395a78`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Red-state evidence, platform migration baseline
+
+- Status: failed as expected before implementation.
+- Observed at: 2026-08-19T13:52:03Z.
+- Command: `node --test tests/platform-migration-baseline.test.mjs`.
+- Result: AC-F013-001 failed because no `Dockerfile` exists; the existing
+  deployment adapter still targets the retired Deno deployment surface.

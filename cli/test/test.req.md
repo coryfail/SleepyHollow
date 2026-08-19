@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F016
 title: Test command
-status: draft
+status: approved
 risk: standard
 source_sections:
   - "11"
@@ -28,7 +28,7 @@ and reporting their acceptance-criterion coverage.
 
 - `hollow test` for the complete application.
 - Targeted endpoint or component test selection.
-- Isolated test-mode application and Deno KV execution.
+- Isolated test-mode application and relational database execution.
 - Human and JSON results with criterion mapping.
 
 ## Requirements
@@ -88,10 +88,11 @@ execution shall never guess a narrower set.
 
 ### Native runner boundary
 
-The production adapter shall invoke the current Deno executable directly through
-`Deno.Command`, never a shell or package-script string. It shall pass sorted,
-deduplicated, project-contained test files, frozen and cached dependency flags,
-`--no-prompt`, TAP output, and only the bounded read, write, run, environment,
+The production adapter shall invoke the supported Node executable and pinned
+Vitest module directly through the SH-F021 process adapter, never a shell
+or package-script string. It shall pass sorted, deduplicated,
+project-contained test files, frozen dependency flags, structured output, and
+only the bounded filesystem, process, environment,
 network, and unstable-KV permissions declared by normalized project test
 configuration. Write permissions may not include a governed `*.req.md` file,
 generated contract, repository metadata, or a path outside the project. Test
@@ -109,7 +110,7 @@ raise those limits.
 
 The runner shall set `SLEEPY_HOLLOW_MODE=test` explicitly. Each selected test
 shall declare either `isolated` or one named `shared-fixture:<stable-id>` policy.
-Isolated tests use SH-F007's `createTestApplication`/in-memory Deno KV boundary
+Isolated tests use SH-F007's `createTestApplication`/in-memory relational database boundary
 and close it after the test. Shared fixtures are opt-in, may be shared only among
 tests with the same declared stable fixture ID, and shall be closed after that
 group. Missing or inconsistent isolation metadata fails before execution. The
@@ -186,7 +187,7 @@ authority that evaluates test evidence with every other required control.
 ## Acceptance criteria
 
 - AC-F016-001: `hollow test` runs the complete project test suite in test mode
-  with isolated Deno KV state and returns zero only when all required tests pass.
+  with isolated relational database state and returns zero only when all required tests pass.
 - AC-F016-002: A documented target selects one endpoint or component and its
   required shared test dependencies without running unrelated independent tests.
 - AC-F016-003: A failing test returns nonzero and reports its file, test name,
@@ -195,7 +196,7 @@ authority that evaluates test evidence with every other required control.
   tests and summarizes criterion coverage.
 - AC-F016-005: `hollow test --json` emits a versioned result containing test
   status, duration, criterion mappings, and diagnostics.
-- AC-F016-006: Repeated tests do not share application or Deno KV state unless a
+- AC-F016-006: Repeated tests do not share application or database state unless a
   test explicitly declares a shared fixture.
 - AC-F016-007: A passing test run alone does not change a requirement from
   `approved` to `verified`.
@@ -212,7 +213,7 @@ authority that evaluates test evidence with every other required control.
 
 ## Out of scope
 
-- Replacing Deno's test runner with a proprietary runner.
+- Replacing the pinned project test runner with arbitrary package scripts.
 - Silently generating or editing acceptance tests.
 - Performing contract, security, or deployment verification owned by
   `hollow check`.
@@ -227,8 +228,8 @@ rendering, diagnostics, and exit semantics without owning test rules.
 
 The normalized inventory loader is a host boundary: it may parse supported
 repository evidence but may not accept source-authored claims that tests passed.
-The native runner result is authoritative for execution status. TAP parsing is
-limited to the output emitted by the pinned Deno runner contract and fails on
+The native runner result is authoritative for execution status. Structured
+result parsing is limited to the output emitted by the pinned runner contract and fails on
 unknown structural events rather than silently discarding them.
 
 ## Acceptance evidence map
@@ -422,3 +423,14 @@ other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, deployment, or external
   mutation was authorized or attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F016.
+- Governed-content digest:
+  `sha256:f4d679adf69fdb95e9b16a588d0ccc15643636c04dd1615b61627fa218e6e2f2`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

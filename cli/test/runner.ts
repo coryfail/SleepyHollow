@@ -1,22 +1,19 @@
-import { isAbsolute, relative, resolve, sep } from "node:path";
+import { platform } from "#platform";
+import { isAbsolute, relative, resolve, sep } from "path";
 
 import type {
-  DenoTestInvocation,
-  DenoTestInvocationOptions,
-  DenoTestRunnerOptions,
+  NodeTestInvocation,
+  NodeTestInvocationOptions,
+  NodeTestRunnerOptions,
   RawTestEvent,
   TestCommandInventory,
   TestCommandPlan,
-  TestRunnerPermissions,
   TestRunnerResult,
 } from "./types.ts";
 
 const MAX_OUTPUT = 1024 * 1024;
 const MAX_STREAM_OUTPUT = MAX_OUTPUT / 2;
 const MAX_TIMEOUT = 10 * 60 * 1000;
-const program = /^[A-Za-z0-9._-]+$/;
-const environmentName = /^[A-Za-z_][A-Za-z0-9_]*$/;
-const host = /^(?:\[[0-9a-fA-F:]+\]|[A-Za-z0-9.-]+)(?::[0-9]{1,5})?$/;
 
 function portable(path: string): string {
   return path.split(sep).join("/");
@@ -33,73 +30,10 @@ function projectPath(root: string, path: string): string {
   return local;
 }
 
-function permissionArgs(
-  root: string,
-  permissions: TestRunnerPermissions,
-): string[] {
-  const args: string[] = [];
-  if (permissions.read?.length) {
-    args.push(
-      `--allow-read=${
-        [...new Set(permissions.read.map((path) => projectPath(root, path)))]
-          .sort().join(",")
-      }`,
-    );
-  }
-  if (permissions.write?.length) {
-    const writes = [
-      ...new Set(permissions.write.map((path) => projectPath(root, path))),
-    ]
-      .sort();
-    if (
-      writes.some((path) =>
-        path === ".git" || path.startsWith(".git/") ||
-        path === ".github" || path.startsWith(".github/") ||
-        path === "generated" || path.startsWith("generated/") ||
-        path === "deno.json" || path === "deno.lock" ||
-        path.endsWith(".req.md")
-      )
-    ) {
-      throw new TypeError("Test write permission includes governed output");
-    }
-    args.push(`--allow-write=${writes.join(",")}`);
-  }
-  if (permissions.run?.length) {
-    if (permissions.run.some((value) => !program.test(value))) {
-      throw new TypeError("Test run permissions must name bounded programs");
-    }
-    args.push(`--allow-run=${[...new Set(permissions.run)].sort().join(",")}`);
-  }
-  const environment = [
-    ...new Set([
-      "SLEEPY_HOLLOW_MODE",
-      ...(permissions.env ?? []),
-    ]),
-  ].sort();
-  if (
-    environment.some((value) =>
-      !environmentName.test(value) ||
-      (/secret|token|password|credential|api_?key/i.test(value) &&
-        value !== "SLEEPY_HOLLOW_MODE")
-    )
-  ) {
-    throw new TypeError("Test environment permissions include an unsafe key");
-  }
-  args.push(`--allow-env=${environment.join(",")}`);
-  if (permissions.net?.length) {
-    if (permissions.net.some((value) => !host.test(value))) {
-      throw new TypeError("Test network permissions must name exact hosts");
-    }
-    args.push(`--allow-net=${[...new Set(permissions.net)].sort().join(",")}`);
-  }
-  if (permissions.unstableKv) args.push("--unstable-kv");
-  return args;
-}
-
 export function invocation(
   plan: TestCommandPlan,
-  options: DenoTestInvocationOptions,
-): DenoTestInvocation {
+  options: NodeTestInvocationOptions,
+): NodeTestInvocation {
   const root = resolve(options.projectRoot);
   const files = [...new Set(plan.files.map((path) => projectPath(root, path)))]
     .sort();
@@ -109,19 +43,14 @@ export function invocation(
     );
   }
   const args = [
-    "test",
-    "--cached-only",
-    "--frozen",
-    "--no-prompt",
-    "--reporter=tap",
-    ...permissionArgs(root, options.permissions ?? {}),
-    ...(plan.filter
-      ? [`--filter=/${plan.filter.replaceAll("/", "\\/")}/`]
-      : []),
+    "./node_modules/vitest/vitest.mjs",
+    "run",
+    "--reporter=verbose",
+    ...(plan.filter ? ["--testNamePattern", plan.filter] : []),
     ...files,
   ];
   return Object.freeze({
-    command: options.denoExecutable ?? Deno.execPath(),
+    command: options.nodeExecutable ?? platform.execPath(),
     cwd: root,
     args: Object.freeze(args),
     env: Object.freeze({ SLEEPY_HOLLOW_MODE: "test" }),
@@ -199,7 +128,7 @@ function parseTap(
 export async function runNative(
   plan: TestCommandPlan,
   inventory: TestCommandInventory,
-  options: DenoTestRunnerOptions,
+  options: NodeTestRunnerOptions,
 ): Promise<TestRunnerResult> {
   const timeoutMs = options.timeoutMs ?? MAX_TIMEOUT;
   if (
@@ -212,7 +141,7 @@ export async function runNative(
   }
   const command = invocation(plan, options);
   const started = performance.now();
-  const child = new Deno.Command(command.command, {
+  const child = new platform.Command(command.command, {
     cwd: command.cwd,
     args: [...command.args],
     env: { ...command.env },

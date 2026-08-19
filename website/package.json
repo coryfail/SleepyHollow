@@ -9,7 +9,7 @@
   "scripts": {
     "docs:build": "node scripts/generate-docs.mjs",
     "docs:api": "npm run docs:api:generate && npm run docs:api:link",
-    "docs:api:generate": "cd .. && deno doc --html '--name=Sleepy Hollow' --output=website/dist/api mod.ts core/routing/mod.ts core/validation/mod.ts core/kv/mod.ts core/security/mod.ts core/config/mod.ts core/services/mod.ts core/testing/mod.ts core/capture/mod.ts",
+    "docs:api:generate": "cd .. && npx typedoc --name 'Sleepy Hollow' --out website/dist/api mod.ts core/routing/mod.ts core/validation/mod.ts core/database/mod.ts core/security/mod.ts core/config/mod.ts core/services/mod.ts core/testing/mod.ts core/capture/mod.ts",
     "docs:api:link": "node scripts/brand-api-reference.mjs",
     "predev": "npm run docs:build",
     "dev": "vite",
@@ -45,7 +45,8 @@
     "@vitejs/plugin-react": "6.0.5",
     "jsdom": "30.0.1",
     "marked": "18.0.9",
-    "typescript": "7.0.2",
+    "typedoc": "0.28.17",
+    "typescript": "5.9.3",
     "vite": "8.2.1",
     "vitest": "4.1.10",
     "yaml": "2.9.0"

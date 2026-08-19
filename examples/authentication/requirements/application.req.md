@@ -75,7 +75,7 @@ or a diagnostic.
 
 ## Deployment model
 
-One deployable API on Deno Deploy. This example is not intended for deployment;
+One deployable API on Fly.io. This example is not intended for deployment;
 it exists to be read, run locally, and verified.
 
 ## Service architecture
@@ -148,3 +148,14 @@ readability; no other digest normalization is permitted.
 ### Delivery
 
 - Status: not applicable; this example is not deployed.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by the authentication example.
+- Governed-content digest:
+  `sha256:fc2b7d8ba568c855ffd55ab828860555e8c88c83033943168bd21b29d6900565`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

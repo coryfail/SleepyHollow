@@ -59,7 +59,7 @@ export function createTestInventoryLoader() {
 
 export function createDeployInventoryLoader(options: {
   readonly revision: string | (() => string);
-  readonly target: { readonly kind: "deno-deploy"; readonly project: string };
+  readonly target: { readonly kind: "fly"; readonly project: string };
 }) {
   return (request: { readonly projectRoot: string }) =>
     deployLoader(request.projectRoot, {

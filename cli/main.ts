@@ -1,14 +1,15 @@
+import { platform } from "#platform";
+import { pathToFileURL } from "url";
 /**
  * The `hollow` command line, and its programmatic entry point.
  *
  * Run it without installing anything:
  *
  * ```bash
- * deno run -A jsr:@sleepy-hollow/framework/cli create my-api
+ * npx @sleepy-hollow/framework create my-api
  * ```
  *
- * JSR declares no binary, so the CLI is invoked through `deno run` and is not
- * reachable through `npx`. {@linkcode runCli} exposes the same command surface
+ * The npm package declares the `hollow` binary. {@linkcode runCli} exposes the same command surface
  * to a caller that supplies its own I/O, which is how the CLI is tested.
  *
  * @module
@@ -28,7 +29,7 @@ export const VERSION = CLI_VERSION;
 function revision(): () => string {
   return () => {
     try {
-      return Deno.env.get("SLEEPY_HOLLOW_REVISION") ?? "workspace";
+      return platform.env.get("SLEEPY_HOLLOW_REVISION") ?? "workspace";
     } catch {
       return "workspace";
     }
@@ -37,8 +38,8 @@ function revision(): () => string {
 
 function projectName(): string {
   try {
-    return Deno.env.get("SLEEPY_HOLLOW_PROJECT") ??
-      Deno.cwd().split("/").filter(Boolean).pop() ?? "sleepy-hollow";
+    return platform.env.get("SLEEPY_HOLLOW_PROJECT") ??
+      platform.cwd().split("/").filter(Boolean).pop() ?? "sleepy-hollow";
   } catch {
     return "sleepy-hollow";
   }
@@ -64,15 +65,15 @@ export function runCli(
   return runCommandSurface(args, io, createCliHandlers(dependencies));
 }
 
-if (import.meta.main) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (
-    Deno.args[0] === DEV_WORKER_ARGUMENT &&
-    Deno.env.get("SLEEPY_HOLLOW_INTERNAL_DEV_WORKER") === "1"
+    platform.args[0] === DEV_WORKER_ARGUMENT &&
+    platform.env.get("SLEEPY_HOLLOW_INTERNAL_DEV_WORKER") === "1"
   ) {
-    Deno.exit(await runDevWorker(Deno.args.slice(1)));
+    platform.exit(await runDevWorker(platform.args.slice(1)));
   }
-  const code = await runCli(Deno.args, {
-    cwd: Deno.cwd(),
+  const code = await runCli(platform.args, {
+    cwd: platform.cwd(),
     stdout: console.log,
     stderr: console.error,
   }, {
@@ -80,8 +81,8 @@ if (import.meta.main) {
     testInventoryLoader: createTestInventoryLoader(),
     deployInventoryLoader: createDeployInventoryLoader({
       revision: revision(),
-      target: { kind: "deno-deploy", project: projectName() },
+      target: { kind: "fly", project: projectName() },
     }),
   });
-  Deno.exit(code);
+  platform.exit(code);
 }

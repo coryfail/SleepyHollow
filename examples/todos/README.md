@@ -2,7 +2,7 @@
 
 A worked Sleepy Hollow application: a todo list with two approved endpoints,
 `/todos` and `/todos/[id]`, covering creation, bounded listing, reading,
-updating, and deletion over Deno KV.
+updating, and deletion over embedded SQLite.
 
 Authentication is recorded as an explicit `none`, so this example demonstrates
 routing, validation, data access, and verification. For a route that requires an
@@ -17,5 +17,5 @@ approval bound to the exact content approved.
 ## Verify
 
 ```bash
-deno task verify
+npm run verify
 ```

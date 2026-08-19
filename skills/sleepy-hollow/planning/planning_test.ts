@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
+import { platform } from "#platform";
+import assert from "assert/strict";
+import { createHash } from "crypto";
 
 import {
   applyPlanningDecision,
@@ -44,7 +45,7 @@ Authentication: none. Authorization: none.
 Validate URLs and bound request bodies.
 
 ## Deployment model
-Deno Deploy.
+platform Deploy.
 
 ## Service architecture
 One API.
@@ -185,7 +186,7 @@ Declared in frontmatter.
 `;
 }
 
-Deno.test("AC-F006-001 · application planning requires every mandatory topic", () => {
+test("AC-F006-001 · application planning requires every mandatory topic", () => {
   const parsed = validateApplicationRequirement(applicationSource());
   assert.equal(parsed.kind, "application");
   assert.equal(parsed.sections.has("Security constraints"), true);
@@ -202,7 +203,7 @@ Deno.test("AC-F006-001 · application planning requires every mandatory topic", 
   );
 });
 
-Deno.test("AC-F006-002 · unresolved material decisions remain explicit", () => {
+test("AC-F006-002 · unresolved material decisions remain explicit", () => {
   const parsed = validateApplicationRequirement(applicationSource());
   assert.match(
     parsed.sections.get("Open questions, assumptions, and risks") ?? "",
@@ -210,7 +211,7 @@ Deno.test("AC-F006-002 · unresolved material decisions remain explicit", () => 
   );
 });
 
-Deno.test("AC-F006-003 · decomposition proposes only directories and requirements", () => {
+test("AC-F006-003 · decomposition proposes only directories and requirements", () => {
   const plan = decomposeApplication(
     {
       path: "requirements/application.req.md",
@@ -227,7 +228,7 @@ Deno.test("AC-F006-003 · decomposition proposes only directories and requiremen
   );
 });
 
-Deno.test("AC-NRF-006 · decomposition rejects portable named-file collisions", () => {
+test("AC-NRF-006 · decomposition rejects portable named-file collisions", () => {
   assert.throws(
     () =>
       decomposeApplication(
@@ -255,7 +256,7 @@ Deno.test("AC-NRF-006 · decomposition rejects portable named-file collisions", 
   );
 });
 
-Deno.test("AC-F006-004 · endpoint frontmatter is strict and machine-readable", () => {
+test("AC-F006-004 · endpoint frontmatter is strict and machine-readable", () => {
   const parsed = parseRequirement(
     endpointSource("bookmarks", "/bookmarks"),
     "api/bookmarks/bookmarks.req.md",
@@ -266,7 +267,7 @@ Deno.test("AC-F006-004 · endpoint frontmatter is strict and machine-readable", 
   assert.equal(parsed.metadata.service, "application");
 });
 
-Deno.test("AC-F006-005 · endpoint requirements include every mandatory section", () => {
+test("AC-F006-005 · endpoint requirements include every mandatory section", () => {
   assert.throws(
     () =>
       parseRequirement(
@@ -296,7 +297,7 @@ const decisionDocuments: readonly PlanningDocument[] = [
   },
 ];
 
-Deno.test("AC-F006-006 · one endpoint decision does not approve another", () => {
+test("AC-F006-006 · one endpoint decision does not approve another", () => {
   const result = applyPlanningDecision(decisionDocuments, {
     action: "approve",
     requirementIds: ["bookmarks"],
@@ -308,7 +309,7 @@ Deno.test("AC-F006-006 · one endpoint decision does not approve another", () =>
   assert.match(result.documents[1].source, /status: draft/);
 });
 
-Deno.test("AC-F006-007 · explicit group approval changes only named endpoints", () => {
+test("AC-F006-007 · explicit group approval changes only named endpoints", () => {
   const third = {
     path: "api/tags/tags.req.md",
     source: endpointSource("tags", "/tags"),
@@ -324,7 +325,7 @@ Deno.test("AC-F006-007 · explicit group approval changes only named endpoints",
   assert.match(result.documents[2].source, /status: draft/);
 });
 
-Deno.test("AC-F006-008 · revision returns affected behavior to draft and reports dependents", () => {
+test("AC-F006-008 · revision returns affected behavior to draft and reports dependents", () => {
   const initiallyApproved = applyPlanningDecision(decisionDocuments, {
     action: "approve",
     requirementIds: ["bookmarks", "collections"],
@@ -344,7 +345,7 @@ Deno.test("AC-F006-008 · revision returns affected behavior to draft and report
   assert.deepEqual(revised.reviewRequired, ["collections"]);
 });
 
-Deno.test("AC-F006-009 · decomposition reports approved-source conflicts", () => {
+test("AC-F006-009 · decomposition reports approved-source conflicts", () => {
   assert.throws(
     () =>
       decomposeApplication(
@@ -369,7 +370,7 @@ Deno.test("AC-F006-009 · decomposition reports approved-source conflicts", () =
   );
 });
 
-Deno.test("AC-F006-010 · malformed and duplicate criteria report source locations", () => {
+test("AC-F006-010 · malformed and duplicate criteria report source locations", () => {
   const source = endpointSource("bookmarks", "/bookmarks").replace(
     "- AC-BOOKMARKS-001: Returns a bounded response.",
     "- AC-BOOKMARKS-001: First behavior.\n- AC-BOOKMARKS-001: Duplicate behavior.",

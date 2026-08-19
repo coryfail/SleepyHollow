@@ -20,15 +20,6 @@ export interface TestIsolationPolicy {
   readonly policy: "isolated" | `shared-fixture:${string}`;
 }
 
-export interface TestRunnerPermissions {
-  readonly read?: readonly string[];
-  readonly write?: readonly string[];
-  readonly run?: readonly string[];
-  readonly env?: readonly string[];
-  readonly net?: readonly string[];
-  readonly unstableKv?: boolean;
-}
-
 export interface TestCommandInventory {
   readonly captureArtifactPath?: string;
   readonly projectRootDisplay: string;
@@ -38,9 +29,8 @@ export interface TestCommandInventory {
   readonly manifest: TestManifest;
   readonly isolation: readonly TestIsolationPolicy[];
   readonly hasUnownedSharedChange?: boolean;
-  readonly permissions?: TestRunnerPermissions;
   readonly timeoutMs?: number;
-  readonly denoExecutable?: string;
+  readonly nodeExecutable?: string;
 }
 
 export interface TestCommandDiagnostic {
@@ -94,20 +84,19 @@ export interface TestCommandIo {
   readonly stderr: (value: string) => void;
 }
 
-export interface DenoTestInvocation {
+export interface NodeTestInvocation {
   readonly command: string;
   readonly cwd: string;
   readonly args: readonly string[];
   readonly env: Readonly<Record<string, string>>;
 }
 
-export interface DenoTestInvocationOptions {
+export interface NodeTestInvocationOptions {
   readonly projectRoot: string;
-  readonly denoExecutable?: string;
-  readonly permissions?: TestRunnerPermissions;
+  readonly nodeExecutable?: string;
 }
 
-export interface DenoTestRunnerOptions extends DenoTestInvocationOptions {
+export interface NodeTestRunnerOptions extends NodeTestInvocationOptions {
   readonly timeoutMs?: number;
   readonly signal?: AbortSignal;
 }

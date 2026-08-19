@@ -1,12 +1,8 @@
-import assert from "node:assert/strict";
+import assert from "assert/strict";
 
-import {
-  createKvRepository,
-  openKvTestContext,
-} from "@sleepy-hollow/framework/kv";
+import { openEmbeddedSqlite } from "@sleepy-hollow/framework/database";
 
-import { todos } from "../../models/todo.ts";
-import { useTodoRepository } from "../../models/repository.ts";
+import { createTodoRepository, useTodoRepository } from "../../models/repository.ts";
 import collection from "./route.ts";
 import item from "./[id]/route.ts";
 
@@ -25,13 +21,13 @@ function call(
 }
 
 async function withRepository(run: () => Promise<void>): Promise<void> {
-  const kv = await openKvTestContext();
-  useTodoRepository(createKvRepository(kv.kv, todos));
+  const database = openEmbeddedSqlite({ filename: ":memory:" });
+  useTodoRepository(createTodoRepository(database));
   try {
     await run();
   } finally {
     useTodoRepository(undefined);
-    await kv.close();
+    database.close();
   }
 }
 
@@ -41,7 +37,7 @@ async function create(title: string): Promise<Record<string, string>> {
   return await response.json();
 }
 
-Deno.test("AC-TODOS-001 · a valid create returns the stored todo, not done", async () => {
+test("AC-TODOS-001 · a valid create returns the stored todo, not done", async () => {
   await withRepository(async () => {
     const todo = await create("Write docs");
     assert.equal(todo.title, "Write docs");
@@ -50,7 +46,7 @@ Deno.test("AC-TODOS-001 · a valid create returns the stored todo, not done", as
   });
 });
 
-Deno.test("AC-TODOS-002 · listing returns only todos matching the done state", async () => {
+test("AC-TODOS-002 · listing returns only todos matching the done state", async () => {
   await withRepository(async () => {
     const open = await create("Open item");
     await call(item.PATCH!, { params: { id: open.id }, body: { done: true } });
@@ -72,7 +68,7 @@ Deno.test("AC-TODOS-002 · listing returns only todos matching the done state", 
   });
 });
 
-Deno.test("AC-TODOS-003 · listing uses the declared done index with a bounded limit", async () => {
+test("AC-TODOS-003 · listing uses the declared done index with a bounded limit", async () => {
   await withRepository(async () => {
     await create("One");
     await create("Two");
@@ -84,7 +80,7 @@ Deno.test("AC-TODOS-003 · listing uses the declared done index with a bounded l
   });
 });
 
-Deno.test("AC-TODOS-004 · an unknown identifier returns 404", async () => {
+test("AC-TODOS-004 · an unknown identifier returns 404", async () => {
   await withRepository(async () => {
     const response = await call(item.GET!, {
       params: { id: crypto.randomUUID() },
@@ -93,7 +89,7 @@ Deno.test("AC-TODOS-004 · an unknown identifier returns 404", async () => {
   });
 });
 
-Deno.test("AC-TODOS-005 · an update replaces only the supplied fields", async () => {
+test("AC-TODOS-005 · an update replaces only the supplied fields", async () => {
   await withRepository(async () => {
     const todo = await create("Before");
     const updated = await (await call(item.PATCH!, {
@@ -105,7 +101,7 @@ Deno.test("AC-TODOS-005 · an update replaces only the supplied fields", async (
   });
 });
 
-Deno.test("AC-TODOS-006 · a delete removes the todo and later reads return 404", async () => {
+test("AC-TODOS-006 · a delete removes the todo and later reads return 404", async () => {
   await withRepository(async () => {
     const todo = await create("Temporary");
     assert.equal(

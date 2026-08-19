@@ -43,7 +43,7 @@ The first-release registry shall contain exactly these commands in this order:
 | `test` | Run full or safely targeted project tests. | SH-F016 command API |
 | `check` | Independently verify project evidence. | SH-F008 `runCheckCommand` |
 | `generate` | Generate or check owned API contracts. | SH-F010 `generateContracts` |
-| `deploy` | Preview and deliver one verified Deno Deploy revision. | SH-F013 command API |
+| `deploy` | Preview and deliver one verified provider revision from a portable bundle. | SH-F013 command API |
 
 `hollow`, `hollow help`, and `hollow --help` shall render top-level help and
 return zero. `hollow help <command>` and `hollow <command> --help` shall render
@@ -285,3 +285,14 @@ other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, deployment, or external
   mutation was authorized or attempted.
+
+### Approval, Node/Bun platform migration
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-19T13:52:03Z.
+- Approved criteria: all acceptance criteria currently owned by SH-F011.
+- Governed-content digest:
+  `sha256:b10afd7bc7f2e8e1a2c7d3b0aae8442e3ead5115a47bfa4888f8f7d43755e238`.
+- Decision source: owner direct response `approve it all`, immediately after
+  review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.

@@ -32,7 +32,7 @@ the handler never runs are all the framework's job, not yours.
 ## Run it
 
 ```bash
-deno task verify
+npm run verify
 ```
 
 Serve it and try the route:

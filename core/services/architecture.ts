@@ -1,4 +1,4 @@
-import { isAbsolute, posix } from "node:path";
+import { isAbsolute, posix } from "path";
 
 import { ServiceArchitectureError } from "./errors.ts";
 import type {
@@ -76,13 +76,13 @@ function validateService(
       service.requirementsPath,
     ));
   }
-  if (!identifier.test(service.kvBinding)) {
+  if (!identifier.test(service.databaseBinding)) {
     diagnostics.push(diagnostic(
-      "SH_SERVICE_KV_BINDING_INVALID",
-      `${service.id} declares an unsafe KV binding`,
-      "Use a unique stable lowercase KV binding identifier.",
+      "SH_SERVICE_DATABASE_BINDING_INVALID",
+      `${service.id} declares an unsafe database binding`,
+      "Use a unique stable lowercase database binding identifier.",
       service.id,
-      service.kvBinding,
+      service.databaseBinding,
     ));
   }
   const dependencyIds = new Set<string>();
@@ -203,17 +203,17 @@ export function normalizeArchitecture(
         service.id,
       ));
     }
-    if (bindings.has(service.kvBinding)) {
+    if (bindings.has(service.databaseBinding)) {
       diagnostics.push(diagnostic(
-        "SH_SERVICE_KV_BINDING_DUPLICATED",
-        `KV binding ${service.kvBinding} is shared`,
+        "SH_SERVICE_DATABASE_BINDING_DUPLICATED",
+        `Database binding ${service.databaseBinding} is shared`,
         "Assign a unique database binding to every service.",
         service.id,
-        service.kvBinding,
+        service.databaseBinding,
       ));
     }
     ids.add(service.id);
-    bindings.add(service.kvBinding);
+    bindings.add(service.databaseBinding);
   }
   for (let left = 0; left < architecture.services.length; left++) {
     for (let right = left + 1; right < architecture.services.length; right++) {

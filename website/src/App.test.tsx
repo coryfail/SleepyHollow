@@ -6,7 +6,7 @@ import App from "./App";
 describe("approved site behavior", () => {
   test("AC-HOME-001 AC-HOME-016 · the home page opens as an agentic framework with SGAD built in", () => {
     render(<App page="sleepy-hollow" />);
-    expect(screen.getAllByText(/agentic-first headless API framework for Deno/i)[0]).toBeVisible();
+    expect(screen.getAllByText(/agentic-first headless API framework for Node\.js and Bun/i)[0]).toBeVisible();
     expect(screen.getAllByText(/Specification-Governed Agentic Development/i)[0]).toBeVisible();
     expect(screen.getAllByText(/in development/i)[0]).toBeVisible();
     expect(screen.getByText(/test-driven development/i)).toBeVisible();
@@ -27,8 +27,8 @@ describe("approved site behavior", () => {
 
   test("AC-HOME-011 AC-HOME-014 · the home page shows how to install it and where to learn it", () => {
     render(<App page="sleepy-hollow" />);
-    expect(screen.getByText("deno add jsr:@sleepy-hollow/framework", { exact: true })).toBeVisible();
-    expect(screen.getByText("deno install -A --global --name hollow jsr:@sleepy-hollow/framework/cli", { exact: true })).toBeVisible();
+    expect(screen.getByText("npm install @sleepy-hollow/framework", { exact: true })).toBeVisible();
+    expect(screen.getByText("npm install -g @sleepy-hollow/framework", { exact: true })).toBeVisible();
     expect(screen.getByRole("link", { name: /read the documentation/i })).toHaveAttribute(
       "href", expect.stringMatching(/\/docs\/$/),
     );

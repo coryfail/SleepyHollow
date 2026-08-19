@@ -1,4 +1,5 @@
-import { posix } from "node:path";
+import { platform } from "#platform";
+import { posix } from "path";
 
 import { normalizeArchitecture } from "./architecture.ts";
 import { ServiceBoundaryError } from "./errors.ts";
@@ -60,14 +61,14 @@ export function verifyBoundaries(options: {
       ));
       continue;
     }
-    if (/\bDeno\s*\.\s*openKv\s*\(/.test(source.content)) {
+    if (/\bopenEmbeddedSqlite\s*\(/.test(source.content)) {
       diagnostics.push(diagnostic(
-        "SH_SERVICE_DIRECT_KV_FORBIDDEN",
-        `${source.serviceId} directly opens Deno KV`,
-        "Use the owner-bound SH-F004 service KV capability.",
+        "SH_SERVICE_DIRECT_DATABASE_FORBIDDEN",
+        `${source.serviceId} directly opens a database`,
+        "Use the owner-bound SH-F004 database capability.",
         source.serviceId,
         source.path,
-        owner.kvBinding,
+        owner.databaseBinding,
       ));
     }
     for (const match of source.content.matchAll(importSpecifier)) {
@@ -93,12 +94,12 @@ export function verifyBoundaries(options: {
     const owner = services.get(capability.ownerServiceId);
     if (
       !owner || capability.requesterServiceId !== capability.ownerServiceId ||
-      capability.bindingId !== owner.kvBinding
+      capability.bindingId !== owner.databaseBinding
     ) {
       diagnostics.push(diagnostic(
-        "SH_SERVICE_FOREIGN_KV_CAPABILITY",
-        `${capability.requesterServiceId} received a foreign or invalid KV capability`,
-        "Keep repository and raw-KV capabilities inside the owning service and use its generated client.",
+        "SH_SERVICE_FOREIGN_DATABASE_CAPABILITY",
+        `${capability.requesterServiceId} received a foreign or invalid database capability`,
+        "Keep repository and raw database capabilities inside the owning service and use its generated client.",
         capability.requesterServiceId,
         capability.source,
         capability.bindingId,
@@ -126,14 +127,14 @@ export async function openOwned<T>(options: {
   );
   if (
     !owner || options.ownerServiceId !== options.requesterServiceId ||
-    owner.kvBinding !== options.bindingId
+    owner.databaseBinding !== options.bindingId
   ) {
     throw new ServiceBoundaryError([diagnostic(
-      "SH_SERVICE_FOREIGN_KV_CAPABILITY",
-      `${options.requesterServiceId} cannot open ${options.ownerServiceId}'s KV binding`,
+      "SH_SERVICE_FOREIGN_DATABASE_CAPABILITY",
+      `${options.requesterServiceId} cannot open ${options.ownerServiceId}'s database binding`,
       `Call ${options.ownerServiceId} through its generated typed HTTP client.`,
       options.requesterServiceId,
-      "runtime service KV capability",
+      "runtime service database capability",
       options.bindingId,
     )]);
   }

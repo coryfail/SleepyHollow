@@ -1,3 +1,4 @@
+import { platform } from "#platform";
 /**
  * Verifies that every named requirement's recorded approval binds its exact
  * governed content, reading the staged blob rather than the working tree so the
@@ -5,8 +6,8 @@
  *
  * This exists because governed Markdown has twice been rewritten after
  * approval by a formatting command, silently detaching an exact-content
- * approval from the content it claims to authorize. `deno.json` excludes these
- * files from `deno fmt`, which prevents that specific cause; this check is
+ * approval from the content it claims to authorize. Formatting excludes these
+ * files, which prevents that specific cause; this check is
  * cause-independent and catches any edit that moves governed bytes.
  *
  * The digest algorithm is the canonical one defined in the SGAD documentation
@@ -15,7 +16,7 @@
  * the `## Governance record` heading, omitting the single top-level frontmatter
  * `status:` line and its line ending. Keep the three in agreement.
  */
-import { createHash } from "node:crypto";
+import { createHash } from "crypto";
 
 interface Failure {
   readonly path: string;
@@ -23,7 +24,7 @@ interface Failure {
 }
 
 async function git(args: string[]): Promise<string | null> {
-  const output = await new Deno.Command("git", {
+  const output = await new platform.Command("git", {
     args,
     stdout: "piped",
     stderr: "null",
@@ -39,7 +40,7 @@ async function contents(
 ): Promise<string | null> {
   if (fromIndex) return await git(["show", `:${path}`]);
   try {
-    return await Deno.readTextFile(path);
+    return await platform.readTextFile(path);
   } catch {
     return null;
   }
@@ -68,8 +69,8 @@ function governedDigest(source: string): string | null {
     .digest("hex");
 }
 
-const fromIndex = Deno.args.includes("--staged");
-const named = Deno.args.filter((argument) => !argument.startsWith("--"));
+const fromIndex = platform.args.includes("--staged");
+const named = platform.args.filter((argument) => !argument.startsWith("--"));
 const paths = named.length > 0 ? named : await tracked();
 
 const failures: Failure[] = [];
@@ -116,7 +117,7 @@ if (failures.length > 0) {
       "governed content, or record a new approval for the digest above and set\n" +
       "status to draft until it is granted.\n",
   );
-  Deno.exit(1);
+  platform.exit(1);
 }
 
 if (checked > 0) {

@@ -1,3 +1,4 @@
+import { stat } from "fs/promises";
 import config from "../sleepyhollow.config.ts";
 
 const required = [
@@ -7,7 +8,7 @@ const required = [
   "requirements/application.req.md",
   "tests",
 ];
-for (const path of required) await Deno.stat(path);
+for (const path of required) await stat(path);
 if (
   config.apiDirectory !== "api" ||
   config.requirementsFile !== "requirements/application.req.md" ||

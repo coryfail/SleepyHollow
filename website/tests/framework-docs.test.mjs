@@ -149,14 +149,12 @@ test("AC-FWDOC-005 · every installable artifact a guide names resolves", () => 
     );
   }
 
-  const { name } = JSON.parse(read("deno.json"));
-  for (
-    const [, specifier] of prose.matchAll(/jsr:(@[a-z0-9-]+\/[a-z0-9-]+)/g)
-  ) {
+  const { name } = JSON.parse(read("package.json"));
+  for (const [, specifier] of prose.matchAll(/npm install(?: -g)? (@[a-z0-9-]+\/[a-z0-9-]+)/g)) {
     assert.equal(
       specifier,
       name,
-      `guides install '${specifier}' but deno.json publishes '${name}'`,
+      `guides install '${specifier}' but package.json publishes '${name}'`,
     );
   }
 });
@@ -193,8 +191,8 @@ test("AC-FWDOC-007 · every framework guide has a reading-order position and a s
   }
 });
 
-test("AC-FWDOC-008 · getting-started introduces identifiers before it depends on them", () => {
-  const guide = read("docs/framework/getting-started.md");
+test("AC-FWDOC-008 · writing requirements introduces identifiers before it depends on them", () => {
+  const guide = read("docs/framework/writing-requirements.md");
 
   // The guide hands the reader a requirementId and a criterion ID inside a test
   // example. Whatever position those appear in, the guide must have already
@@ -203,17 +201,17 @@ test("AC-FWDOC-008 · getting-started introduces identifiers before it depends o
   assert.notEqual(
     dependency,
     -1,
-    "expected the criterionTest example to remain in the guide",
+    "expected the criterionTest example to remain in the requirements guide",
   );
 
-  const introduction = guide.search(/writing-requirements|npx skills add/);
+  const introduction = guide.search(/## Acceptance criteria/);
   assert.notEqual(
     introduction,
     -1,
-    "getting-started.md must introduce how an approved requirement is produced",
+    "writing-requirements.md must introduce acceptance criteria before the test example",
   );
   assert.ok(
     introduction < dependency,
-    "getting-started.md depends on a requirement ID before telling the reader how to create one",
+    "writing-requirements.md depends on a requirement ID before explaining acceptance criteria",
   );
 });

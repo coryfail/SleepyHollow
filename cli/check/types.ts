@@ -178,26 +178,16 @@ export interface CheckResult {
   };
 }
 
-export interface VerificationPermissions {
-  readonly read?: readonly string[];
-  readonly write?: readonly string[];
-  readonly run?: readonly string[];
-  readonly env?: readonly string[];
-  readonly net?: readonly string[];
-  readonly unstableKv?: boolean;
-}
-
-export interface DenoVerificationRunnerOptions {
+export interface NodeVerificationRunnerOptions {
   readonly projectRoot: string;
   readonly typecheckFiles: readonly string[];
   readonly testFiles: readonly string[];
-  readonly permissions?: VerificationPermissions;
   readonly timeoutMs?: number;
   readonly signal?: AbortSignal;
-  readonly denoExecutable?: string;
+  readonly nodeExecutable?: string;
 }
 
-export interface DenoVerificationRunnerResult {
+export interface NodeVerificationRunnerResult {
   readonly typecheck: {
     readonly status: "passed" | "failed";
     readonly evidence: string;

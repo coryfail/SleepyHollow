@@ -87,7 +87,7 @@ Approval is bound to a SHA-256 digest of the governed content. The canonical
 algorithm has one definition, in the repository's root `repository.req.md`, and
 [Verification](verification.md) explains why editing an approved requirement
 detaches its approval. Do not reimplement the digest from either description —
-`deno task check:governance` computes it.
+`npm run check` validates the project before the independent evidence check.
 
 ## Mapping a test to a criterion
 
@@ -117,7 +117,7 @@ fails verification, and a test naming a criterion that does not exist fails too.
 3. Write the mapped tests and **watch them fail**. A test that has never failed
    is not evidence that it can.
 4. Implement until they pass.
-5. Run `deno task test`, then `hollow check`.
+5. Run `npm run test`, then `hollow check`.
 
 Step 3 is not ceremony. Verification proves your tests exercised the handler; it
 cannot prove a test would have caught the failure it claims to cover.

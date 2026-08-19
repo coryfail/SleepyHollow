@@ -1,0 +1,12 @@
+{
+  "name": "sleepy-hollow-authentication-example",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": { "check": "tsc --noEmit", "test": "vitest run", "verify": "npm run check && npm run test" },
+  "devDependencies": {
+    "@sleepy-hollow/framework": "file:../..",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

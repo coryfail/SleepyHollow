@@ -1,5 +1,5 @@
-import assert from "node:assert/strict";
-import { fileURLToPath } from "node:url";
+import assert from "assert/strict";
+import { fileURLToPath } from "url";
 
 import { discoverRoutes } from "@sleepy-hollow/framework/routing";
 import { createTestApplication } from "@sleepy-hollow/framework/testing";
@@ -38,7 +38,7 @@ async function application() {
   return { context, calls };
 }
 
-Deno.test("AC-HELLO-001 · a recognized credential is greeted by name", async () => {
+test("AC-HELLO-001 · a recognized credential is greeted by name", async () => {
   const { context, calls } = await application();
   try {
     const response = await context.fetch("/hello", {
@@ -53,7 +53,7 @@ Deno.test("AC-HELLO-001 · a recognized credential is greeted by name", async ()
   }
 });
 
-Deno.test("AC-HELLO-002 · an anonymous request is refused before the handler", async () => {
+test("AC-HELLO-002 · an anonymous request is refused before the handler", async () => {
   const { context, calls } = await application();
   try {
     const response = await context.fetch("/hello");
@@ -68,7 +68,7 @@ Deno.test("AC-HELLO-002 · an anonymous request is refused before the handler", 
   }
 });
 
-Deno.test("AC-HELLO-003 · an unrecognized credential is refused identically", async () => {
+test("AC-HELLO-003 · an unrecognized credential is refused identically", async () => {
   const { context, calls } = await application();
   try {
     const anonymous = await context.fetch("/hello");
