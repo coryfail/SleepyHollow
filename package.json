@@ -41,7 +41,7 @@
     }
   },
   "bin": {
-    "hollow": "./dist/cli.js"
+    "hollow": "dist/cli.js"
   },
   "files": [
     "dist",

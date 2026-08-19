@@ -135,7 +135,7 @@ test("AC-F001-008 · repeat creation preserves the first project", () =>
 
 test("AC-F001-009 · the package declares the hollow executable", async () => {
   const manifest = JSON.parse(await platform.readTextFile(new URL("../../package.json", import.meta.url)));
-  assert.equal(manifest.bin.hollow, "./dist/cli.js");
+  assert.equal(manifest.bin.hollow, "dist/cli.js");
 });
 
 test("AC-F001-010 · generated projects include capture-aware test setup", () =>

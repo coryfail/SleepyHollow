@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { platform } from "#platform";
 import { pathToFileURL } from "url";
 /**
