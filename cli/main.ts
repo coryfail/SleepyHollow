@@ -19,7 +19,6 @@ import { pathToFileURL } from "url";
 import { type CliDependencies, createCliHandlers } from "./adapters.ts";
 import {
   createCheckInventoryLoader,
-  createDeployInventoryLoader,
   createTestInventoryLoader,
 } from "./evidence/mod.ts";
 import { DEV_WORKER_ARGUMENT, runDevWorker } from "./dev/mod.ts";
@@ -81,10 +80,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }, {
     checkInventoryLoader: createCheckInventoryLoader({ revision: revision() }),
     testInventoryLoader: createTestInventoryLoader(),
-    deployInventoryLoader: createDeployInventoryLoader({
-      revision: revision(),
-      target: { kind: "fly", project: projectName() },
-    }),
   });
   platform.exit(code);
 }

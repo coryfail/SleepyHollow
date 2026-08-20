@@ -7,7 +7,6 @@ import { runCli } from "../main.ts";
 import { createProject } from "../create/mod.ts";
 import {
   createCheckInventoryLoader,
-  createDeployInventoryLoader,
   createTestInventoryLoader,
   EvidenceError,
   loadRequirementEvidence,
@@ -639,41 +638,5 @@ test("AC-F018-010 · hollow test runs against a real project through the CLI", a
     !emitted.includes("SH_TEST_INVENTORY_LOAD_FAILED"),
     `the shipped CLI must supply a test inventory loader, saw ${emitted}`,
   );
-  assert.ok(code === 0 || code === 1);
-});
-
-test("AC-F018-011 · hollow deploy assembles a plan through the CLI", async () => {
-  const root = await scaffold();
-  await writeEndpoint(
-    root,
-    "bookmarks",
-    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
-  );
-  await writeRoute(root);
-  await writeCapture(root, captureArtifact());
-  const loader = createDeployInventoryLoader({
-    revision: "test-revision",
-    target: { kind: "fly", project: "bookmarks" },
-  });
-  const loaded = await loader({ projectRoot: root });
-  assert.equal(loaded.target.project, "bookmarks");
-  assert.equal(loaded.openApiPath, "generated/openapi.json");
-
-  const stdout: string[] = [];
-  const stderr: string[] = [];
-  const code = await runCli(["deploy", "--json"], {
-    cwd: root,
-    stdout: (v) => stdout.push(v),
-    stderr: (v) => stderr.push(v),
-  }, {
-    deployInventoryLoader: loader,
-    deployToken: () => "ddp_test_token",
-  });
-  const emitted = (stdout[0] ?? stderr[0]) ?? "";
-  assert.ok(
-    !emitted.includes("SH_CLI_FEATURE_UNAVAILABLE"),
-    `the shipped CLI must implement deploy, saw ${emitted}`,
-  );
-  assert.ok(!emitted.includes("ddp_test_token"), "token must not be emitted");
   assert.ok(code === 0 || code === 1);
 });

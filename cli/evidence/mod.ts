@@ -3,7 +3,6 @@ import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
 import {
   checkLoader,
-  deployLoader,
   inventory,
   testLoader,
 } from "./inventory.ts";
@@ -55,17 +54,4 @@ export function createCheckInventoryLoader(
 export function createTestInventoryLoader() {
   return (request: { readonly projectRoot: string }) =>
     testLoader(request.projectRoot);
-}
-
-export function createDeployInventoryLoader(options: {
-  readonly revision: string | (() => string);
-  readonly target: { readonly kind: "fly"; readonly project: string };
-}) {
-  return (request: { readonly projectRoot: string }) =>
-    deployLoader(request.projectRoot, {
-      revision: typeof options.revision === "function"
-        ? options.revision()
-        : options.revision,
-      target: options.target,
-    });
 }

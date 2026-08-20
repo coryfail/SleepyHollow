@@ -8,7 +8,7 @@ export const CLI_COMMANDS = [
   "deploy",
 ] as const;
 
-export const CLI_VERSION = "0.3.0";
+export const CLI_VERSION = "0.3.1";
 
 export type CliCommandName = typeof CLI_COMMANDS[number];
 
@@ -108,8 +108,9 @@ const commandMetadata: Readonly<
     usage: "hollow generate [--check] [--json]",
   },
   deploy: {
-    description: "Preview and deliver one verified platform Deploy revision.",
-    usage: "hollow deploy [--preview] [--confirm <digest>] [--json]",
+    description: "Prepare local Fly deployment artifacts; Fly performs deployment.",
+    usage:
+      "hollow deploy prepare --target fly:<app> --database <sqlite|postgres> [--region <region>] [--force] [--json]",
   },
 };
 

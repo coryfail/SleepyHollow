@@ -7,7 +7,7 @@ import {
   type CreationResult,
 } from "./types.ts";
 
-const VERSION = "0.3.0";
+const VERSION = "0.3.1";
 const NAME = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
 function files(name: string): Readonly<Record<string, string>> {
@@ -18,7 +18,7 @@ function files(name: string): Readonly<Record<string, string>> {
     ".sleepyhollow/verify.ts":
       `import { stat } from "fs/promises";\nimport config from "../sleepyhollow.config.ts";\n\nconst required = ["api", "generated", "models", "requirements/application.req.md", "tests"];\nfor (const path of required) await stat(path);\nif (config.apiDirectory !== "api" || config.requirementsFile !== "requirements/application.req.md" || config.generatedDirectory !== "generated") {\n  throw new Error("Invalid Sleepy Hollow project configuration");\n}\nconsole.log("Sleepy Hollow scaffold verified");\n`,
     "README.md":
-      `# ${name}\n\nAn empty Sleepy Hollow application scaffold. It contains no generated or\napproved endpoints yet.\n\n## Begin planning\n\nActivate the official Sleepy Hollow skill in your agent environment, then ask it\nto plan this application. The planning source of truth is\n\`requirements/application.req.md\`.\n\n## Verify\n\n\`\`\`bash\nnpm run verify\n\`\`\`\n`,
+      `# ${name}\n\nAn empty Sleepy Hollow application scaffold. It contains no generated or\napproved endpoints yet.\n\n## Begin planning\n\nActivate the official Sleepy Hollow skill in your agent environment, then ask it\nto plan this application. The planning source of truth is\n\`requirements/application.req.md\`.\n\n## Verify\n\n\`\`\`bash\nnpm run verify\n\`\`\`\n\n## Prepare deployment\n\nAfter adding a production \`start\` script, prepare reviewable Fly deployment\nfiles locally. This command does not log in to or deploy to Fly:\n\n\`\`\`bash\nhollow deploy prepare --target fly:${name} --database sqlite --region iad\n\`\`\`\n`,
     "tests/capture.ts":
       `import { rename, writeFile } from "fs/promises";\n\nconst records = { requests: [] as unknown[], dataOperations: [] as unknown[], uncapturedRoutes: [] as unknown[] };\nexport const CAPTURE_ARTIFACT = "generated/capture.json";\nexport const session = {\n  runner: "vitest",\n  revision: process.env.SLEEPY_HOLLOW_REVISION ?? "workspace",\n  artifact() { return { schema: "sleepy-hollow-capture/v1", runner: session.runner, revision: session.revision, ...records }; },\n};\nexport async function persist(): Promise<void> {\n  const staging = CAPTURE_ARTIFACT + ".partial";\n  await writeFile(staging, JSON.stringify(session.artifact(), null, 2) + "\\n", { flag: "wx" });\n  await rename(staging, CAPTURE_ARTIFACT);\n}\n`,
     "tests/capture_test.ts":
@@ -31,7 +31,8 @@ function files(name: string): Readonly<Record<string, string>> {
         type: "module",
         engines: { node: ">=24" },
         scripts: { check: "tsc --noEmit", test: "vitest run", verify: "npm run check && npm run test && node .sleepyhollow/verify.ts" },
-        devDependencies: { "@sleepy-hollow/framework": `^${FRAMEWORK_VERSION}`, typescript: "5.9.3", vitest: "4.1.11" },
+        dependencies: { "@sleepy-hollow/framework": `^${FRAMEWORK_VERSION}` },
+        devDependencies: { typescript: "5.9.3", vitest: "4.1.11" },
       },
       null,
       2,
@@ -68,7 +69,7 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-export const FRAMEWORK_VERSION = "0.3.0";
+export const FRAMEWORK_VERSION = "0.3.1";
 
 export async function createProject(
   options: CreateProjectOptions,

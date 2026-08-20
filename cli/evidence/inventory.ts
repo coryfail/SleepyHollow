@@ -1,6 +1,5 @@
 import type { CheckRoute, VerificationInventory } from "../check/mod.ts";
 import { verifyProject } from "../check/mod.ts";
-import type { DeployInventory } from "../deploy/mod.ts";
 import type { TestCommandInventory } from "../test/mod.ts";
 import type { TestManifest } from "../../core/testing/mod.ts";
 import { capture, routes } from "./behavior.ts";
@@ -110,32 +109,6 @@ export async function checkLoader(
       present: true,
       uncapturedRoutes: evidence.uncapturedRoutes,
     },
-  };
-}
-
-export async function deployLoader(
-  projectRoot: string,
-  options: {
-    readonly revision: string;
-    readonly target: { readonly kind: "fly"; readonly project: string };
-  },
-): Promise<DeployInventory> {
-  const project = await locations({ projectRoot });
-  const verification = verifyProject(
-    await checkLoader(projectRoot, options.revision, undefined),
-  );
-  return {
-    projectRootDisplay: projectRoot,
-    target: options.target,
-    revision: options.revision,
-    verification,
-    environmentKeys: [],
-    deployedEnvironmentKeys: [],
-    contractChanges: [],
-    openApiPath: `${project.generatedDirectory}/openapi.json`,
-    documentationPath: `${project.generatedDirectory}/docs.html`,
-    smokeTests: [],
-    firstExternalDeployment: true,
   };
 }
 

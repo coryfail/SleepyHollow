@@ -21,11 +21,12 @@ test("AC-F004-001: a framework-owned relational database module replaces Deno KV
   assert.equal(existsSync(atRoot("core", "kv")), false, "legacy Deno KV module must be removed");
 });
 
-test("AC-F013-001: deployment uses a portable OCI bundle rather than Deno Deploy", () => {
-  assert.equal(existsSync(atRoot("Dockerfile")), true, "portable Dockerfile is required");
-  const deploymentSource = readFileSync(atRoot("cli", "deploy", "adapter.ts"), "utf8");
+test("AC-F022-004: deployment preparation is local and has no Deno or Fly execution boundary", () => {
+  const deploymentSource = readFileSync(atRoot("cli", "deploy", "prepare.ts"), "utf8");
   assert.doesNotMatch(deploymentSource, /Deno Deploy|deployctl|deno deploy/i);
-  assert.match(deploymentSource, /flyctl/, "the first provider adapter must invoke flyctl");
+  assert.doesNotMatch(deploymentSource, /flyctl|FLY_API_TOKEN|\.fetch\(|new Command\(/);
+  assert.match(deploymentSource, /Dockerfile/);
+  assert.match(deploymentSource, /fly\.toml/);
 });
 
 test("AC-F020-003: the package includes a changelog explaining the platform change", () => {

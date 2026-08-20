@@ -2,6 +2,21 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.3.1 - 2026-08-20
+
+### Changed: local Fly deployment preparation
+
+`hollow deploy` no longer attempts to authenticate with Fly, upload an image,
+or run live health and smoke checks. Use `hollow deploy prepare` to create or
+validate a managed `Dockerfile`, `.dockerignore`, and `fly.toml` locally, then
+review them and run Fly's own commands yourself.
+
+The SQLite profile prepares one `data` volume mounted at `/data`; the PostgreSQL
+profile names `DATABASE_URL` as an operator-provided secret without writing its
+value. This keeps Fly-specific scaling, Machines, regions, release behavior,
+and account actions in Fly's tools while preserving a portable container and
+database boundary for future hosts.
+
 ## 0.3.0 - 2026-08-19
 
 ### Breaking: Node and Bun platform migration

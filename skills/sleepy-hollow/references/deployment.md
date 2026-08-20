@@ -1,47 +1,43 @@
 # Deployment
 
-Deploy only from a verified revision. `hollow deploy` owns the deterministic
-build, validation, upload, and smoke-test steps; this skill guides and
-interprets them but never bypasses them.
+`hollow deploy prepare` owns only deterministic local Fly preparation. It
+creates or validates marked `Dockerfile`, `.dockerignore`, and `fly.toml`
+artifacts, then prints commands for the operator to run with Fly tooling. This
+skill must never claim that Sleepy Hollow uploads, deploys, authenticates, or
+checks a live Fly application.
 
-## Before deploying
+## Before preparation
 
-Full verification must pass. A failed required check blocks upload and reports
-the blocking evidence rather than deploying anyway.
+Confirm the project has a supported Node or Bun `package.json` with a non-empty
+`start` script. Select the database profile deliberately: SQLite requires a
+region and a single writable Fly volume; PostgreSQL requires an externally
+managed `DATABASE_URL` secret.
 
-## The plan
+## Prepare local artifacts
 
-Present a deployment plan before any external mutation:
+Run one of:
 
-- Target and application revision
-- Environment key changes, named without their values
-- Contract changes since the deployed revision
-- Checks already run and smoke tests planned
+```bash
+hollow deploy prepare --target fly:<app> --database sqlite --region <region>
+hollow deploy prepare --target fly:<app> --database postgres
+```
 
-## Confirmation
+The command must not inspect credentials, start a process, contact a provider,
+or create a remote resource. Do not use `--force` to overwrite a user-owned
+deployment file; it may replace only a file carrying the Sleepy Hollow marker.
 
-The first external deployment and any materially risky production change require
-explicit confirmation after the plan is presented. Record who confirmed and
-where the decision was made. Never infer confirmation from an earlier approval
-of unrelated work: approving an endpoint is not approving a deploy.
+## Operator hand-off
 
-## Credentials
+Review the generated files and run the printed Fly commands yourself. For
+SQLite, create the app and `data` volume in the selected region before deploying.
+For PostgreSQL, set `DATABASE_URL` directly with Fly tooling without putting its
+value in generated files or logs.
 
-Deployment credentials come from the environment and must not appear in logs,
-generated artifacts, diagnostics, or command output. Never echo a token to
-confirm it is set.
+Keep Fly-specific scaling, Machines, release commands, regions, and deployment
+strategy in `fly.toml` and Fly's own commands. This keeps the framework from
+becoming a narrow wrapper around one hosting provider.
 
-## After uploading
+## After deployment
 
-A deployment is not successful until required smoke tests pass. Run a live
-health check and at least one representative API operation.
-
-A failed smoke test returns a failed deployment result carrying the live
-revision and actionable evidence. Do not report a false success because the
-upload itself succeeded.
-
-## Results
-
-A successful result reports the live URL, deployed revision, OpenAPI location,
-documentation location, smoke-test evidence, and completion time. Redeploying an
-unchanged verified revision produces a predictable no-change result.
+Use Fly's status, logs, and health-check tools to inspect the live service. The
+operator—not `hollow deploy prepare`—owns validation of a remote deployment.

@@ -4,14 +4,9 @@ import { pathToFileURL } from "url";
 import { discoverRoutes } from "../core/routing/mod.ts";
 import { runCheckCommand, type VerificationInventory } from "./check/mod.ts";
 import {
-  buildDeployPlan,
-  createFlyAdapter,
-  type DeployAdapter,
-  type DeployInventory,
-  renderHumanDeployResult,
-  renderJsonDeployResult,
-  resolveDeployToken,
-  runDeployment,
+  DeploymentPreparationError,
+  prepareFlyDeployment,
+  renderFlyPreparation,
 } from "./deploy/mod.ts";
 import { createProject, CreationError } from "./create/mod.ts";
 import { runDevCommand } from "./dev/mod.ts";
@@ -43,11 +38,6 @@ export interface CliDependencies {
     readonly scope: VerificationInventory["requestedScope"];
   }) => VerificationInventory | Promise<VerificationInventory>;
   readonly testInventoryLoader?: TestInventoryLoader;
-  readonly deployInventoryLoader?: (options: {
-    readonly projectRoot: string;
-  }) => DeployInventory | Promise<DeployInventory>;
-  readonly deployAdapter?: DeployAdapter;
-  readonly deployToken?: () => string;
   readonly testRunner?: TestRunner;
   readonly commands?: Partial<Record<CliCommandName, CliCommandHandler>>;
 }
@@ -388,119 +378,78 @@ function checkHandler(
   };
 }
 
-function deployPlanDigest(plan: unknown): string {
-  const encoded = new TextEncoder().encode(JSON.stringify(plan));
-  let hash = 2166136261;
-  for (const byte of encoded) {
-    hash ^= byte;
-    hash = Math.imul(hash, 16777619) >>> 0;
-  }
-  return hash.toString(16).padStart(8, "0");
-}
-
-function deployHandler(
-  load: NonNullable<CliDependencies["deployInventoryLoader"]>,
-  adapter: DeployAdapter | undefined,
-  token: (() => string) | undefined,
-): CliCommandHandler {
+function deployHandler(): CliCommandHandler {
   return async ({ args, cwd }) => {
-    const index = args.indexOf("--confirm");
-    const provided = index >= 0 ? args[index + 1] : undefined;
-    const preview = args.includes("--preview");
-    let inventory;
-    try {
-      inventory = await load({ projectRoot: cwd });
-    } catch (error) {
-      return deployPrecondition(error);
+    if (args[0] !== "prepare") {
+      return usage(
+        "deploy",
+        "Expected hollow deploy prepare --target fly:<app> --database <sqlite|postgres> [--region <region>] [--force] [--json].",
+      );
     }
-    const built = buildDeployPlan(inventory);
-    const digest = deployPlanDigest(built);
-
-    const run = async (confirmed: boolean): Promise<CliCommandResult> => {
-      let result;
-      try {
-        result = await runDeployment(
-          {
-            inventory,
-            token: (token ?? resolveDeployToken)(),
-            confirmed,
-            ...(confirmed
-              ? { confirmationSource: `operator confirmed plan ${digest}` }
-              : {}),
-          },
-          adapter ?? createFlyAdapter({
-            runner: {
-              async run() {
-                throw new Error("No Fly command runner was configured for this invocation.");
-              },
-            },
-          }),
-          () => new Date().toISOString(),
-        );
-      } catch (error) {
-        return deployPrecondition(error).result;
+    let target: string | undefined;
+    let database: "sqlite" | "postgres" | undefined;
+    let region: string | undefined;
+    let force = false;
+    if (args.filter((argument) => argument === "--json").length > 1) {
+      return usage("deploy", "Deployment preparation accepts --json at most once.");
+    }
+    for (let index = 1; index < args.length; index++) {
+      const argument = args[index];
+      if (argument === "--json") continue;
+      if (argument === "--force" && !force) {
+        force = true;
+        continue;
       }
-      return {
-        ok: result.ok,
-        command: "deploy" as const,
-        schema: result.schema,
-        summary: renderHumanDeployResult(result).split("\n")[0] ?? "",
-        diagnostics: result.diagnostics.map((item) => ({
-          code: item.code,
-          severity: item.severity,
-          summary: item.summary,
-          correction: item.correction,
-        })),
-        json: JSON.parse(renderJsonDeployResult(result)) as Record<
-          string,
-          unknown
-        >,
-      };
-    };
-
-    if (preview || built.requiresConfirmation) {
-      const previewed = await run(false);
+      if ((argument === "--target" || argument === "--database" || argument === "--region") && index + 1 < args.length) {
+        const value = args[++index];
+        if (argument === "--target" && !target) target = value;
+        else if (argument === "--database" && !database && (value === "sqlite" || value === "postgres")) database = value;
+        else if (argument === "--region" && !region) region = value;
+        else return usage("deploy", "Deployment preparation options must occur once with a valid value.");
+        continue;
+      }
+      return usage("deploy", "Deployment preparation options are invalid.");
+    }
+    if (!target?.startsWith("fly:") || !database) {
+      return usage("deploy", "Deployment preparation requires --target fly:<app> and --database sqlite or postgres.");
+    }
+    try {
+      const prepared = await prepareFlyDeployment({
+        projectRoot: cwd,
+        target: { kind: "fly", app: target.slice("fly:".length) },
+        database,
+        ...(region ? { region } : {}),
+        ...(force ? { force: true } : {}),
+      });
       return {
         result: {
-          ...previewed,
-          summary: preview
-            ? previewed.summary
-            : `${previewed.summary} Confirm with --confirm ${digest}`,
+          ok: true,
+          command: "deploy",
+          schema: prepared.schema,
+          summary: renderFlyPreparation(prepared).trimEnd(),
+          diagnostics: [],
+          json: prepared as unknown as Readonly<Record<string, unknown>>,
         },
-        operation: {
-          intent: preview ? "preview" as const : "apply" as const,
-          confirmationDigest: digest,
-          ...(provided ? { providedConfirmation: provided } : {}),
-          apply: () => run(true),
+      };
+    } catch (error) {
+      const diagnostics = error instanceof DeploymentPreparationError
+        ? error.diagnostics
+        : [{
+          code: "SH_DEPLOY_PREPARE_FAILED",
+          summary: "Deployment preparation failed.",
+          correction: "Inspect the project files and retry the documented command.",
+        }];
+      return {
+        exitCode: 1,
+        result: {
+          ok: false,
+          command: "deploy",
+          schema: "sleepy-hollow-deploy-prepare-result/v1",
+          summary: diagnostics[0].summary,
+          diagnostics: diagnostics.map((item) => ({ ...item, severity: "error" as const })),
         },
       };
     }
-    const applied = await run(true);
-    return { exitCode: applied.ok ? 0 as const : 1 as const, result: applied };
-  };
-}
-
-function deployPrecondition(error: unknown): {
-  readonly exitCode: 1;
-  readonly result: CliCommandResult;
-} {
-  const summary = error instanceof Error
-    ? error.message
-    : "Deployment could not start.";
-  return {
-    exitCode: 1,
-    result: {
-      ok: false,
-      command: "deploy",
-      schema: "sleepy-hollow-deploy-result/v1",
-      summary,
-      diagnostics: [{
-        code: "SH_DEPLOY_PRECONDITION_UNMET",
-        severity: "error",
-        summary,
-        correction: "Resolve the reported condition and rerun hollow deploy.",
-      }],
-    },
   };
 }
 
@@ -625,13 +574,7 @@ export function createCliHandlers(
     ),
     check: checkHandler(dependencies.checkInventoryLoader),
     generate,
-    deploy: dependencies.deployInventoryLoader
-      ? deployHandler(
-        dependencies.deployInventoryLoader,
-        dependencies.deployAdapter,
-        dependencies.deployToken,
-      )
-      : unavailable("deploy"),
+    deploy: deployHandler(),
   };
   return Object.fromEntries(CLI_COMMANDS.map((command) => [
     command,

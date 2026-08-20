@@ -72,6 +72,14 @@ test("AC-F001-004 · scaffold directs planning through the official skill", () =
     assert.doesNotMatch(readme, /generated endpoint/i);
   }));
 
+test("AC-F022-008 · scaffolded guidance describes local deployment preparation", () =>
+  temporary(async (directory) => {
+    const result = await createProject({ name: "prepared-app", directory });
+    const readme = await platform.readTextFile(join(result.projectPath, "README.md"));
+    assert.match(readme, /hollow deploy prepare --target fly:prepared-app/);
+    assert.doesNotMatch(readme, /FLY_API_TOKEN|flyctl/);
+  }));
+
 test("AC-F001-005 · invalid names and unsafe destinations leave no project", () =>
   temporary(async (directory) => {
     await assert.rejects(
@@ -154,10 +162,10 @@ test("AC-F001-010 · generated projects include capture-aware test setup", () =>
     assert.equal(config.scripts.test, "vitest run");
   }));
 
-test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.0", () =>
+test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.1", () =>
   temporary(async (directory) => {
     const result = await createProject({ name: "named-app", directory });
-    assert.equal(result.version, "0.3.0");
+    assert.equal(result.version, "0.3.1");
     assert.ok(result.createdFiles.includes("requirements/application.req.md"));
     assert.ok(!result.createdFiles.includes("requirements/application.md"));
     assert.ok(
@@ -169,8 +177,8 @@ test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.
       join(result.projectPath, "sleepyhollow.config.ts"),
     );
     assert.match(config, /requirements\/application\.req\.md/);
-    const manifest = await platform.readTextFile(join(result.projectPath, "package.json"));
-    assert.match(manifest, /"@sleepy-hollow\/framework": "\^0\.3\.0"/);
+    const manifest = JSON.parse(await platform.readTextFile(join(result.projectPath, "package.json")));
+    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.3.1");
   }));
 
 test("AC-F001-011 · the generated test task produces a capture artifact", () =>

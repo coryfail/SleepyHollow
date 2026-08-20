@@ -65,14 +65,14 @@ explicit file path in production; the Todo example demonstrates that profile.
 For multi-instance or externally managed storage, configure the optional
 PostgreSQL profile through `DATABASE_URL`.
 
-`hollow deploy` is provider-oriented. Fly.io is the first adapter and uses a
-Docker image plus `flyctl`; its persistent volume is suitable for SQLite. The
-application/server boundary and OCI image are portable, so future adapters can
-target other hosts without changing route or database code.
+`hollow deploy prepare` creates local, reviewable deployment artifacts for
+Fly.io; it never reads a Fly token, calls Fly, or deploys. The generated
+Dockerfile keeps the application boundary portable, so future preparation
+targets can support other hosts without changing route or database code.
 
 ```bash
-export FLY_API_TOKEN=your-app-scoped-token
-hollow deploy --target fly:my-api
+hollow deploy prepare --target fly:my-api --database sqlite --region iad
+# Review Dockerfile, .dockerignore, and fly.toml, then run the printed Fly commands.
 ```
 
 ## Documentation
