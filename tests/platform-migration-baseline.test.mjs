@@ -1,11 +1,16 @@
 import assert from "node:assert/strict";
+import { execFile as execFileCallback } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { mkdtemp, rm, symlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const atRoot = (...segments) => path.join(root, ...segments);
+const execFile = promisify(execFileCallback);
 
 test("AC-F021-001: the repository is installable with npm and has no active Deno artifacts", () => {
   assert.equal(existsSync(atRoot("package.json")), true, "root package.json is required");
@@ -33,4 +38,17 @@ test("AC-F020-003: the package includes a changelog explaining the platform chan
   assert.equal(existsSync(atRoot("CHANGELOG.md")), true);
   const changelog = readFileSync(atRoot("CHANGELOG.md"), "utf8");
   assert.match(changelog, /Node and Bun platform migration/);
+});
+
+test("AC-F020-004: the built hollow executable runs when npm invokes it through a symlink", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "sleepy-hollow-bin-"));
+  try {
+    const executable = path.join(directory, "hollow");
+    await symlink(atRoot("dist", "cli.js"), executable);
+    const output = await execFile(process.execPath, [executable, "--version"]);
+    assert.match(output.stdout, /^hollow \d+\.\d+\.\d+\n$/);
+    assert.equal(output.stderr, "");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });

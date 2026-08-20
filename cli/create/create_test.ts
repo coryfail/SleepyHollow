@@ -162,10 +162,10 @@ test("AC-F001-010 · generated projects include capture-aware test setup", () =>
     assert.equal(config.scripts.test, "vitest run");
   }));
 
-test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.1", () =>
+test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.2", () =>
   temporary(async (directory) => {
     const result = await createProject({ name: "named-app", directory });
-    assert.equal(result.version, "0.3.1");
+    assert.equal(result.version, "0.3.2");
     assert.ok(result.createdFiles.includes("requirements/application.req.md"));
     assert.ok(!result.createdFiles.includes("requirements/application.md"));
     assert.ok(
@@ -178,7 +178,7 @@ test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.
     );
     assert.match(config, /requirements\/application\.req\.md/);
     const manifest = JSON.parse(await platform.readTextFile(join(result.projectPath, "package.json")));
-    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.3.1");
+    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.3.2");
   }));
 
 test("AC-F001-011 · the generated test task produces a capture artifact", () =>

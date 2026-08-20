@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { platform } from "#platform";
+import { realpathSync } from "fs";
 import { pathToFileURL } from "url";
 /**
  * The `hollow` command line, and its programmatic entry point.
@@ -66,7 +67,16 @@ export function runCli(
   return runCommandSurface(args, io, createCliHandlers(dependencies));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+function invokedAsCli(entry: string | undefined = process.argv[1]): boolean {
+  if (!entry) return false;
+  try {
+    return import.meta.url === pathToFileURL(realpathSync(entry)).href;
+  } catch {
+    return false;
+  }
+}
+
+if (invokedAsCli()) {
   if (
     platform.args[0] === DEV_WORKER_ARGUMENT &&
     platform.env.get("SLEEPY_HOLLOW_INTERNAL_DEV_WORKER") === "1"

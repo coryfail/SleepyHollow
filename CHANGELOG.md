@@ -2,6 +2,15 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.3.2 - 2026-08-20
+
+### Fixed: global `hollow` executable
+
+The npm binary now resolves its invoked path before deciding whether it is the
+main module. `hollow` therefore runs correctly when npm invokes `dist/cli.js`
+through its normal global or local symlink, instead of silently exiting with
+success and no output.
+
 ## 0.3.1 - 2026-08-20
 
 ### Changed: local Fly deployment preparation

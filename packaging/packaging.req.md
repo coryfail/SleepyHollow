@@ -420,3 +420,21 @@ readability; no other digest normalization is permitted.
   changelog and linked migration notice are present; package construction and
   packed-artifact behavior remain unimplemented and are covered by the failed
   AC-F021-001 baseline.
+
+### Regression correction, symlinked CLI entrypoint
+
+- Status: passed.
+- Scope: this correction implements the existing AC-F020-004 requirement that
+  global, package-manager, and local executable invocation reach the same CLI.
+  It introduces no new package behavior or approval scope.
+- Characterization red state: on 2026-08-20, after `npm run build`,
+  `npm run test:baseline` passed 4 tests and failed the new symlinked-entrypoint
+  probe. A temporary symlink to `dist/cli.js` ran with status zero and empty
+  stdout for `--version`, demonstrating npm-bin-compatible entrypoint failure.
+- Correction: `cli/main.ts` resolves the invoked entry path with `realpathSync`
+  before comparing it with `import.meta.url`.
+- Criterion mapping: AC-F020-004 maps to
+  `tests/platform-migration-baseline.test.mjs`, which invokes the built CLI
+  through a temporary symlink and asserts a version response.
+- Verification: `npm run verify` passed Node and Bun suites (220 passed, 3
+  skipped each) and the 5-test baseline, including the symlinked executable.
