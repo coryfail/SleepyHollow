@@ -99,6 +99,10 @@ hosts.
 
 ## Governance record
 
+> Historical verification note: Deno commands in the archived entries below
+> describe the pre-Node/Bun implementation. They are retained as audit history
+> only and are not the current framework or skill verification workflow.
+
 ### Invalidation, 0.2.0 named requirement files
 
 - Status: prior approval and verification are stale for current content.

@@ -150,6 +150,11 @@ and deployment-time validation are refined by SH-F013.
 
 ## Governance record
 
+> Historical verification note: Deno commands, runtime names, and platform
+> artifacts appearing below this boundary belong to the pre-Node/Bun
+> implementation or migration record. They are retained for audit history only;
+> current behavior and verification use the Node.js/Bun package workflow.
+
 The governed-content digest covers the exact UTF-8 bytes before this heading after
 omitting the single top-level frontmatter `status:` line and its line ending. The
 status field is a lifecycle projection for routing and human readability; no

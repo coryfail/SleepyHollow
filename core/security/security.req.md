@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F005
 title: Security and authorization boundaries
-status: approved
+status: draft
 risk: high
 source_sections:
   - "7"
@@ -171,7 +171,7 @@ is the routing table; security wiring has no such justification.
 A project that names no `securityModule` declares no providers. A project that
 names one which cannot be resolved fails composition rather than continuing
 without it. That is a valid state for an application whose routes all declare
-`authentication: "none"`, and it is a failure for any route declaring a required
+`authentication: { mode: "none" }`, and it is a failure for any route declaring a required
 mode, because a required route without a resolvable provider cannot authenticate
 anyone. The failure shall be reported when the runtime is composed rather than
 on the first request.
@@ -214,7 +214,7 @@ mutate provider wiring after composition.
   produced by `defineSecurity` supplies the providers, rate limits, and CORS
   used to compose the runtime, and the returned declaration is frozen.
 - AC-F005-013: A project naming no `securityModule` composes successfully when
-  every route declares `authentication: "none"`, and a named module that cannot
+  every route declares `authentication: { mode: "none" }`, and a named module that cannot
   be resolved fails composition with the named path.
 - AC-F005-014: A route declaring a required authentication mode with no
   resolvable provider fails when the runtime is composed, naming the route and
@@ -242,6 +242,17 @@ isolated process memory, so process memory is not a production-global
 security boundary.
 
 ## Governance record
+
+> Historical verification note: Deno commands, runtime names, and platform
+> artifacts appearing below this boundary belong to the pre-Node/Bun
+> implementation or migration record. They are retained for audit history only;
+> current behavior and verification use the Node.js/Bun package workflow.
+
+### Node/Bun auth-shape correction
+
+The route declarations above were normalized to the object-shaped security
+metadata expected by the current Node/Bun runtime. This document is draft until
+the updated governed content receives fresh approval.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line

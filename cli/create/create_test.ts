@@ -162,10 +162,10 @@ test("AC-F001-010 · generated projects include capture-aware test setup", () =>
     assert.equal(config.scripts.test, "vitest run");
   }));
 
-test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.2", () =>
+test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.3", () =>
   temporary(async (directory) => {
     const result = await createProject({ name: "named-app", directory });
-    assert.equal(result.version, "0.3.2");
+    assert.equal(result.version, "0.3.3");
     assert.ok(result.createdFiles.includes("requirements/application.req.md"));
     assert.ok(!result.createdFiles.includes("requirements/application.md"));
     assert.ok(
@@ -178,7 +178,19 @@ test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.
     );
     assert.match(config, /requirements\/application\.req\.md/);
     const manifest = JSON.parse(await platform.readTextFile(join(result.projectPath, "package.json")));
-    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.3.2");
+    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.3.3");
+    assert.equal(manifest.scripts.check, "tsc --noEmit");
+    assert.equal(manifest.devDependencies["@types/node"], "26.2.0");
+    assert.ok(result.createdFiles.includes("tsconfig.json"));
+    const application = await platform.readTextFile(
+      join(result.projectPath, "requirements", "application.req.md"),
+    );
+    assert.match(application, /^schema: sgad-application\/v0\.2$/m);
+    assert.match(application, /^id: named-app-application$/m);
+    assert.match(application, /^risk: standard$/m);
+    assert.match(application, /^depends_on: \[\]$/m);
+    assert.match(application, /^owners:\n  - application owner$/m);
+    assert.doesNotMatch(application, /sleepy-hollow-application\/v0\.1/);
   }));
 
 test("AC-F001-011 · the generated test task produces a capture artifact", () =>

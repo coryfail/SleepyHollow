@@ -42,6 +42,13 @@ model, endpoints, relationships, indexes, conventions, errors, authentication,
 authorization, security, operations, deployment, service architecture,
 cross-cutting criteria, dependencies, assumptions, and open questions.
 
+Use the local application requirement format exactly: `schema:
+sgad-application/v0.2`, stable `id`, `title`, `risk`, `status`, `depends_on`,
+and non-empty `owners`. The parser rejects the legacy
+`sleepy-hollow-application/v0.1` shape. Read
+[references/requirement-format.md](references/requirement-format.md) before
+migrating an existing scaffold.
+
 Authentication planning must record actors, trust boundaries, credential kind,
 expiration, revocation, transport, cross-site request implications, and the
 `401` and `403` response behavior whenever authentication is required. An
@@ -82,7 +89,10 @@ definitions for bounded, index-compatible data access.
 ### 5. Verify independently
 
 Run `hollow check` and treat its result as the only source of verification. Do
-not declare an endpoint verified from passing tests alone. Repair bounded
+not declare an endpoint verified from passing tests alone. In framework 0.3.3,
+read the known Vitest/CLI manifest limitation in
+[references/tdd.md](references/tdd.md) and report it rather than treating a
+direct Vitest pass as independent verification. Repair bounded
 implementation defects and rerun. If satisfying the diagnostics would change
 approved behavior, return to requirement review instead.
 

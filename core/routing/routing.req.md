@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F002
 title: File-based routing runtime
-status: verified
+status: draft
 risk: standard
 source_sections:
   - "6.1"
@@ -40,7 +40,7 @@ default export is created with this canonical shape:
 export default defineRoute({
   GET: {
     schemas: { params, query, headers, body, responses },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Return one bookmark" },
     handler: async (context) => new Response(context.params.id),
   },
@@ -106,6 +106,17 @@ place, passes schema and security declarations through as metadata for their
 owning components, and leaves custom behavior in an explicit handler.
 
 ## Governance record
+
+> Historical verification note: Deno commands, runtime names, and platform
+> artifacts appearing below this boundary belong to the pre-Node/Bun
+> implementation or migration record. They are retained for audit history only;
+> current behavior and verification use the Node.js/Bun package workflow.
+
+### Node/Bun auth-shape correction
+
+The route example above was normalized to the object-shaped security metadata
+expected by the current Node/Bun runtime. This document is draft until the
+updated governed content receives fresh approval.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line

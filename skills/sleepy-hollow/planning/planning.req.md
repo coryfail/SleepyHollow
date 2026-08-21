@@ -157,6 +157,11 @@ above. SH-F001 supplies the valid generated project in which planning operates.
 
 ## Governance record
 
+> Historical verification note: Deno task commands in the archived entries
+> below belong to the pre-Node/Bun planning implementation. They are retained
+> for audit history only; current skill verification uses the Node/Bun
+> repository workflow.
+
 ### Invalidation, 0.2.0 named requirement files
 
 - Status: prior approval and verification are stale for current content.

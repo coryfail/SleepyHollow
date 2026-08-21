@@ -2,6 +2,20 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.3.3 - 2026-08-21
+
+### Changed: Node/Bun documentation and scaffold alignment
+
+The framework documentation and Sleepy Hollow skill now describe the runtime's
+object-shaped route security metadata, case-sensitive endpoint requirement
+headings, the `sgad-application/v0.2` application format, and the current
+framework 0.3.3 testing workflow. `hollow create` now emits the matching
+application metadata, Node/Bun TypeScript configuration, and Node typings.
+
+The framework's route evidence and fixtures were aligned with the same security
+shape, while retained Deno-era verification records are explicitly marked as
+historical migration evidence.
+
 ## 0.3.2 - 2026-08-20
 
 ### Fixed: global `hollow` executable

@@ -19,9 +19,17 @@ incomplete OpenAPI contract.
 
 ## Authentication and authorization
 
-Each route explicitly declares `authentication: "none"` or
-`authentication: "required"`. There is no implicit default, because a forgotten
-default is how endpoints ship unprotected.
+Each route explicitly declares `security.authentication.mode` as `"none"` or
+`"required"`:
+
+```ts
+security: { authentication: { mode: "none" } }
+```
+
+There is no implicit default, because a forgotten default is how endpoints ship
+unprotected. The string forms `authentication: "none"` and
+`authentication: "required"` are stale examples and are not the runtime route
+configuration for framework 0.3.3.
 
 An authenticated route returns:
 

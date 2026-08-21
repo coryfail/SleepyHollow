@@ -81,7 +81,10 @@ function declaredStatuses(schemas: unknown): readonly number[] {
 function authenticationOf(security: unknown): "none" | "required" {
   if (typeof security !== "object" || security === null) return "none";
   const declared = (security as { authentication?: unknown }).authentication;
-  return declared === "required" ? "required" : "none";
+  if (typeof declared !== "object" || declared === null) return "none";
+  return (declared as { mode?: unknown }).mode === "required"
+    ? "required"
+    : "none";
 }
 
 export async function routes(

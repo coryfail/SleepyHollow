@@ -203,6 +203,11 @@ It does not authorize release delivery.
 
 ## Governance record
 
+> Historical verification note: Deno commands, runtime names, and platform
+> artifacts appearing below this boundary belong to the pre-Node/Bun
+> implementation or migration record. They are retained for audit history only;
+> current behavior and verification use the Node.js/Bun package workflow.
+
 ### Approval
 
 - Status: approved.

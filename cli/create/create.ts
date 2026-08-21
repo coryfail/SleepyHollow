@@ -7,7 +7,7 @@ import {
   type CreationResult,
 } from "./types.ts";
 
-const VERSION = "0.3.2";
+const VERSION = "0.3.3";
 const NAME = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
 function files(name: string): Readonly<Record<string, string>> {
@@ -32,7 +32,33 @@ function files(name: string): Readonly<Record<string, string>> {
         engines: { node: ">=24" },
         scripts: { check: "tsc --noEmit", test: "vitest run", verify: "npm run check && npm run test && node .sleepyhollow/verify.ts" },
         dependencies: { "@sleepy-hollow/framework": `^${FRAMEWORK_VERSION}` },
-        devDependencies: { typescript: "5.9.3", vitest: "4.1.11" },
+        devDependencies: { "@types/node": "26.2.0", typescript: "5.9.3", vitest: "4.1.11" },
+      },
+      null,
+      2,
+    ) + "\n",
+    "tsconfig.json": JSON.stringify(
+      {
+        compilerOptions: {
+          target: "ES2024",
+          module: "NodeNext",
+          moduleResolution: "NodeNext",
+          strict: true,
+          noEmit: true,
+          allowImportingTsExtensions: true,
+          verbatimModuleSyntax: true,
+          skipLibCheck: true,
+          types: ["node", "vitest/globals"],
+        },
+        include: [
+          ".sleepyhollow/**/*.ts",
+          "api/**/*.ts",
+          "models/**/*.ts",
+          "tests/**/*.ts",
+          "sleepyhollow.config.ts",
+          "vitest.config.ts",
+        ],
+        exclude: ["generated", "node_modules"],
       },
       null,
       2,
@@ -42,7 +68,7 @@ function files(name: string): Readonly<Record<string, string>> {
     "generated/.gitkeep": "",
     "models/.gitkeep": "",
     "requirements/application.req.md":
-      `---\nschema: sleepy-hollow-application/v0.1\ntitle: ${name}\nstatus: draft\n---\n\n# Application requirements\n\nUse the official Sleepy Hollow skill to plan actors, behavior, data, security,\noperations, and acceptance criteria before generating endpoints.\n`,
+      `---\nschema: sgad-application/v0.2\nid: ${name}-application\ntitle: ${name}\nstatus: draft\nrisk: standard\ndepends_on: []\nowners:\n  - application owner\n---\n\n# Application requirements\n\nUse the official Sleepy Hollow skill to replace this planning placeholder with\nthe complete application requirements before generating endpoints.\n`,
     "sleepyhollow.config.ts":
       `import { defineProject } from "./.sleepyhollow/project.ts";\n\nexport default defineProject(\n  {\n    name: "${name}",\n    apiDirectory: "api",\n    requirementsFile: "requirements/application.req.md",\n    generatedDirectory: "generated",\n  } satisfies import("./.sleepyhollow/project.ts").SleepyHollowProject,\n);\n`,
     "tests/scaffold_test.ts":
@@ -69,7 +95,7 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-export const FRAMEWORK_VERSION = "0.3.2";
+export const FRAMEWORK_VERSION = "0.3.3";
 
 export async function createProject(
   options: CreateProjectOptions,

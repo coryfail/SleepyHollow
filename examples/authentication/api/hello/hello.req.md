@@ -85,6 +85,11 @@ authentication unapplied.
 
 ## Governance record
 
+> Historical verification note: Deno commands in the archived entries below
+> describe the pre-Node/Bun example. They are retained as audit history only;
+> use the example's Node/Vitest package scripts and framework 0.3.3 CLI for
+> current reproduction.
+
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line
 ending. The status field is a lifecycle projection for routing and human

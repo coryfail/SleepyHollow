@@ -495,7 +495,10 @@ async function writeCapture(
   );
 }
 
-async function writeRoute(projectRoot: string): Promise<void> {
+async function writeRoute(
+  projectRoot: string,
+  authentication: "none" | "required" = "none",
+): Promise<void> {
   const routingModule = new URL("../../core/routing/mod.ts", import.meta.url)
     .href;
   await platform.writeTextFile(
@@ -505,7 +508,7 @@ async function writeRoute(projectRoot: string): Promise<void> {
 export default defineRoute({
   POST: {
     schemas: { body: { contract: { type: "object" } } },
-    security: { authentication: "none" },
+    security: { authentication: { mode: ${JSON.stringify(authentication)} } },
     contract: {},
     handler: () => new Response(null, { status: 201 }),
   },
@@ -535,6 +538,23 @@ test("AC-F018-008 · an observed read with no declared schema is missing coverag
     "body",
     "query",
   ]);
+});
+
+test("AC-F018-015 · evidence reads object-form required authentication", async () => {
+  const root = await scaffold();
+  await writeEndpoint(
+    root,
+    "bookmarks",
+    endpointRequirement({ id: "EP-BOOKMARKS-CREATE" }),
+  );
+  await writeRoute(root, "required");
+  await writeCapture(root, captureArtifact());
+  const project = await resolveProjectLocations({ projectRoot: root });
+  const inventory = await loadVerificationInventory(project, {
+    projectRoot: root,
+    revision: "test-revision",
+  });
+  assert.equal(inventory.routes[0]?.authentication, "required");
 });
 
 test("AC-F018-014 · an uncaptured route is carried through as uncaptured", async () => {

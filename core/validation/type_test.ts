@@ -13,7 +13,7 @@ const inferredRoute = defineRoute({
       },
       responses: { 201: z.strictObject({ id: z.string() }) },
     },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Create a bookmark" },
     handler: ({ params, query, headers, body }) => {
       const collectionId: string = params.collectionId;

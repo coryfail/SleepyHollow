@@ -48,7 +48,7 @@ const route = (
   parameterNames: ["collectionId"],
   operation: {
     schemas,
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Create a bookmark" },
     handler: handler as RouteOperation["handler"],
   },

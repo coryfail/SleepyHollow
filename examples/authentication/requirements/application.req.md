@@ -1,7 +1,12 @@
 ---
-schema: sleepy-hollow-application/v0.1
-title: authentication
-status: approved
+schema: sgad-application/v0.2
+id: authentication-application
+title: Authentication example application
+status: draft
+risk: standard
+depends_on: []
+owners:
+  - Sleepy Hollow example maintainers
 ---
 
 # Authentication example
@@ -100,6 +105,19 @@ One API. Nothing here justifies independent deployment.
   endpoint requirement, and the module's own source each say so.
 
 ## Governance record
+
+> Historical verification note: the Deno command in the archived entry below
+> describes the pre-Node/Bun example. It is retained as audit history only;
+> use the example's Node/Vitest package scripts and framework 0.3.3 CLI for
+> current reproduction.
+
+### Application format migration
+
+- Status: draft pending fresh approval of the migrated application requirement.
+- Reason: this example now uses the parser-required `sgad-application/v0.2`
+  metadata instead of the legacy `sleepy-hollow-application/v0.1` scaffold.
+- Required next step: review and approve the exact governed bytes before using
+  this application requirement as an implementation authorization.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line

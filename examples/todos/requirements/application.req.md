@@ -1,7 +1,12 @@
 ---
-schema: sleepy-hollow-application/v0.1
-title: todos
-status: approved
+schema: sgad-application/v0.2
+id: todos-application
+title: Todo example application
+status: draft
+risk: standard
+depends_on: []
+owners:
+  - Sleepy Hollow example maintainers
 ---
 
 # Todo application
@@ -94,6 +99,14 @@ depends on the collection for creation.
   hundred character bound.
 
 ## Governance record
+
+### Application format migration
+
+- Status: draft pending fresh approval of the migrated application requirement.
+- Reason: this example now uses the parser-required `sgad-application/v0.2`
+  metadata instead of the legacy `sleepy-hollow-application/v0.1` scaffold.
+- Required next step: review and approve the exact governed bytes before using
+  this application requirement as an implementation authorization.
 
 ### Approval
 

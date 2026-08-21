@@ -17,6 +17,7 @@ delimiter are invalid.
 
 ```yaml
 ---
+# Endpoint requirements use this shape.
 id: EP-BOOKMARKS-CREATE
 path: /bookmarks
 status: draft
@@ -30,6 +31,35 @@ service: api
 `status` is a lifecycle projection for routing and human readability. It is
 never evidence. Approval and verification come from the governance record.
 
+The application requirement has a different, exact frontmatter contract:
+
+```yaml
+---
+schema: sgad-application/v0.2
+id: bookmarks-application
+title: Bookmark application
+status: draft
+risk: standard
+depends_on: []
+owners:
+  - bookmarks maintainers
+---
+```
+
+The application parser requires `schema`, `id`, `title`, `risk`, `status`, a
+`depends_on` sequence, and a non-empty `owners` sequence. The legacy
+`sleepy-hollow-application/v0.1` scaffold is not accepted. For an existing
+local project, replace that schema, add the missing identity/risk/ownership and
+dependency fields, complete the application sections below, then return the
+requirement to `draft` and obtain fresh exact-content approval. The migration
+changes governed bytes; changing `status` alone cannot make the old approval
+valid.
+
+The framework 0.3.3 `hollow create` scaffold now emits a matching `tsconfig.json`
+alongside its `tsc --noEmit` check script. A project created by an older CLI may
+have the script without that file; add or migrate the TypeScript configuration
+before treating a check failure as application behavior or red state.
+
 ## Body sections
 
 An endpoint requirement includes purpose, supported methods, inputs, success and
@@ -37,6 +67,32 @@ error responses, authentication, authorization, data access and indexes, side
 effects, abuse considerations, dependencies, assumptions, and acceptance
 criteria. A derived requirement cites the applicable application sections and
 must not contradict approved application behavior.
+
+### Endpoint headings accepted by the parser
+
+Section lookup is case-sensitive. Use these exact heading titles (normally as
+level-two headings); where two titles are shown, either spelling is accepted:
+
+| Required title | Accepted alternative |
+| --- | --- |
+| `Purpose` | — |
+| `Inputs` | `Input` |
+| `Success responses` | `Success response` |
+| `Errors` | `Error responses` |
+| `Security` | — |
+| `Data access and indexes` | `Data access` |
+| `Side effects` | — |
+| `Abuse considerations` | `Rate-limit or abuse considerations` |
+| `Dependencies and assumptions` | — |
+| `Acceptance criteria` | — |
+
+For every value in frontmatter `methods`, add a heading with that exact value;
+for example, `methods: [GET, POST]` requires `## GET` and `## POST`. Method
+values must be uppercase. `Purpose`, `Security`, and the other titles above are
+not normalized for capitalization, so `## security` or `## Acceptance Criteria`
+does not satisfy the required section lookup. The parser does accept
+case-insensitive `Authentication:` and `Authorization:` labels inside the
+exact `Security` section.
 
 ## Acceptance criteria
 

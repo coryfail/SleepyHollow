@@ -2,7 +2,7 @@
 schema: sgad-component/v0.2
 id: SH-F007
 title: Testing and acceptance-criterion traceability
-status: approved
+status: draft
 risk: standard
 source_sections:
   - "3.6"
@@ -179,7 +179,8 @@ the falsehood propagates into verification.
   required authentication mode is rejected without invoking the handler when no
   credential is supplied.
 - AC-F007-012: A test application composed for a project declaring no
-  `securityModule` serves routes declaring `authentication: "none"` unchanged.
+  `securityModule` serves routes declaring
+  `authentication: { mode: "none" }` unchanged.
 
 ## Out of scope
 
@@ -202,6 +203,17 @@ or routing change that does not select these tests would leave the composition
 this component depends on unverified.
 
 ## Governance record
+
+> Historical verification note: Deno commands, runtime names, and platform
+> artifacts appearing below this boundary belong to the pre-Node/Bun
+> implementation or migration record. They are retained for audit history only;
+> current behavior and verification use the Node.js/Bun package workflow.
+
+### Node/Bun auth-shape correction
+
+The route declaration above was normalized to the object-shaped security
+metadata expected by the current Node/Bun runtime. This document is draft until
+the updated governed content receives fresh approval.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
 after omitting the single top-level frontmatter `status:` line and its line

@@ -91,7 +91,9 @@ test("AC-F002-006 · preserves custom handler metadata and behavior", async () =
   const route = routes[0];
 
   assert.deepEqual(route.operation.contract, { summary: "Stream custom text" });
-  assert.deepEqual(route.operation.security, { authentication: "none" });
+  assert.deepEqual(route.operation.security, {
+    authentication: { mode: "none" },
+  });
   assert.deepEqual(route.operation.schemas, {
     responses: { 202: "text/plain" },
   });

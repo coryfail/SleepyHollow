@@ -18,7 +18,7 @@ export default defineRoute({
       params: z.object({ id: z.string() }).strict(),
       responses: { 200: bookmark },
     },
-    security: { authentication: "none" },
+    security: { authentication: { mode: "none" } },
     contract: { summary: "Return one bookmark" },
     handler: ({ params }) =>
       Response.json({ id: params.id, url: "https://example.com" }),

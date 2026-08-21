@@ -22,7 +22,7 @@
  *       params: z.object({ id: z.string() }).strict(),
  *       responses: { 200: z.object({ id: z.string() }).strict() },
  *     },
- *     security: { authentication: "none" },
+ *     security: { authentication: { mode: "none" } },
  *     contract: { summary: "Return one widget" },
  *     handler: ({ params }) => Response.json({ id: params.id }),
  *   },
