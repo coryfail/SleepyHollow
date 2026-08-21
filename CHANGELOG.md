@@ -2,6 +2,17 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.3.4 - 2026-08-21
+
+### Fixed: development server lifecycle
+
+The development worker now reports readiness only after the listener is bound,
+keeps the Node 24 server lifecycle under one explicit contract, and preserves
+bounded diagnostics when serving fails after binding. Public `hollow dev`
+supervision now reports unexpected worker exits instead of remaining falsely
+active. SQLite database files and their `-wal`/`-shm` runtime sidecars are
+excluded from reload triggers.
+
 ## 0.3.3 - 2026-08-21
 
 ### Changed: Node/Bun documentation and scaffold alignment

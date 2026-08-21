@@ -17,7 +17,14 @@ import { symlink } from "fs/promises";
 import { Readable } from "stream";
 import { tmpdir } from "os";
 import { join } from "path";
-import { serve as nodeServe, type FetchHandler } from "./server.ts";
+import {
+  serve as nodeServe,
+  type FetchHandler,
+  type HttpServer,
+  type ServerOptions,
+} from "./server.ts";
+
+export type { HttpServer, ServerOptions } from "./server.ts";
 
 export interface PlatformDirEntry {
   readonly name: string;
@@ -204,6 +211,6 @@ export const platform = Object.freeze({
   watchFs: (root: string, _options?: { readonly recursive?: boolean }) => new Watcher(root),
   addSignalListener: (signal: NodeJS.Signals, listener: () => void) => process.on(signal, listener),
   removeSignalListener: (signal: NodeJS.Signals, listener: () => void) => process.off(signal, listener),
-  serve: (options: { readonly port?: number; readonly hostname?: string }, handler: FetchHandler) => nodeServe(handler, options),
+  serve: (options: ServerOptions, handler: FetchHandler): HttpServer => nodeServe(handler, options),
   Command,
 });

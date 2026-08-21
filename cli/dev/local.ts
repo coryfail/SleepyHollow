@@ -159,6 +159,7 @@ async function startWorker(
   const child = workerCommand(options, "serve").spawn();
   const stdout = readFirstLine(child.stdout);
   const stderr = readBounded(child.stderr);
+  const status = child.status;
   let timeout: ReturnType<typeof setTimeout> | undefined;
   const timer = new Promise<never>((_, reject) => {
     timeout = setTimeout(
@@ -188,9 +189,34 @@ async function startWorker(
     );
   }
   let stopped = false;
+  const failure = new Promise<never>((_, reject) => {
+    void status.then(async (result) => {
+      if (stopped) return;
+      if (result.success) {
+        reject(new DevCommandError([{
+          code: "SH_DEV_WORKER_EXITED",
+          severity: "error",
+          summary: "The development worker exited after becoming active",
+          correction: "Inspect the worker diagnostics and retry.",
+        }]));
+        return;
+      }
+      reject(await workerFailure(
+        await stderr,
+        "The development worker failed after becoming active",
+      ));
+    }, async () => {
+      if (stopped) return;
+      reject(await workerFailure(
+        await stderr,
+        "The development worker failed after becoming active",
+      ));
+    });
+  });
   return {
     url: `http://${options.hostname}:${options.port}/`,
     routeCount: expectedRoutes,
+    failure,
     async stop() {
       if (stopped) return;
       stopped = true;

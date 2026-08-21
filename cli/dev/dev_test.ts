@@ -1,4 +1,5 @@
-import { platform } from "#platform";
+import { platform, type HttpServer } from "#platform";
+import { fileURLToPath } from "url";
 import {
   type ActiveDevRuntime,
   DevCommandError,
@@ -113,6 +114,195 @@ function unusedPort(): number {
 // explicitly in a normal host with SLEEPY_HOLLOW_NETWORK_TESTS=1.
 const networkTest = process.env.SLEEPY_HOLLOW_NETWORK_TESTS === "1" ? test : test.skip;
 
+async function readLine(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let text = "";
+  while (text.length < 8 * 1024) {
+    const result = await reader.read();
+    if (result.done) break;
+    text += decoder.decode(result.value, { stream: true });
+    const newline = text.search(/\r?\n/);
+    if (newline >= 0) {
+      void (async () => {
+        try {
+          while (!(await reader.read()).done) {
+            // Drain child output after the first lifecycle line.
+          }
+        } catch {
+          // Child shutdown may close the stream abruptly.
+        } finally {
+          reader.releaseLock();
+        }
+      })();
+      return text.slice(0, newline);
+    }
+  }
+  reader.releaseLock();
+  return text;
+}
+
+async function devProject(): Promise<string> {
+  const root = await platform.makeTempDir();
+  await platform.mkdir(`${root}/api/music/releases`, { recursive: true });
+  await platform.writeTextFile(
+    `${root}/package.json`,
+    '{"type":"module"}\n',
+  );
+  await platform.writeTextFile(
+    `${root}/sleepyhollow.config.ts`,
+    'export default { apiDirectory: "api" };\n',
+  );
+  await platform.writeTextFile(
+    `${root}/api/music/releases/route.ts`,
+    `import { defineRoute } from "${new URL("../../dist", import.meta.url).href}/routing.js";\n` +
+      `import { z } from "${new URL("../../dist", import.meta.url).href}/validation.js";\n\n` +
+      "const responseSchema = z.strictObject({\n" +
+      "  releases: z.array(z.strictObject({\n" +
+      "    slug: z.string(),\n" +
+      "    title: z.string(),\n" +
+      "  })),\n" +
+      "});\n\n" +
+      "export default defineRoute({\n" +
+      "  GET: {\n" +
+      "    schemas: { responses: { 200: responseSchema } },\n" +
+      '    security: { authentication: { mode: "none" } },\n' +
+      '    contract: { operationId: "getMusicReleases", summary: "Return music releases" },\n' +
+      "    handler: () => Response.json({\n" +
+      '      releases: [{ slug: "afterfield", title: "Afterfield" }],\n' +
+      "    }),\n" +
+      "  },\n" +
+      "});\n",
+  );
+  return root;
+}
+
+test("regression · internal worker validation reports the discovered route count", async () => {
+  const root = await devProject();
+  const lines: string[] = [];
+  const original = console.log;
+  console.log = (line: unknown) => lines.push(String(line));
+  try {
+    const status = await runDevWorker([
+      "validate",
+      root,
+      "127.0.0.1",
+      String(unusedPort()),
+    ]);
+    assert(status === 0, "internal validation should succeed");
+    assert(
+      JSON.parse(lines[0]).ready === true && JSON.parse(lines[0]).routeCount === 1,
+      "validation must report one ready route",
+    );
+  } finally {
+    console.log = original;
+    await platform.remove(root, { recursive: true });
+  }
+});
+
+networkTest("regression · internal serve remains alive after its ready event", async () => {
+  const root = await devProject();
+  const port = unusedPort();
+  const entry = fileURLToPath(new URL("../../dist/cli.js", import.meta.url));
+  const child = new platform.Command(platform.execPath(), {
+    args: [entry, "__sleepy_hollow_dev_worker", "serve", root, "127.0.0.1", String(port)],
+    cwd: root,
+    env: { SLEEPY_HOLLOW_INTERNAL_DEV_WORKER: "1" },
+    stdout: "piped",
+    stderr: "piped",
+  }).spawn();
+  const status = child.status;
+  try {
+    const readyLine = await readLine(child.stdout);
+    if (!readyLine.trim()) {
+      assert(false, `serve worker produced no ready event: ${await readLine(child.stderr)}`);
+    }
+    const ready = JSON.parse(readyLine);
+    assert(ready.ready === true && ready.routeCount === 1, "serve ready event missing");
+    const response = await fetch(`http://127.0.0.1:${port}/music/releases`);
+    if (response.status !== 200) {
+      assert(false, `expected 200, received ${response.status}: ${await response.text()}`);
+    }
+    assert(response.status === 200, `expected 200, received ${response.status}`);
+    let exited = false;
+    void status.then(() => exited = true);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert(!exited, "serve worker must remain alive after readiness");
+  } finally {
+    child.kill("SIGTERM");
+    await status.catch(() => undefined);
+    await platform.remove(root, { recursive: true });
+  }
+});
+
+networkTest("regression · public JSON dev remains active and serves the discovered route", async () => {
+  const root = await devProject();
+  const port = unusedPort();
+  const entry = fileURLToPath(new URL("../../dist/cli.js", import.meta.url));
+  const child = new platform.Command(platform.execPath(), {
+    args: [entry, "dev", "--port", String(port), "--json"],
+    cwd: root,
+    stdout: "piped",
+    stderr: "piped",
+  }).spawn();
+  const status = child.status;
+  try {
+    const startupLine = await readLine(child.stdout);
+    if (!startupLine.trim()) {
+      assert(false, `public dev produced no startup event: ${await readLine(child.stderr)}`);
+    }
+    const startup = JSON.parse(startupLine);
+    assert(startup.type === "startup" && startup.state === "active", "public startup event missing");
+    const response = await fetch(`http://127.0.0.1:${port}/music/releases`);
+    if (response.status !== 200) {
+      assert(false, `expected 200, received ${response.status}: ${await response.text()}`);
+    }
+    const body = await response.json() as { releases?: readonly { slug?: string }[] };
+    assert(body.releases?.[0]?.slug === "afterfield", "route response mismatch");
+    let exited = false;
+    void status.then(() => exited = true);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert(!exited, "public dev supervisor must remain active after startup");
+  } finally {
+    child.kill("SIGTERM");
+    await status.catch(() => undefined);
+    await platform.remove(root, { recursive: true });
+  }
+});
+
+networkTest("regression · serve failure retains the bounded listener cause", async () => {
+  const root = await devProject();
+  const port = unusedPort();
+  const occupied = platform.serve(
+    { hostname: "127.0.0.1", port },
+    () => new Response("occupied"),
+  );
+  await occupied.ready;
+  const errors: string[] = [];
+  const original = console.error;
+  console.error = (line: unknown) => errors.push(String(line));
+  try {
+    const status = await runDevWorker([
+      "serve",
+      root,
+      "127.0.0.1",
+      String(port),
+    ]);
+    assert(status !== 0, "a duplicate listener must fail the worker");
+    const output = JSON.parse(errors.at(-1) ?? "{}");
+    assert(output.diagnostics?.[0]?.code === "SH_DEV_BIND_FAILED", "bind failure code missing");
+    assert(
+      String(output.diagnostics?.[0]?.summary).includes("EADDRINUSE"),
+      "bounded listener cause missing",
+    );
+  } finally {
+    console.error = original;
+    await occupied.shutdown();
+    await occupied.finished;
+    await platform.remove(root, { recursive: true });
+  }
+});
+
 networkTest("AC-F015-001 · empty scaffold starts a real loopback application", async () => {
   const root = await platform.makeTempDir();
   await platform.mkdir(`${root}/api`);
@@ -124,7 +314,7 @@ networkTest("AC-F015-001 · empty scaffold starts a real loopback application", 
   const events: DevEvent[] = [];
   const controller = new AbortController();
   const watcher = new QueueWatcher();
-  let server: platform.HttpServer | undefined;
+  let server: HttpServer | undefined;
   try {
     const run = runDevCommand(["--port", String(port), "--json"], {
       cwd: root,
@@ -144,8 +334,8 @@ networkTest("AC-F015-001 · empty scaffold starts a real loopback application", 
         );
         return {
           routeCount: 0,
-          activate() {
-            server = platform.serve({
+          async activate() {
+            const created = platform.serve({
               hostname: options.hostname,
               port: options.port,
             }, () =>
@@ -153,6 +343,8 @@ networkTest("AC-F015-001 · empty scaffold starts a real loopback application", 
                 status: 404,
                 headers: { "content-type": "application/problem+json" },
               }));
+            await created.ready;
+            server = created;
             return {
               url: `http://${options.hostname}:${options.port}/`,
               routeCount: 0,
@@ -245,6 +437,37 @@ test("AC-F015-003 · valid changes activate one fresh ordered generation", async
   );
 });
 
+test("AC-F015-003 · SQLite runtime artifacts do not trigger a reload", async () => {
+  const prepared: number[] = [];
+  const harness = jsonHarness({
+    prepare(options) {
+      prepared.push(options.generation);
+      return fakeCandidate(options.generation, []);
+    },
+  });
+  await eventually(() => harness.events.length === 1, "startup missing");
+  harness.watcher.push([
+    ".sleepyhollow/todos.sqlite",
+    ".sleepyhollow/todos.sqlite-wal",
+    ".sleepyhollow/todos.sqlite-shm",
+    ".sleepyhollow/cache.db",
+    ".sleepyhollow/cache.db-wal",
+    ".sleepyhollow/cache.db-shm",
+  ]);
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert(
+    harness.events.length === 1 && prepared.join(",") === "1",
+    "SQLite runtime artifacts must not start a new generation",
+  );
+  harness.watcher.push(["api/music/releases/route.ts"]);
+  await eventually(
+    () => harness.events.some((event) => event.type === "reload"),
+    "source reload missing",
+  );
+  harness.controller.abort("cancelled");
+  assert(await harness.run === 0, "development run should stop normally");
+});
+
 test("AC-F015-004 · invalid changes retain the active generation", async () => {
   const stops: number[] = [];
   const harness = jsonHarness({
@@ -334,7 +557,7 @@ networkTest("AC-F015-006 · cancellation releases watcher and listener exactly o
   const controller = new AbortController();
   const events: DevEvent[] = [];
   let stops = 0;
-  let server: platform.HttpServer | undefined;
+  let server: HttpServer | undefined;
   const run = runDevCommand(["--port", String(port), "--json"], {
     cwd: "/project",
     stdout: (line) => events.push(JSON.parse(line)),
@@ -345,11 +568,13 @@ networkTest("AC-F015-006 · cancellation releases watcher and listener exactly o
     prepare(options) {
       return {
         routeCount: 0,
-        activate() {
-          server = platform.serve(
+        async activate() {
+          const created = platform.serve(
             { hostname: options.hostname, port },
             () => new Response("ok"),
           );
+          await created.ready;
+          server = created;
           return {
             url: `http://127.0.0.1:${port}/`,
             routeCount: 0,
@@ -374,8 +599,13 @@ networkTest("AC-F015-006 · cancellation releases watcher and listener exactly o
     events.filter((event) => event.type === "shutdown").length === 1,
     "one shutdown event required",
   );
-  const rebound = platform.listen({ hostname: "127.0.0.1", port });
-  rebound.close();
+  const rebound = platform.serve(
+    { hostname: "127.0.0.1", port },
+    () => new Response("ok"),
+  );
+  await rebound.ready;
+  await rebound.shutdown();
+  await rebound.finished;
 });
 
 test("AC-F015-007 · human and NDJSON lifecycle output remain equivalent and redacted", async () => {
@@ -468,7 +698,8 @@ async function securedProject(
   );
   await platform.writeTextFile(
     `${root}/api/vault/route.ts`,
-    `import { z } from "${FRAMEWORK}/validation/mod.ts";\n\n` +
+    `import { writeFile } from "node:fs/promises";\n` +
+      `import { z } from "${FRAMEWORK}/validation/mod.ts";\n\n` +
       "export default {\n" +
       "  GET: {\n" +
       "    schemas: {\n" +
@@ -490,8 +721,8 @@ async function securedProject(
       "      },\n" +
       "    },\n" +
       '    contract: { summary: "Read the vault" },\n' +
-      "    handler: () => {\n" +
-      `      platform.writeTextFileSync(${JSON.stringify(marker)}, "entered");\n` +
+      "    handler: async () => {\n" +
+      `      await writeFile(${JSON.stringify(marker)}, "entered");\n` +
       "      return Response.json({ ok: true });\n" +
       "    },\n" +
       "  },\n" +
@@ -546,6 +777,7 @@ networkTest("AC-F015-008 · a protected route rejects an unauthenticated local r
   }, (request) => runtime.fetch(request));
 
   try {
+    await server.ready;
     const rejected = await fetch(`http://127.0.0.1:${port}/vault`);
     await rejected.body?.cancel();
     assert(
@@ -564,10 +796,9 @@ networkTest("AC-F015-008 · a protected route rejects an unauthenticated local r
     const accepted = await fetch(`http://127.0.0.1:${port}/vault`, {
       headers: { authorization: "Bearer good" },
     });
-    await accepted.body?.cancel();
     assert(
       accepted.status === 200,
-      `expected 200, received ${accepted.status}`,
+      `expected 200, received ${accepted.status}: ${await accepted.text()}`,
     );
   } finally {
     controller.abort();

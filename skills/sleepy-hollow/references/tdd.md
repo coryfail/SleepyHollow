@@ -6,7 +6,7 @@ Approved acceptance criteria become failing tests before implementation begins.
 
 Every approved criterion maps to at least one test, and every governed
 acceptance test maps back to an approved criterion. In a consuming application,
-import the public testing entry point and use the framework 0.3.3
+import the public testing entry point and use the framework 0.3.4
 `CriterionTestSpec` shape. `criteria` is an array and `sourcePath` is the
 project-relative path of the test file:
 
@@ -33,13 +33,13 @@ evidence with valid exact-content approval.
 Cover the happy path, each declared failure, boundaries, security behavior, and
 side effects. An unmapped criterion blocks implementation.
 
-## Vitest and the hollow CLI in framework 0.3.3
+## Vitest and the hollow CLI in framework 0.3.4
 
 `criterionTest` registers a named test with Vitest and returns traceability
 metadata in the current process. It does not, by itself, write a
 `sleepy-hollow-test-manifest/v1` file for the CLI to discover.
 
-The public 0.3.3 project adapter has a known gap: `hollow test` and `hollow
+The public 0.3.4 project adapter has a known gap: `hollow test` and `hollow
 check` do not execute the test modules to discover their `criterionTest`
 registries, and their default evidence loaders currently expose an empty test
 manifest and no test results. The native runner and verifier can consume a
@@ -48,7 +48,7 @@ yet provide that bridge. Consequently, a direct Vitest pass is useful behavior
 evidence but cannot close criterion traceability by itself; `hollow check` may
 report `SH_CHECK_CRITERION_UNMAPPED` even when the Vitest test passed.
 
-The reliable workflow against 0.3.3 is:
+The reliable workflow against 0.3.4 is:
 
 1. Keep every criterion test mapped with the public `criterionTest` API above.
 2. Run `npm run check` and `npm run test` (or the equivalent Bun commands) so

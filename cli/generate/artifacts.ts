@@ -45,7 +45,7 @@ export function renderArtifacts(
   ] as const;
   const manifestContent = canonicalJson({
     schema: "sleepy-hollow-generated-manifest/v1",
-    generatorVersion: "0.3.3",
+    generatorVersion: "0.3.4",
     serviceId: normalized.serviceId,
     inputDigest: digest(input),
     artifacts: Object.fromEntries(

@@ -92,6 +92,8 @@ function changedPaths(
   paths: readonly string[],
 ): readonly string[] | DevDiagnostic {
   const normalized: string[] = [];
+  const runtimeDatabaseArtifact =
+    /^\.sleepyhollow\/[^/]+\.(?:sqlite|db)(?:-(?:wal|shm))?$/;
   for (const path of paths) {
     const absolute = isAbsolute(path)
       ? resolve(path)
@@ -108,6 +110,7 @@ function changedPaths(
       local === ".git" || local.startsWith(".git/") ||
       local === "generated" || local.startsWith("generated/") ||
       local.includes("/node_modules/") ||
+      runtimeDatabaseArtifact.test(local) ||
       /(?:^|\/)(?:\.DS_Store|.*(?:\.swp|~))$/.test(local)
     ) continue;
     normalized.push(local);
@@ -124,6 +127,25 @@ function abortReason(signal: AbortSignal): DevEvent["reason"] {
     return "termination";
   }
   return "cancelled";
+}
+
+async function nextChange(
+  iterator: AsyncIterator<readonly string[]>,
+  active: ActiveDevRuntime | undefined,
+): Promise<IteratorResult<readonly string[]>> {
+  const change = iterator.next();
+  if (!active?.failure) return change;
+  return Promise.race([
+    change,
+    active.failure.then(() => {
+      throw new DevCommandError([{
+        code: "SH_DEV_WORKER_EXITED",
+        severity: "error",
+        summary: "The active development worker exited unexpectedly",
+        correction: "Inspect the worker diagnostics and retry.",
+      }]);
+    }),
+  ]);
 }
 
 export async function runDevCommand(
@@ -260,7 +282,11 @@ export async function runDevCommand(
     }
     if (signal.aborted) await closeWatcher();
 
-    for await (const paths of watcher) {
+    const iterator = watcher[Symbol.asyncIterator]();
+    while (true) {
+      const next = await nextChange(iterator, active);
+      if (next.done) break;
+      const paths = next.value;
       if (signal.aborted) break;
       const changes = changedPaths(projectRoot, paths);
       if (!Array.isArray(changes)) {
