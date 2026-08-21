@@ -41,6 +41,8 @@ export interface DevPrepareOptions {
 export interface ActiveDevRuntime {
   readonly url: string;
   readonly routeCount: number;
+  /** Rejects if a serving worker exits unexpectedly after activation. */
+  readonly failure?: Promise<never>;
   stop(): void | Promise<void>;
 }
 

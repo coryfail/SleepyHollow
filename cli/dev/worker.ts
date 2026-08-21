@@ -66,16 +66,42 @@ function safeDiagnostic(
       ...(typeof item.key === "string" ? { configuration: [item.key] } : {}),
     }));
   }
-  if (
-    intent === "serve" &&
-    (error instanceof platform.errors.AddrInUse ||
-      error instanceof platform.errors.PermissionDenied)
-  ) {
+  const nodeError = error as {
+    readonly code?: unknown;
+    readonly syscall?: unknown;
+  };
+  const nodeCode = typeof nodeError?.code === "string" ? nodeError.code : undefined;
+  const isListenFailure =
+    error instanceof platform.errors.AddrInUse ||
+    error instanceof platform.errors.PermissionDenied ||
+    nodeError?.syscall === "listen" ||
+    nodeCode === "EADDRINUSE" || nodeCode === "EACCES" || nodeCode === "EPERM";
+  if (intent === "serve" && isListenFailure) {
     return [{
       code: "SH_DEV_BIND_FAILED",
       severity: "error",
-      summary: "The loopback listener could not bind",
+      summary: nodeCode
+        ? `The loopback listener failed with ${nodeCode}`
+        : "The loopback listener could not bind",
       correction: "Choose an available port and confirm local network access.",
+    }];
+  }
+  if (intent === "serve") {
+    const cause = error instanceof Error
+      ? `${error.name}: ${error.message}`
+        .replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "")
+        .replace(/(?:Bearer|token|password|secret|authorization)[=: ]+\S+/gi, "$1=[redacted]")
+        .replace(/(?:[A-Za-z]:)?\/[^\s]+/g, "[path]")
+        .slice(0, 180)
+      : undefined;
+    return [{
+      code: "SH_DEV_SERVE_FAILED",
+      severity: "error",
+      summary: cause
+        ? `The development server failed: ${cause}`
+        : "The development server failed",
+      correction:
+        "Inspect the bounded server diagnostic and retry after repairing the host boundary.",
     }];
   }
   return [{
@@ -160,20 +186,20 @@ export async function runDevWorker(args: readonly string[]): Promise<number> {
     hostname !== "127.0.0.1" || !Number.isInteger(port) || port < 1 ||
     port > 65_535
   ) return 2;
+  let server: ReturnType<typeof platform.serve> | undefined;
   try {
     const { runtime, routeCount } = await loadRuntime(projectRoot);
     if (intent === "validate") {
       console.log(JSON.stringify({ ready: true, routeCount }));
       return 0;
     }
-    const server = platform.serve({ hostname, port }, (request) => runtime.fetch(request));
+    server = platform.serve({ hostname, port }, (request) => runtime.fetch(request));
+    await server.ready;
     console.log(JSON.stringify({ ready: true, routeCount }));
-    await new Promise<void>((resolve, reject) => {
-      server.once("close", resolve);
-      server.once("error", reject);
-    });
+    await server.finished;
     return 0;
   } catch (error) {
+    await server?.shutdown().catch(() => undefined);
     console.error(
       JSON.stringify({
         ready: false,

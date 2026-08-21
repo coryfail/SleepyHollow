@@ -126,6 +126,25 @@ function abortReason(signal: AbortSignal): DevEvent["reason"] {
   return "cancelled";
 }
 
+async function nextChange(
+  iterator: AsyncIterator<readonly string[]>,
+  active: ActiveDevRuntime | undefined,
+): Promise<IteratorResult<readonly string[]>> {
+  const change = iterator.next();
+  if (!active?.failure) return change;
+  return Promise.race([
+    change,
+    active.failure.then(() => {
+      throw new DevCommandError([{
+        code: "SH_DEV_WORKER_EXITED",
+        severity: "error",
+        summary: "The active development worker exited unexpectedly",
+        correction: "Inspect the worker diagnostics and retry.",
+      }]);
+    }),
+  ]);
+}
+
 export async function runDevCommand(
   args: readonly string[],
   io: DevCommandIo,
@@ -260,7 +279,11 @@ export async function runDevCommand(
     }
     if (signal.aborted) await closeWatcher();
 
-    for await (const paths of watcher) {
+    const iterator = watcher[Symbol.asyncIterator]();
+    while (true) {
+      const next = await nextChange(iterator, active);
+      if (next.done) break;
+      const paths = next.value;
       if (signal.aborted) break;
       const changes = changedPaths(projectRoot, paths);
       if (!Array.isArray(changes)) {
