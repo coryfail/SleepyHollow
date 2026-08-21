@@ -1,6 +1,6 @@
 {
   "name": "@sleepy-hollow/framework",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A specification-governed Node and Bun framework for HTTP services.",
   "license": "MPL-2.0",
   "repository": {

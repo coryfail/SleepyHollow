@@ -89,7 +89,7 @@ definitions for bounded, index-compatible data access.
 ### 5. Verify independently
 
 Run `hollow check` and treat its result as the only source of verification. Do
-not declare an endpoint verified from passing tests alone. In framework 0.3.3,
+not declare an endpoint verified from passing tests alone. In framework 0.3.4,
 read the known Vitest/CLI manifest limitation in
 [references/tdd.md](references/tdd.md) and report it rather than treating a
 direct Vitest pass as independent verification. Repair bounded

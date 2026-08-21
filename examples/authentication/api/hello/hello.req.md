@@ -87,7 +87,7 @@ authentication unapplied.
 
 > Historical verification note: Deno commands in the archived entries below
 > describe the pre-Node/Bun example. They are retained as audit history only;
-> use the example's Node/Vitest package scripts and framework 0.3.3 CLI for
+> use the example's Node/Vitest package scripts and framework 0.3.4 CLI for
 > current reproduction.
 
 The governed-content digest covers the exact UTF-8 bytes before this heading
