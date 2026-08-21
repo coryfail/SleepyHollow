@@ -92,6 +92,8 @@ function changedPaths(
   paths: readonly string[],
 ): readonly string[] | DevDiagnostic {
   const normalized: string[] = [];
+  const runtimeDatabaseArtifact =
+    /^\.sleepyhollow\/[^/]+\.(?:sqlite|db)(?:-(?:wal|shm))?$/;
   for (const path of paths) {
     const absolute = isAbsolute(path)
       ? resolve(path)
@@ -108,6 +110,7 @@ function changedPaths(
       local === ".git" || local.startsWith(".git/") ||
       local === "generated" || local.startsWith("generated/") ||
       local.includes("/node_modules/") ||
+      runtimeDatabaseArtifact.test(local) ||
       /(?:^|\/)(?:\.DS_Store|.*(?:\.swp|~))$/.test(local)
     ) continue;
     normalized.push(local);

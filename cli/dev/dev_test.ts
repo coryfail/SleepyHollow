@@ -437,6 +437,37 @@ test("AC-F015-003 · valid changes activate one fresh ordered generation", async
   );
 });
 
+test("AC-F015-003 · SQLite runtime artifacts do not trigger a reload", async () => {
+  const prepared: number[] = [];
+  const harness = jsonHarness({
+    prepare(options) {
+      prepared.push(options.generation);
+      return fakeCandidate(options.generation, []);
+    },
+  });
+  await eventually(() => harness.events.length === 1, "startup missing");
+  harness.watcher.push([
+    ".sleepyhollow/todos.sqlite",
+    ".sleepyhollow/todos.sqlite-wal",
+    ".sleepyhollow/todos.sqlite-shm",
+    ".sleepyhollow/cache.db",
+    ".sleepyhollow/cache.db-wal",
+    ".sleepyhollow/cache.db-shm",
+  ]);
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert(
+    harness.events.length === 1 && prepared.join(",") === "1",
+    "SQLite runtime artifacts must not start a new generation",
+  );
+  harness.watcher.push(["api/music/releases/route.ts"]);
+  await eventually(
+    () => harness.events.some((event) => event.type === "reload"),
+    "source reload missing",
+  );
+  harness.controller.abort("cancelled");
+  assert(await harness.run === 0, "development run should stop normally");
+});
+
 test("AC-F015-004 · invalid changes retain the active generation", async () => {
   const stops: number[] = [];
   const harness = jsonHarness({
