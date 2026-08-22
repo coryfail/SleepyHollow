@@ -108,7 +108,7 @@ One API. Nothing here justifies independent deployment.
 
 > Historical verification note: the Deno command in the archived entry below
 > describes the pre-Node/Bun example. It is retained as audit history only;
-> use the example's Node/Vitest package scripts and framework 0.3.5 CLI for
+> use the example's Node/Vitest package scripts and framework 0.3.6 CLI for
 > current reproduction.
 
 ### Application format migration

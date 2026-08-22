@@ -55,7 +55,7 @@ requirement to `draft` and obtain fresh exact-content approval. The migration
 changes governed bytes; changing `status` alone cannot make the old approval
 valid.
 
-The framework 0.3.5 `hollow create` scaffold now emits a matching `tsconfig.json`
+The framework 0.3.6 `hollow create` scaffold now emits a matching `tsconfig.json`
 alongside its `tsc --noEmit` check script. A project created by an older CLI may
 have the script without that file; add or migrate the TypeScript configuration
 before treating a check failure as application behavior or red state.

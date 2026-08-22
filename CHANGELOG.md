@@ -2,6 +2,16 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.3.6 - 2026-08-21
+
+### Changed: skill verification guidance and release surfaces
+
+The Sleepy Hollow skill now documents the framework 0.3.6 evidence workflow,
+discovery-safe governed tests, explicit approval criterion IDs, application
+criterion mappings, post-green smoke testing, and the current red-state
+characterization limitation. CLI, generator, scaffold, and package metadata
+all report 0.3.6.
+
 ## 0.3.5 - 2026-08-21
 
 ### Fixed: governed test evidence loading

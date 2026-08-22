@@ -6,7 +6,7 @@ Approved acceptance criteria become failing tests before implementation begins.
 
 Every approved criterion maps to at least one test, and every governed
 acceptance test maps back to an approved criterion. In a consuming application,
-import the public testing entry point and use the framework 0.3.5
+import the public testing entry point and use the framework 0.3.6
 `CriterionTestSpec` shape. `criteria` is an array and `sourcePath` is the
 project-relative path of the test file:
 
@@ -32,7 +32,7 @@ evidence with valid exact-content approval.
 
 ### Discovery-safe Vitest files
 
-During `hollow test`, framework 0.3.5 imports governed test files once outside
+During `hollow test`, framework 0.3.6 imports governed test files once outside
 Vitest to collect their `criterionTest(...)` descriptors. The test body is not
 run during that import. Keep the module importable in that mode: do not call
 Vitest-only globals such as `test`, `describe`, `afterEach`, or `vi` at module
@@ -74,7 +74,7 @@ of the governed discovery inventory and are ignored by `hollow test`.
 Cover the happy path, each declared failure, boundaries, security behavior, and
 side effects. An unmapped criterion blocks implementation.
 
-## Vitest and the hollow CLI in framework 0.3.5
+## Vitest and the hollow CLI in framework 0.3.6
 
 `criterionTest` registers a named test with Vitest and carries the same
 traceability metadata into the CLI's discovery manifest. `hollow test` imports
@@ -135,7 +135,7 @@ before continuing. Reporting a broken baseline as expected red state fabricates
 evidence.
 
 When behavior predates the requirement, record characterization evidence and
-state honestly that no historical red state exists. In framework 0.3.5,
+state honestly that no historical red state exists. In framework 0.3.6,
 `hollow check` accepts only red-state records whose status is exactly
 `credible red state captured.` or `failed as expected.` (with the other required
 red-state fields). It does not accept characterization-only evidence as a

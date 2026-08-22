@@ -465,18 +465,18 @@ test("AC-NRF-002 AC-NRF-009 · every current governed artifact has a named requi
   assert.ok(requirementPaths().includes("named-requirement-files.req.md"));
 });
 
-test("AC-NRF-012 · framework release surfaces report 0.3.5", () => {
-  assert.equal(JSON.parse(read("package.json")).version, "0.3.5");
+test("AC-NRF-012 · framework release surfaces report 0.3.6", () => {
+  assert.equal(JSON.parse(read("package.json")).version, "0.3.6");
   assert.equal(JSON.parse(read("website/package.json")).version, "0.2.0");
-  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.3\.5"/);
-  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.3\.5"/);
+  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.3\.6"/);
+  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.3\.6"/);
   assert.match(
     read("cli/generate/artifacts.ts"),
-    /generatorVersion: "0\.3\.5"/,
+    /generatorVersion: "0\.3\.6"/,
   );
   assert.match(
     read("cli/generate/inventory.ts"),
-    /options\.version \?\? "0\.3\.5"/,
+    /options\.version \?\? "0\.3\.6"/,
   );
   assert.match(
     read("docs/sgad/README.md"),

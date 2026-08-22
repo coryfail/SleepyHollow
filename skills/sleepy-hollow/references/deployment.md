@@ -2,7 +2,7 @@
 
 ## Verification gate
 
-For framework 0.3.5, use this exact order on the revision being prepared for
+For framework 0.3.6, use this exact order on the revision being prepared for
 deployment:
 
 ```bash
