@@ -1,5 +1,22 @@
 # Deployment
 
+## Verification gate
+
+For framework 0.3.5, use this exact order on the revision being prepared for
+deployment:
+
+```bash
+npm run verify
+npx hollow test
+npx hollow check
+```
+
+Do not run `hollow check` before `hollow test`. The test command discovers
+governed `criterionTest(...)` registrations and persists the manifest and
+results; capture-aware tests must write the capture evidence that the check
+command consumes. Deploy only when the check passes. A direct Vitest pass alone
+is not a verification result.
+
 `hollow deploy prepare` owns only deterministic local Fly preparation. It
 creates or validates marked `Dockerfile`, `.dockerignore`, and `fly.toml`
 artifacts, then prints commands for the operator to run with Fly tooling. This

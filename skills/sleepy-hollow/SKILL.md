@@ -49,6 +49,12 @@ and non-empty `owners`. The parser rejects the legacy
 [references/requirement-format.md](references/requirement-format.md) before
 migrating an existing scaffold.
 
+For the root application requirement, use `depends_on: []` unless a reviewed
+dependency is intentional. Because framework 0.3.5 includes this application
+requirement in verification scope, map every approved application criterion to
+one or more governed `criterionTest(...)` tests as well as mapping endpoint
+criteria.
+
 Authentication planning must record actors, trust boundaries, credential kind,
 expiration, revocation, transport, cross-site request implications, and the
 `401` and `403` response behavior whenever authentication is required. An
@@ -90,19 +96,36 @@ definitions for bounded, index-compatible data access.
 
 Run `hollow check` and treat its result as the only source of verification. Do
 not declare an endpoint verified from passing tests alone. In framework 0.3.5,
-run `hollow test` to discover and persist governed criterion tests, then run
-`hollow check` to independently evaluate those results and the current capture
-evidence. Read the current discovery boundary and known limitations in
+run these commands in order:
+
+```bash
+npm run verify
+npx hollow test
+npx hollow check
+```
+
+`hollow test` must run before `hollow check`: it discovers governed
+`criterionTest(...)` registrations and persists
+`generated/test-manifest.json` and `generated/test-results.json`; the
+capture-aware tests must also write the current `generated/capture.json`.
+`hollow check` consumes all three persisted artifacts; it does not replace them
+with an empty or inferred test manifest. It also includes the configured
+application requirement in its inventory, so every approved application
+criterion must be mapped to a governed test. Otherwise the check reports
+`SH_CHECK_CRITERION_UNMAPPED` even when endpoint criteria are covered.
+
+Read the current discovery boundary and known limitations in
 [references/tdd.md](references/tdd.md). A direct Vitest pass is not
 independent verification. Repair bounded implementation defects and rerun. If
-satisfying the diagnostics would change
-approved behavior, return to requirement review instead.
+satisfying the diagnostics would change approved behavior, return to requirement
+review instead.
 
 ### 6. Report and deploy
 
 Report changed files, criterion coverage, verification results, contract
 outputs, deployment results, and remaining risks for the selected work.
 
-Deploy only from a verified revision. Read
+Deploy only after `npm run verify`, `npx hollow test`, and `npx hollow check`
+have completed successfully for the same revision. Read
 [references/deployment.md](references/deployment.md) for the plan, confirmation,
 and smoke-test requirements.

@@ -118,3 +118,24 @@ invalidates approval while changing only `status` does not.
 
 The record carries Approval, Criterion mapping, Red-state evidence,
 Verification, and Delivery entries. Never edit a historical entry; append.
+
+The parser selects the latest heading whose title starts with `### Approval`,
+including named headings such as `### Approval, current implementation`. An
+append-only invalidation followed by reapproval therefore works only when the
+new approval is appended after the invalidation; do not edit the old record.
+The current approval's `- Approved criteria:` line must explicitly contain
+every approved criterion ID, such as:
+
+```markdown
+### Approval, current implementation
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-21T12:00:00Z.
+- Approved criteria: AC-APP-001, AC-APP-002, AC-APP-003.
+- Governed-content digest: sha256:<64 lowercase hex characters>.
+```
+
+Human shorthand such as `AC-APP-001 through AC-APP-010` is not sufficient for
+the parser. Keep the complete list of IDs explicit in the current approval
+record, and ensure the digest matches the governed content.
