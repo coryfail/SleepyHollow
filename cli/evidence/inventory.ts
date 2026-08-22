@@ -1,10 +1,14 @@
 import type { CheckRoute, VerificationInventory } from "../check/mod.ts";
 import { verifyProject } from "../check/mod.ts";
 import type { TestCommandInventory } from "../test/mod.ts";
-import type { TestManifest } from "../../core/testing/mod.ts";
 import { capture, routes } from "./behavior.ts";
 import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
+import {
+  discoverTestEvidence,
+  readTestEvidence,
+  testEvidencePaths,
+} from "./tests.ts";
 import type {
   EvidenceCaptureOptions,
   EvidenceVerificationInventory,
@@ -17,7 +21,7 @@ export async function inventory(
 ): Promise<EvidenceVerificationInventory> {
   const artifact = await capture(project, options);
   const governed = await requirements(project, options);
-  const discovered = await routes(project, artifact);
+  const discovered = await routes(project, artifact, governed.requirements);
   return {
     projectRootDisplay: project.projectRoot,
     requirements: governed.requirements,
@@ -60,10 +64,7 @@ export async function checkLoader(
 ): Promise<VerificationInventory> {
   const project = await locations({ projectRoot });
   const evidence = await inventory(project, { projectRoot, revision });
-  const testManifest: TestManifest = {
-    schema: "sleepy-hollow-test-manifest/v1",
-    tests: [],
-  };
+  const testEvidence = await readTestEvidence(project);
   return {
     projectRootDisplay: projectRoot,
     requestedScope: { kind: "full" },
@@ -75,14 +76,17 @@ export async function checkLoader(
       criteria: item.criteria,
       ...(item.approval ? { approval: item.approval } : {}),
       path: item.path,
-      redStateValid: item.approvalBound,
+      redStateValid: item.redStateValid,
+      ...(item.routePath ? { routePath: item.routePath } : {}),
+      ...(item.methods ? { methods: item.methods } : {}),
     })),
     dependencyGraph: evidence.requirements.map((item) => ({
       id: item.id,
       dependsOn: item.dependsOn ?? [],
     })),
-    testManifest,
-    testResults: [],
+    testManifest: testEvidence.manifest,
+    previousTestManifest: testEvidence.previousManifest,
+    testResults: testEvidence.results,
     routes: evidence.routes.map((route) => ({
       requirementId: route.requirementId ?? "",
       method: route.method,
@@ -117,6 +121,11 @@ export async function testLoader(
 ): Promise<TestCommandInventory> {
   const project = await locations({ projectRoot });
   const governed = await requirements(project, { projectRoot });
+  const manifest = await discoverTestEvidence(project);
+  const evidencePaths = testEvidencePaths(
+    projectRoot,
+    project.generatedDirectory,
+  );
   return {
     projectRootDisplay: projectRoot,
     requirements: governed.requirements.map((item) => ({
@@ -132,7 +141,14 @@ export async function testLoader(
       dependsOn: item.dependsOn ?? [],
     })),
     routes: [],
-    manifest: { schema: "sleepy-hollow-test-manifest/v1", tests: [] },
-    isolation: [],
+    manifest,
+    isolation: manifest.tests.map((test) => ({
+      testId: test.id,
+      policy: "isolated" as const,
+    })),
+    manifestPath: evidencePaths.manifestPath,
+    resultsPath: evidencePaths.resultsPath,
+    captureArtifactPath:
+      `${projectRoot}/${project.generatedDirectory}/capture.json`,
   };
 }

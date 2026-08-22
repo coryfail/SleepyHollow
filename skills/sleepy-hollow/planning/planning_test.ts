@@ -389,3 +389,38 @@ test("AC-F006-010 · malformed and duplicate criteria report source locations", 
     },
   );
 });
+
+test("AC-F006-008 · the latest append-only approval supersedes an invalidated approval", () => {
+  const prefix = governedPrefix("approved");
+  const approved = `- Status: approved.
+- Approver: original-owner.
+- Approved at: 2026-08-07T12:00:00Z.
+- Approved criteria: AC-APP-001.
+- Governed-content digest: \`sha256:${digest(`${prefix}## Governance record\n`)}\`.
+- Decision source: original approval.
+`;
+  const current = `- Status: approved.
+- Approver: current-owner.
+- Approved at: 2026-08-21T12:00:00Z.
+- Approved criteria: AC-APP-001.
+- Governed-content digest: \`sha256:${digest(`${prefix}## Governance record\n`)}\`.
+- Decision source: current implementation approval.
+`;
+  const source = `${prefix}## Governance record
+
+### Approval
+
+${approved}
+### Invalidation, implementation revision
+
+- Status: invalidated.
+- Reason: the implementation changed after the original approval.
+
+### Approval, current implementation
+
+${current}`;
+  const parsed = validateApplicationRequirement(source);
+  assert.equal(parsed.approval?.approver, "current-owner");
+  assert.equal(parsed.approval?.decisionSource, "current implementation approval");
+  assert.equal(parsed.approval?.valid, true);
+});

@@ -1,10 +1,12 @@
 import { platform } from "#platform";
 import type { CaptureArtifact } from "../../core/capture/mod.ts";
 import { discoverRoutes } from "../../core/routing/mod.ts";
+import { relative, sep } from "path";
 import { EvidenceError } from "./evidence_error.ts";
 import type {
   EvidenceCaptureOptions,
   EvidenceRoute,
+  LoadedRequirement,
   ProjectLocations,
 } from "./types.ts";
 
@@ -87,9 +89,26 @@ function authenticationOf(security: unknown): "none" | "required" {
     : "none";
 }
 
+function normalizedRequirementPath(path: string): string {
+  return path.replace(/\[([A-Za-z_][A-Za-z0-9_]*)\]/g, ":$1");
+}
+
+function ownerOf(
+  route: { readonly method: string; readonly path: string },
+  requirements: readonly LoadedRequirement[],
+): string | undefined {
+  const owners = requirements.filter((requirement) =>
+    requirement.routePath !== undefined &&
+    normalizedRequirementPath(requirement.routePath) === route.path &&
+    requirement.methods?.includes(route.method)
+  );
+  return owners.length === 1 ? owners[0].id : undefined;
+}
+
 export async function routes(
   project: ProjectLocations,
   artifact: CaptureArtifact,
+  requirements: readonly LoadedRequirement[] = [],
 ): Promise<readonly EvidenceRoute[]> {
   const roots = project.services.length > 0
     ? project.services.map((service) => ({
@@ -128,12 +147,14 @@ export async function routes(
         }
         statuses.add(request.responseStatus);
       }
+      const source = route.source.startsWith("/")
+        ? relative(root.absolute, route.source).split(sep).join("/")
+        : route.source;
       found.push({
+        requirementId: ownerOf(route, requirements),
         method: route.method,
         path: route.path,
-        source: `${root.display}${
-          route.source.startsWith("/") ? "" : "/"
-        }${route.source}`,
+        source: `${root.display}/${source}`,
         requestSchemaLocations: declaredLocations(route.operation.schemas),
         requiredRequestLocations: [...readLocations].sort(),
         responseSchemaStatuses: declaredStatuses(route.operation.schemas),

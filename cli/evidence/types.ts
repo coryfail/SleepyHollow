@@ -31,6 +31,9 @@ export interface LoadedRequirement extends RequirementEvidence {
   readonly path: string;
   readonly serviceId?: string;
   readonly approvalBound: boolean;
+  readonly redStateValid: boolean;
+  readonly routePath?: string;
+  readonly methods?: readonly string[];
 }
 
 export interface LoadedBehavior {

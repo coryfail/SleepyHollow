@@ -6,7 +6,7 @@ Approved acceptance criteria become failing tests before implementation begins.
 
 Every approved criterion maps to at least one test, and every governed
 acceptance test maps back to an approved criterion. In a consuming application,
-import the public testing entry point and use the framework 0.3.4
+import the public testing entry point and use the framework 0.3.5
 `CriterionTestSpec` shape. `criteria` is an array and `sourcePath` is the
 project-relative path of the test file:
 
@@ -33,39 +33,41 @@ evidence with valid exact-content approval.
 Cover the happy path, each declared failure, boundaries, security behavior, and
 side effects. An unmapped criterion blocks implementation.
 
-## Vitest and the hollow CLI in framework 0.3.4
+## Vitest and the hollow CLI in framework 0.3.5
 
-`criterionTest` registers a named test with Vitest and returns traceability
-metadata in the current process. It does not, by itself, write a
-`sleepy-hollow-test-manifest/v1` file for the CLI to discover.
+`criterionTest` registers a named test with Vitest and carries the same
+traceability metadata into the CLI's discovery manifest. `hollow test` imports
+test modules containing a direct `criterionTest(...)` registration, without
+executing their test bodies, then runs the selected source files through
+Vitest. It persists `generated/test-manifest.json` and
+`generated/test-results.json`; `hollow check` loads those artifacts.
 
-The public 0.3.4 project adapter has a known gap: `hollow test` and `hollow
-check` do not execute the test modules to discover their `criterionTest`
-registries, and their default evidence loaders currently expose an empty test
-manifest and no test results. The native runner and verifier can consume a
-manifest when a host supplies one, but the generated project scaffold does not
-yet provide that bridge. Consequently, a direct Vitest pass is useful behavior
-evidence but cannot close criterion traceability by itself; `hollow check` may
-report `SH_CHECK_CRITERION_UNMAPPED` even when the Vitest test passed.
+Discovery scans the project `tests/` and API roots (and the corresponding roots
+for declared services). Ordinary Vitest-only files such as scaffold smoke tests
+are ignored during discovery, so they remain safe to import only under Vitest.
+Use a direct `criterionTest(...)` call in every governed source file. Indirect
+wrappers that hide the call from source discovery are not part of the current
+adapter contract.
 
-The reliable workflow against 0.3.4 is:
+The reliable Node/Bun workflow is:
 
 1. Keep every criterion test mapped with the public `criterionTest` API above.
-2. Run `npm run check` and `npm run test` (or the equivalent Bun commands) so
-   TypeScript and Vitest exercise the actual application behavior.
-3. Use capture-aware tests that exercise discovered routes and persist a current
-   `generated/capture.json`. The generated scaffold's capture helper only writes
-   an empty artifact; it is a placeholder and does not observe routes or data
-   operations until the project wires those hooks in.
-4. Run `hollow check --json` and treat its diagnostics as authoritative. Do not
-   report `verified` while the manifest/runner bridge or required capture
-   evidence is missing; record the limitation and the exact diagnostic instead.
+2. Run `hollow test --json`. It discovers the governed registrations, executes
+   them with Vitest's TAP-flat reporter, and persists the two test evidence
+   artifacts. A missing `generated/capture.json` is still reported separately;
+   route and data verification requires capture-aware tests to write it.
+3. Run `hollow check --json`. It loads the persisted manifest/results, the
+   configured application requirement, endpoint requirements, and route
+   ownership before evaluating approval, dependency, traceability, schema,
+   security, and capture evidence.
+4. Also run `npm run check` and the project's direct Vitest suite (or the Bun
+   equivalents) when handing off the change. A passing direct Vitest run does
+   not replace `hollow check`'s independent evidence gate.
 
-This limitation also means `hollow test` is not currently a substitute for
-Vitest in a newly scaffolded project: without a supplied manifest it has no
-governed tests to select. It is a framework integration gap, not a reason to
-weaken criterion mappings or claim that a passing direct test closed independent
-verification.
+Known limitations: discovery does not execute test bodies, does not infer
+criterion mappings from ordinary Vitest names, and does not synthesize route or
+data capture. The project test must still persist a current
+`generated/capture.json` for observed behavior checks to pass.
 
 ## Red state
 

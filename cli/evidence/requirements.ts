@@ -2,6 +2,7 @@ import { platform } from "#platform";
 import {
   parseRequirement,
   PlanningError,
+  type RequirementKind,
 } from "../../skills/sleepy-hollow/planning/mod.ts";
 import { EvidenceError } from "./evidence_error.ts";
 import type {
@@ -17,6 +18,7 @@ interface DiscoveredFile {
   readonly absolutePath: string;
   readonly serviceId?: string;
   readonly legacy: boolean;
+  readonly kind: RequirementKind;
 }
 
 function issue(
@@ -33,6 +35,7 @@ async function collect(
   absoluteRoot: string,
   displayRoot: string,
   serviceId: string | undefined,
+  kind: RequirementKind,
   options: EvidenceLoadOptions,
 ): Promise<readonly DiscoveredFile[]> {
   const list = options.listDirectory ?? (async (path: string) => {
@@ -71,6 +74,7 @@ async function collect(
           path: nextDisplay,
           absolutePath: nextAbsolute,
           legacy: entry.name === "requirements.md",
+          kind,
           ...(serviceId ? { serviceId } : {}),
         });
       }
@@ -99,18 +103,47 @@ export async function requirements(
     }];
 
   const files: DiscoveredFile[] = [];
+  files.push({
+    path: project.requirementsFile,
+    absolutePath: `${project.projectRoot}/${project.requirementsFile}`,
+    legacy: project.requirementsFile.endsWith("requirements.md"),
+    kind: "application",
+  });
+  for (const service of project.services) {
+    const absolutePath = `${project.projectRoot}/${service.requirementsPath}`;
+    try {
+      await platform.lstat(absolutePath);
+      files.push({
+        path: service.requirementsPath,
+        absolutePath,
+        legacy: service.requirementsPath.endsWith("requirements.md"),
+        kind: "application",
+      });
+    } catch (error) {
+      if (!platform.isNotFound(error)) throw error;
+    }
+  }
   for (const root of roots) {
     files.push(
-      ...await collect(root.absolute, root.display, root.serviceId, options),
+      ...await collect(
+        root.absolute,
+        root.display,
+        root.serviceId,
+        "endpoint",
+        options,
+      ),
     );
   }
-  files.sort((left, right) => left.path.localeCompare(right.path));
+  const uniqueFiles = [...new Map(
+    files.map((file) => [file.absolutePath, file]),
+  ).values()];
+  uniqueFiles.sort((left, right) => left.path.localeCompare(right.path));
 
   const diagnostics: EvidenceDiagnostic[] = [];
   const loaded: LoadedRequirement[] = [];
   const seen = new Map<string, string>();
 
-  for (const file of files) {
+  for (const file of uniqueFiles) {
     if (file.legacy) {
       diagnostics.push(issue(
         "SH_EVIDENCE_REQUIREMENT_LEGACY_FILENAME",
@@ -134,7 +167,7 @@ export async function requirements(
     }
     let parsed;
     try {
-      parsed = parseRequirement(source, file.path, "endpoint");
+      parsed = parseRequirement(source, file.path, file.kind);
     } catch (error) {
       if (error instanceof PlanningError) {
         for (const item of error.diagnostics) {
@@ -190,6 +223,19 @@ export async function requirements(
       path: file.path,
       ...(file.serviceId ? { serviceId: file.serviceId } : {}),
       approvalBound,
+      redStateValid: parsed.redStateValid,
+      ...(file.kind === "endpoint"
+        ? {
+          routePath: typeof parsed.metadata.path === "string"
+            ? parsed.metadata.path
+            : undefined,
+          methods: Array.isArray(parsed.metadata.methods)
+            ? parsed.metadata.methods.filter(
+              (method): method is string => typeof method === "string",
+            )
+            : undefined,
+        }
+        : {}),
     });
   }
 
@@ -208,7 +254,9 @@ export async function requirements(
       criteria: item.criteria,
       ...(item.approval ? { approval: item.approval } : {}),
       path: item.path,
-      redStateValid: false,
+      redStateValid: item.redStateValid,
+      ...(item.routePath ? { routePath: item.routePath } : {}),
+      ...(item.methods ? { methods: item.methods } : {}),
     })),
   };
 }

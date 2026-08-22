@@ -454,6 +454,38 @@ readability; no other digest normalization is permitted.
 
 - Status: not applicable until delivery is authorized and attempted.
 
+### Implementation, 0.3.5 evidence loading repair
+
+- Status: implemented.
+- Recorded at: 2026-08-21.
+- Result: `requirements()` now includes the configured application requirement,
+  `routes()` derives endpoint ownership from approved path and method metadata,
+  `checkLoader()` loads persisted test manifests and results, and requirement
+  parsing exposes independent red-state validity. Criterion registrations are
+  discovered through the published testing entry point without executing the
+  native runner during inventory loading.
+- Approval parsing now selects the latest append-only approval record, including
+  named headings such as `### Approval, current implementation`.
+- Regression coverage: `cli/evidence/evidence_regression_test.ts` covers
+  application dependency resolution, route ownership, criterion discovery,
+  persisted evidence loading, a native Vitest smoke run, and a passing
+  `hollow check` against the resulting artifacts.
+
+### Verification, 0.3.5 evidence loading repair
+
+- Status: passed.
+- Verified at: 2026-08-21.
+- Command: `npm run check`, the complete Vitest suite, and the focused
+  evidence regression suite.
+- Result: `228 passed | 6 skipped` in the complete suite; the focused smoke
+  executed the native TAP-flat Vitest runner, persisted both test artifacts,
+  and returned a passing check result.
+- Residual risk: test discovery imports only files containing a direct
+  `criterionTest(...)` call so scaffold-only Vitest tests are not evaluated
+  outside Vitest. Projects using an indirect registration wrapper must expose a
+  direct governed registration or provide an equivalent documented discovery
+  adapter.
+
 ### Approval, Node/Bun platform migration
 
 - Status: approved.

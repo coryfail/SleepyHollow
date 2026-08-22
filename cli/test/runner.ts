@@ -45,7 +45,7 @@ export function invocation(
   const args = [
     "./node_modules/vitest/vitest.mjs",
     "run",
-    "--reporter=verbose",
+    "--reporter=tap-flat",
     ...(plan.filter ? ["--testNamePattern", plan.filter] : []),
     ...files,
   ];
@@ -106,11 +106,20 @@ function parseTap(
   );
   const events: RawTestEvent[] = [];
   for (const line of lines) {
-    const matched = line.match(/^(ok|not ok) \d+ - (.*?)(?: # (SKIP).*)?$/i);
+    const matched = line.match(
+      /^(ok|not ok) \d+ - (.*?)(?:\s+#\s+(SKIP)\b.*|\s+#\s+.*)?$/i,
+    );
     if (!matched) continue;
-    const name = matched[2];
+    const rawName = matched[2];
+    const separator = rawName.indexOf(" > ");
+    const file = separator >= 0
+      ? rawName.slice(0, separator)
+      : byName.get(rawName) ?? "<runner>";
+    const name = separator >= 0
+      ? rawName.slice(separator + 3)
+      : rawName;
     events.push({
-      file: byName.get(name) ?? "<runner>",
+      file,
       name,
       status: matched[3]?.toUpperCase() === "SKIP"
         ? "skipped"

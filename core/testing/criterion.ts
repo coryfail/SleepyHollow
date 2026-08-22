@@ -11,6 +11,30 @@ import type {
   TestManifest,
 } from "./types.ts";
 
+/**
+ * Internal hook used by the CLI to inspect criterion registrations without
+ * executing the native test runner. Symbol.for keeps the hook shared when a
+ * project imports the published testing entry point.
+ */
+export const CRITERION_TEST_DISCOVERY = Symbol.for(
+  "sleepy-hollow.criterion-test-discovery",
+);
+
+export interface CriterionTestDiscovery {
+  readonly onRegistered: (descriptor: CriterionTestDescriptor) => void;
+}
+
+function discoveryHook(): CriterionTestDiscovery | undefined {
+  const value = (globalThis as unknown as Record<symbol, unknown>)[
+    CRITERION_TEST_DISCOVERY
+  ];
+  if (!value || typeof value !== "object") return undefined;
+  const onRegistered = (value as { onRegistered?: unknown }).onRegistered;
+  return typeof onRegistered === "function"
+    ? value as CriterionTestDiscovery
+    : undefined;
+}
+
 const stableId = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 const criterionId = /^AC-[A-Z0-9]+(?:-[A-Z0-9]+)*$/;
 
@@ -37,7 +61,10 @@ export function createRegistry(options: {
   readonly register?: (definition: { readonly name: string; readonly fn: (context?: unknown) => void | Promise<void>; readonly skip?: boolean }) => void;
 }): CriterionTestRegistry {
   const requirements = validateRequirements(options.requirements);
-  const register = options.register ?? ((definition) => test(definition.name, { skip: definition.skip }, definition.fn));
+  const register = options.register ?? ((definition) => {
+    if (discoveryHook()) return;
+    test(definition.name, { skip: definition.skip }, definition.fn);
+  });
   const descriptors = new Map<string, CriterionTestDescriptor>();
 
   return Object.freeze({
@@ -147,6 +174,7 @@ export function createRegistry(options: {
         skip: spec.ignore,
       });
       descriptors.set(spec.id, descriptor);
+      discoveryHook()?.onRegistered(descriptor);
       return descriptor;
     },
     descriptors(): readonly CriterionTestDescriptor[] {

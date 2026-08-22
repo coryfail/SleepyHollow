@@ -264,6 +264,7 @@ test("AC-F018-005 · identical content produces identical inventories", async ()
   const second = await loadRequirementEvidence(project, { projectRoot: root });
   assert.equal(JSON.stringify(first), JSON.stringify(second));
   assert.deepEqual(first.requirements.map((item) => item.id), [
+    "bookmarks-application",
     "EP-AUTHORS-CREATE",
     "EP-BOOKMARKS-CREATE",
   ]);
@@ -291,6 +292,7 @@ test("AC-F018-006 · discovery reads only declared locations", async () => {
     },
   });
   assert.deepEqual(inventory.requirements.map((item) => item.id), [
+    "bookmarks-application",
     "EP-BOOKMARKS-CREATE",
   ]);
   assert.ok(read.some((path) => path.includes("/api/bookmarks/")));
@@ -341,10 +343,12 @@ test("AC-NRF-003 · discovery loads multiple named requirements from one directo
     projectRoot: root,
   });
   assert.deepEqual(inventory.requirements.map((item) => item.id), [
+    "bookmarks-application",
     "EP-BOOKMARKS-CREATE",
     "EP-BOOKMARKS-LIST",
   ]);
   assert.deepEqual(inventory.requirements.map((item) => item.path), [
+    "requirements/application.req.md",
     "api/bookmarks/create-bookmark.req.md",
     "api/bookmarks/list-bookmarks.req.md",
   ]);
@@ -643,6 +647,7 @@ test("AC-F018-010 · hollow test runs against a real project through the CLI", a
   const loaded = await loader({ projectRoot: root });
   assert.equal(loaded.projectRootDisplay, root);
   assert.deepEqual(loaded.requirements.map((item) => item.id), [
+    "bookmarks-application",
     "EP-BOOKMARKS-CREATE",
   ]);
 
