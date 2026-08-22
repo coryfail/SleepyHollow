@@ -38,6 +38,7 @@ export interface ParsedRequirement {
   readonly sections: ReadonlyMap<string, string>;
   readonly governedContentDigest: string;
   readonly approval?: RequirementApproval;
+  readonly redStateValid: boolean;
 }
 
 export interface EndpointProposal {

@@ -2,6 +2,16 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.3.5 - 2026-08-21
+
+### Fixed: governed test evidence loading
+
+`hollow test` now discovers `criterionTest(...)` registrations and persists
+the manifest and results consumed by `hollow check`. Verification also includes
+the configured application requirement, derives endpoint ownership, and honors
+the latest append-only approval record. Native Vitest evidence uses the
+TAP-flat reporter.
+
 ## 0.3.4 - 2026-08-21
 
 ### Fixed: development server lifecycle

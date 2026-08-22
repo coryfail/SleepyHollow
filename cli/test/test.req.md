@@ -429,6 +429,27 @@ other digest normalization is permitted.
 - Status: not applicable; no commit, push, publication, deployment, or external
   mutation was authorized or attempted.
 
+### Implementation, 0.3.5 evidence persistence repair
+
+- Status: implemented.
+- Recorded at: 2026-08-21.
+- Result: `hollow test` now discovers `criterionTest(...)` registrations,
+  runs the selected files through Vitest's TAP-flat reporter, and persists
+  `generated/test-manifest.json` plus `generated/test-results.json` for
+  `hollow check`.
+- Regression coverage: the evidence regression fixture runs the native runner
+  and then verifies that the persisted artifacts produce a passing check.
+
+### Verification, 0.3.5 evidence persistence repair
+
+- Status: passed.
+- Verified at: 2026-08-21.
+- Command: `npm run check`, the complete Vitest suite, and the focused evidence
+  regression smoke.
+- Result: `228 passed | 6 skipped` in the complete suite; the native smoke
+  selected and passed both governed criterion tests and persisted consumable
+  evidence.
+
 ### Approval, Node/Bun platform migration
 
 - Status: approved.

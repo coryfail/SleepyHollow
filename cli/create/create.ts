@@ -7,7 +7,7 @@ import {
   type CreationResult,
 } from "./types.ts";
 
-const VERSION = "0.3.4";
+const VERSION = "0.3.5";
 const NAME = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
 function files(name: string): Readonly<Record<string, string>> {
@@ -68,7 +68,7 @@ function files(name: string): Readonly<Record<string, string>> {
     "generated/.gitkeep": "",
     "models/.gitkeep": "",
     "requirements/application.req.md":
-      `---\nschema: sgad-application/v0.2\nid: ${name}-application\ntitle: ${name}\nstatus: draft\nrisk: standard\ndepends_on: []\nowners:\n  - application owner\n---\n\n# Application requirements\n\nUse the official Sleepy Hollow skill to replace this planning placeholder with\nthe complete application requirements before generating endpoints.\n`,
+      `---\nschema: sgad-application/v0.2\nid: ${name}-application\ntitle: ${name}\nstatus: draft\nrisk: standard\ndepends_on: []\nowners:\n  - application owner\n---\n\n# Application requirements\n\nUse the official Sleepy Hollow skill to replace this planning placeholder with\nthe complete application requirements before generating endpoints.\n\n## Cross-cutting acceptance criteria\n\n- AC-APP-PLACEHOLDER-001: The application requirements are completed and approved before implementation.\n\n## Governance record\n`,
     "sleepyhollow.config.ts":
       `import { defineProject } from "./.sleepyhollow/project.ts";\n\nexport default defineProject(\n  {\n    name: "${name}",\n    apiDirectory: "api",\n    requirementsFile: "requirements/application.req.md",\n    generatedDirectory: "generated",\n  } satisfies import("./.sleepyhollow/project.ts").SleepyHollowProject,\n);\n`,
     "tests/scaffold_test.ts":
@@ -95,7 +95,7 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-export const FRAMEWORK_VERSION = "0.3.4";
+export const FRAMEWORK_VERSION = "0.3.5";
 
 export async function createProject(
   options: CreateProjectOptions,

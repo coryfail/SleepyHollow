@@ -320,10 +320,11 @@ function approvalOf(
   criteria: readonly AcceptanceCriterion[],
 ): RequirementApproval | undefined {
   const governance = source.slice(source.indexOf("## Governance record"));
-  const approvalStart = governance.indexOf("### Approval");
-  if (approvalStart < 0) return undefined;
+  const approvals = [...governance.matchAll(/^### Approval[^\r\n]*\r?$/gm)];
+  const latest = approvals.at(-1);
+  if (!latest || latest.index === undefined) return undefined;
   const approvalRemainder = governance.slice(
-    approvalStart + "### Approval".length,
+    latest.index + latest[0].length,
   );
   const next = approvalRemainder.search(/^### /m);
   const approval = next < 0
@@ -339,7 +340,7 @@ function approvalOf(
   const recordedDigest = /sha256:([a-f0-9]{64})/.exec(approval)?.[1];
   const decisionSource = /- Decision source:\s*([\s\S]*?)(?=\r?\n- [A-Z]|$)/
     .exec(approval)?.[1]
-    ?.replace(/\r?\n\s+/g, " ").replace(/\.$/, "");
+    ?.replace(/\r?\n\s+/g, " ").trim().replace(/\.$/, "");
   const approvedCriteria = criteria.filter((item) =>
     criterionText.includes(item.id)
   ).map((item) => item.id);
@@ -355,6 +356,22 @@ function approvalOf(
     decisionSource: decisionSource ?? "",
     valid,
   };
+}
+
+function redStateValid(source: string): boolean {
+  const governance = source.slice(source.indexOf("## Governance record"));
+  const records = [
+    ...governance.matchAll(/^### Red-state evidence[^\r\n]*\r?$/gm),
+  ];
+  const latest = records.at(-1);
+  if (!latest || latest.index === undefined) return false;
+  const remainder = governance.slice(latest.index + latest[0].length);
+  const next = remainder.search(/^### /m);
+  const record = next < 0 ? remainder : remainder.slice(0, next);
+  return /- Status:\s*(?:credible red state captured|failed as expected)\./i
+      .test(record) &&
+    /- (?:Base revision|Observed at):\s*\S+/i.test(record) &&
+    /- Result:\s*\S+/i.test(record);
 }
 
 export function parseRequirementDocument(
@@ -552,5 +569,6 @@ export function parseRequirementDocument(
     sections,
     governedContentDigest,
     approval,
+    redStateValid: redStateValid(source),
   };
 }

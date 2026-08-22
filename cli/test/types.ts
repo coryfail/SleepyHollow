@@ -22,6 +22,8 @@ export interface TestIsolationPolicy {
 
 export interface TestCommandInventory {
   readonly captureArtifactPath?: string;
+  readonly manifestPath?: string;
+  readonly resultsPath?: string;
   readonly projectRootDisplay: string;
   readonly requirements: readonly RequirementEvidence[];
   readonly dependencyGraph: readonly RequirementDependency[];

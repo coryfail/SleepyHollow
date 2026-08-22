@@ -10,8 +10,16 @@ import { platform } from "#platform";
  * @module
  */
 import { problem, testApplication } from "./application.ts";
-import { createRegistry, manifest } from "./criterion.ts";
+import {
+  createRegistry,
+  CRITERION_TEST_DISCOVERY,
+  manifest,
+} from "./criterion.ts";
 export { TestingError } from "./error.ts";
+export {
+  CRITERION_TEST_DISCOVERY,
+  type CriterionTestDiscovery,
+} from "./criterion.ts";
 import { redState } from "./red_state.ts";
 import { selection } from "./selection.ts";
 import { traceability } from "./traceability.ts";

@@ -6,10 +6,41 @@ import { renderHuman, renderJson } from "./render.ts";
 import type {
   RequestedTestScope,
   TestCommandIo,
+  TestCommandInventory,
   TestCommandResult,
   TestInventoryLoader,
   TestRunner,
 } from "./types.ts";
+
+async function persistEvidence(
+  inventory: TestCommandInventory,
+  result: TestCommandResult,
+): Promise<void> {
+  if (!inventory.manifestPath || !inventory.resultsPath) return;
+  const results = result.tests
+    .filter((test) => !test.id.startsWith("unmapped:"))
+    .map((test) => ({
+      testId: test.id,
+      status: test.status === "unmapped" ? "failed" as const : test.status,
+      ...(test.durationMs === null ? {} : { durationMs: test.durationMs }),
+      ...(test.evidence ? { evidence: test.evidence } : {}),
+    }));
+  await platform.mkdir(inventory.manifestPath.slice(
+    0,
+    inventory.manifestPath.lastIndexOf("/"),
+  ), { recursive: true });
+  await platform.writeTextFile(
+    inventory.manifestPath,
+    `${JSON.stringify(inventory.manifest, null, 2)}\n`,
+  );
+  await platform.writeTextFile(
+    inventory.resultsPath,
+    `${JSON.stringify({
+      schema: "sleepy-hollow-test-results/v1",
+      results,
+    }, null, 2)}\n`,
+  );
+}
 
 function parse(args: readonly string[]): {
   readonly json: boolean;
@@ -166,7 +197,8 @@ export async function execute(
   } catch {
     return emit(loadFailure(parsed.scope), parsed.json, io);
   }
-  const capturePath = `${io.cwd}/generated/capture.json`;
+  const capturePath = inventory.captureArtifactPath ??
+    `${io.cwd}/generated/capture.json`;
   inventory = { ...inventory, captureArtifactPath: capturePath };
   const testPlan = plan(inventory, parsed.scope);
   if (testPlan.diagnostics.some((item) => item.severity === "error")) {
@@ -219,6 +251,28 @@ export async function execute(
     };
   }
   const normalized = normalizeRunnerResult(testPlan, inventory, runnerResult);
+  let persistedResult = normalized;
+  if (inventory.manifestPath && inventory.resultsPath) {
+    try {
+      await persistEvidence(inventory, normalized);
+    } catch {
+      persistedResult = {
+        ...normalized,
+        ok: false,
+        diagnostics: [
+          ...normalized.diagnostics,
+          {
+            code: "SH_TEST_EVIDENCE_NOT_PERSISTED",
+            severity: "error" as const,
+            summary:
+              "The test run completed but governed test evidence could not be persisted.",
+            correction:
+              "Repair the generated directory and rerun hollow test before checking the project.",
+          },
+        ],
+      };
+    }
+  }
   let persisted = true;
   try {
     await platform.stat(capturePath);
@@ -226,8 +280,8 @@ export async function execute(
     persisted = false;
   }
   return emit(
-    persisted ? normalized : {
-      ...normalized,
+    persisted ? persistedResult : {
+      ...persistedResult,
       diagnostics: [
         ...normalized.diagnostics,
         {

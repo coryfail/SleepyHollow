@@ -144,7 +144,7 @@ export function inventoryFromRoutes(
   return {
     serviceId: options.serviceId,
     title: options.title ?? options.serviceId,
-    version: options.version ?? "0.3.4",
+    version: options.version ?? "0.3.5",
     ...(options.description ? { description: options.description } : {}),
     operations,
     securitySchemes: options.securitySchemes ?? {},

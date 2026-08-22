@@ -173,7 +173,7 @@ test("AC-F016-001 · full tests run natively in isolated test mode", async () =>
   assert.deepEqual(invocation.args.slice(0, 3), [
     "./node_modules/vitest/vitest.mjs",
     "run",
-    "--reporter=verbose",
+    "--reporter=tap-flat",
   ]);
   assert.ok(invocation.args.includes("tests/base_test.ts"));
 
