@@ -150,6 +150,28 @@ Implement the smallest change that satisfies the approved contract, then rerun
 the mapped tests. Do not expand scope beyond approved criteria while
 implementing.
 
+## Smoke test after green
+
+After the mapped unit tests pass, run a smoke test when the environment permits
+it. Exercise the changed behavior through the public boundary rather than only
+calling an internal helper: for an API route, start the local server with
+`hollow dev` and make a real HTTP request to the changed method and path; for a
+non-server change, use the closest supported public entry point. Check the
+status, response shape, and the most important changed behavior. Stop the
+server cleanly after the request.
+
+A smoke test is supplemental evidence, not a replacement for the governed
+test workflow. If the environment cannot start the server or provide a safe
+public-boundary fixture, record why the smoke test was not possible and do not
+claim that it passed. The normal handoff order is:
+
+```bash
+npm run verify
+# smoke test the changed public behavior when possible
+npx hollow test
+npx hollow check
+```
+
 ## Bounded repair
 
 When a test fails after implementation, repair the implementation. Do not edit

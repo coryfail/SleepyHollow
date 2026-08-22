@@ -87,9 +87,11 @@ identifies the approved missing behavior. If the baseline fails for an unrelated
 reason, stop and report it: that is a broken baseline, not red state.
 
 Implement the smallest behavior that satisfies the approved contract, then rerun
-the mapped tests. Read [references/tdd.md](references/tdd.md) for the mapping
-and red-state rules, [references/security.md](references/security.md) for
-required request, response, and authorization behavior, and relational resource
+the mapped tests. After the unit tests pass, exercise the changed behavior with
+a smoke test through the public API boundary when the environment permits it.
+Read [references/tdd.md](references/tdd.md) for the mapping, red-state, and
+smoke-test rules, [references/security.md](references/security.md) for required
+request, response, and authorization behavior, and relational resource
 definitions for bounded, index-compatible data access.
 
 ### 5. Verify independently
