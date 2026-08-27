@@ -390,6 +390,64 @@ test("AC-F006-010 · malformed and duplicate criteria report source locations", 
   );
 });
 
+test("AC-F006-011 · model requirements use the governed model format", () => {
+  const source = `---
+schema: sgad-model/v0.1
+id: MODEL-BOOKMARK
+model: bookmark
+status: draft
+persistence: drizzle
+database: postgres
+depends_on:
+  - bookmark-application
+owners:
+  - application owner
+---
+
+# Bookmark model
+
+## Purpose
+Persist bookmarks.
+
+## Fields
+Identifier and URL.
+
+## Relationships
+Owned by an account.
+
+## Constraints and indexes
+Unique identifier and owner index.
+
+## Data access
+Bounded reads by identifier or owner.
+
+## Retention and deletion
+Retained until owner deletion.
+
+## Security
+URLs are not treated as credentials.
+
+## Migration strategy
+Drizzle owns forward migrations.
+
+## Acceptance criteria
+- AC-MODEL-BOOKMARK-001: Bookmark identifiers are unique.
+
+## Governance record
+`;
+  const parsed = parseRequirement(
+    source,
+    "models/bookmark/bookmark.req.md",
+    "model",
+  );
+
+  assert.equal(parsed.kind, "model");
+  assert.equal(parsed.metadata.model, "bookmark");
+  assert.deepEqual(parsed.criteria.map((item) => item.id), [
+    "AC-MODEL-BOOKMARK-001",
+  ]);
+});
+
 test("AC-F006-008 · the latest append-only approval supersedes an invalidated approval", () => {
   const prefix = governedPrefix("approved");
   const approved = `- Status: approved.

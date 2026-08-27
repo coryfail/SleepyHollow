@@ -8,7 +8,7 @@ export const CLI_COMMANDS = [
   "deploy",
 ] as const;
 
-export const CLI_VERSION = "0.3.6";
+export const CLI_VERSION = "0.4.0";
 
 export type CliCommandName = typeof CLI_COMMANDS[number];
 

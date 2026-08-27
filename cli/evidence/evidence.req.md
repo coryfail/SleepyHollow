@@ -175,6 +175,14 @@ selection, and delivery rules shall remain unchanged.
   inventory.
 - AC-F018-011: `hollow deploy` run against a real verified project assembles a
   deployment plan without a caller-supplied inventory.
+- AC-F018-016: Evidence loading discovers governed model requirements and emits
+  deterministic source-standard violations for model layout, Drizzle adoption,
+  route data access, function documentation, multi-line bodies, and line length.
+- AC-F018-017: Evidence loading emits deterministic source-standard violations
+  for explicit `any`, non-null assertions, unchecked TypeScript directives,
+  blanket or unexplained lint suppressions, console use, empty catch blocks,
+  functions over four parameters or 40 executable lines, complexity over 10,
+  and control-flow nesting deeper than three levels.
 
 ## Out of scope
 
@@ -496,3 +504,42 @@ readability; no other digest normalization is permitted.
   `sha256:a9c477022d0f218ddccd8589a32b2cfae0cb7ce29aff935450e249241e8c77be`.
 - Decision source: owner direct response `approve it all`, immediately after
   review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Approval, source standards evidence
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T17:49:55Z.
+- Approved criteria: AC-F018-001, AC-F018-002, AC-F018-003, AC-F018-004,
+  AC-F018-005, AC-F018-006, AC-F018-007, AC-F018-008, AC-F018-009,
+  AC-F018-010, AC-F018-011, AC-F018-012, AC-F018-013, AC-F018-014,
+  AC-F018-015, AC-F018-016.
+- Governed-content digest:
+  `sha256:83bdd57ccad14a97c21f90cab585d103c21e6103cfb6c46ead55472898f3f3ad`.
+- Decision source: owner direct response `Do it` after approving the proposed
+  Drizzle, model ownership, repository boundary, and code-quality standards.
+
+### Criterion mapping, source standards evidence
+
+- AC-F018-016 -> `cli/evidence/standards_test.ts` failing and conforming model
+  architecture fixtures.
+
+### Approval, expanded application source standards
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T18:23:59Z.
+- Approved criteria: AC-F018-001, AC-F018-002, AC-F018-003, AC-F018-004,
+  AC-F018-005, AC-F018-006, AC-F018-007, AC-F018-008, AC-F018-009,
+  AC-F018-010, AC-F018-011, AC-F018-012, AC-F018-013, AC-F018-014,
+  AC-F018-015, AC-F018-016, AC-F018-017.
+- Governed-content digest:
+  `sha256:ce783890ef43bf94239913d7d1a7dd193ff06f30e2f301c0bc6a91d8f74073f7`.
+- Decision source: owner direct response `Let's do it` after specifying that the
+  proposed code standards are the baseline for AI-generated and human-authored
+  applications built with the framework and skill.
+
+### Criterion mapping, expanded application source standards
+
+- AC-F018-017 -> `cli/evidence/standards_test.ts` unsafe type, suppression,
+  console, empty-catch, parameter, length, complexity, and nesting fixture.

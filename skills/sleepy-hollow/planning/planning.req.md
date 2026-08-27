@@ -29,6 +29,7 @@ before Sleepy Hollow generates tests or application behavior.
 
 - Comprehensive application requirements.
 - Endpoint-level decomposition and shared model or policy requirements.
+- Governed model requirements and model-to-endpoint dependency ownership.
 - Structure-first API scaffolding.
 - Stable frontmatter, acceptance identifiers, dependencies, and lifecycle state.
 - Storage-neutral governance references and lifecycle-status projections.
@@ -54,8 +55,9 @@ the exact application requirement for review and shall not decompose it until a
 valid approval record binds its current governed-content digest.
 
 After application approval, decomposition shall create the complete proposed API
-directory structure and named `<requirement-id>.req.md` files in endpoint directories without
-creating tests, route implementations, or generated contracts. Shared contracts
+directory structure, one `models/<model>/<model>.req.md` per model, and named
+`<requirement-id>.req.md` files in endpoint directories without creating tests,
+model source, route implementations, or generated contracts. Shared contracts
 shall live in colocated shared model or policy requirements. The skill shall
 present the endpoint inventory and dependency order before requesting endpoint
 decisions.
@@ -143,6 +145,10 @@ lifecycle projection; it is not sole approval authority or verification evidence
   application requirement and identifies the conflicting source text.
 - AC-F006-010: The requirement parser preserves stable criterion identifiers and
   reports malformed or duplicate identifiers with file locations.
+- AC-F006-011: Every proposed model has a parseable
+  `models/<model>/<model>.req.md` using `sgad-model/v0.1` and the mandatory data,
+  security, migration, and acceptance-criteria sections before model source is
+  created.
 
 ## Out of scope
 
@@ -250,3 +256,21 @@ other digest normalization is permitted.
 
 - Status: not applicable; no commit, push, publication, or deployment was
   authorized or attempted.
+
+### Approval, governed model requirements
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T17:49:55Z.
+- Approved criteria: AC-F006-001, AC-F006-002, AC-F006-003, AC-F006-004,
+  AC-F006-005, AC-F006-006, AC-F006-007, AC-F006-008, AC-F006-009,
+  AC-F006-010, AC-F006-011.
+- Governed-content digest:
+  `sha256:782f4c86b9e980011b1141f82794c882e13e20e6940c288f31a6bb014c95e419`.
+- Decision source: owner direct response `Do it` after approving the proposed
+  Drizzle, model ownership, repository boundary, and code-quality standards.
+
+### Criterion mapping, governed model requirements
+
+- AC-F006-011 -> `skills/sleepy-hollow/planning/planning_test.ts` governed model
+  requirement parser test.

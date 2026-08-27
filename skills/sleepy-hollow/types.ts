@@ -46,6 +46,28 @@ export interface AuthenticationPlan {
   readonly unauthorizedBehavior?: string;
 }
 
+/** Records the persistence choice made during application planning. */
+export interface PersistencePlan {
+  /** Whether application data must survive a request or process restart. */
+  readonly durableData: boolean;
+  /** The data-access approach selected for the application. */
+  readonly orm: "drizzle" | "none" | "alternative";
+  /** The supported relational database profile, when durable data exists. */
+  readonly adapter?: "sqlite" | "postgres";
+  /** Confirms that a human approved a non-Drizzle persistence approach. */
+  readonly humanApprovedAlternative?: boolean;
+  /** Identifies the human decision that approved the alternative. */
+  readonly approvalSource?: string;
+}
+
+/** Captures the code-quality evidence required before verification. */
+export interface CodeQualityVerification {
+  /** The project formatter result for the current revision. */
+  readonly formatter: "passed" | "failed" | "not-run";
+  /** The project linter result for the current revision. */
+  readonly linter: "passed" | "failed" | "not-run";
+}
+
 export type WorkflowPhase =
   | "discovery"
   | "application-review"

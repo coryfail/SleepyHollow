@@ -4,6 +4,7 @@ import type { TestCommandInventory } from "../test/mod.ts";
 import { capture, routes } from "./behavior.ts";
 import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
+import { standards } from "./standards.ts";
 import {
   discoverTestEvidence,
   readTestEvidence,
@@ -19,8 +20,11 @@ export async function inventory(
   project: ProjectLocations,
   options: EvidenceCaptureOptions,
 ): Promise<EvidenceVerificationInventory> {
-  const artifact = await capture(project, options);
-  const governed = await requirements(project, options);
+  const [artifact, governed, codeStandards] = await Promise.all([
+    capture(project, options),
+    requirements(project, options),
+    standards(project),
+  ]);
   const discovered = await routes(project, artifact, governed.requirements);
   return {
     projectRootDisplay: project.projectRoot,
@@ -54,6 +58,7 @@ export async function inventory(
         ? { rawJustification: operation.rawJustification }
         : {}),
     })),
+    codeStandards,
   };
 }
 
@@ -109,6 +114,7 @@ export async function checkLoader(
     typecheck: { status: "passed", evidence: "loaded from project evidence" },
     testRunner: { status: "passed", evidence: "loaded from project evidence" },
     configurationDiagnostics: [],
+    codeStandards: evidence.codeStandards,
     capture: {
       present: true,
       uncapturedRoutes: evidence.uncapturedRoutes,

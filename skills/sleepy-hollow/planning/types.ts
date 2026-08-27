@@ -1,4 +1,4 @@
-export type RequirementKind = "application" | "endpoint";
+export type RequirementKind = "application" | "endpoint" | "model";
 export type RequirementStatus = "draft" | "approved" | "verified";
 
 export interface PlanningDiagnostic {

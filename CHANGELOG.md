@@ -2,6 +2,23 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.4.0 - 2026-08-27
+
+### Added: governed persistence architecture and shared engineering standards
+
+Drizzle is now the default for durable application data unless an exact
+human-approved alternative is recorded. Every persistent model owns a governed
+requirement, schema, repository, and public types, while route handlers are kept
+outside the database boundary.
+
+The official skill and generated applications now share one engineering
+standard for AI-generated and human-authored code. New projects include a human
+`CONTRIBUTING.md`, Prettier, typed ESLint 10, stricter TypeScript settings, and
+ordered quality gates. `hollow check` independently reports missing function
+documentation, compressed source, unsafe type escapes, unchecked suppressions,
+console use, empty catches, excessive parameters, long functions, complexity,
+nesting, model-layout drift, and direct route persistence access.
+
 ## 0.3.6 - 2026-08-21
 
 ### Changed: skill verification guidance and release surfaces

@@ -12,6 +12,8 @@ delimiter are invalid.
   item in the top-level `requirements/` directory.
 - A component or endpoint uses a meaningful named `*.req.md` file beside the
   behavior it owns. A directory may contain multiple named requirement files.
+- A model uses exactly `models/<model>/<model>.req.md` beside its `schema.ts`,
+  `repository.ts`, and `types.ts` files.
 
 ## Frontmatter
 
@@ -55,7 +57,35 @@ requirement to `draft` and obtain fresh exact-content approval. The migration
 changes governed bytes; changing `status` alone cannot make the old approval
 valid.
 
-The framework 0.3.6 `hollow create` scaffold now emits a matching `tsconfig.json`
+A model requirement uses this exact frontmatter shape:
+
+```yaml
+---
+schema: sgad-model/v0.1
+id: MODEL-BOOKMARK
+model: bookmark
+status: draft
+persistence: drizzle
+database: postgres
+depends_on:
+  - bookmarks-application
+owners:
+  - bookmarks maintainers
+---
+```
+
+Its directory name, filename stem, and `model` value must match. Use these exact
+level-two headings: `Purpose`, `Fields`, `Relationships`, `Constraints and
+indexes`, `Data access`, `Retention and deletion`, `Security`, `Migration
+strategy`, and `Acceptance criteria`.
+
+`persistence: drizzle` requires `database: sqlite` or `database: postgres`. A
+human-approved exception uses `persistence: alternative` and records a
+`persistence_exception` mapping with non-empty `technology`, `reason`,
+`approver`, and `decision_source` values. Because this mapping is governed
+content, the model requirement's exact-content approval binds the exception.
+
+The framework 0.4.0 `hollow create` scaffold now emits a matching `tsconfig.json`
 alongside its `tsc --noEmit` check script. A project created by an older CLI may
 have the script without that file; add or migrate the TypeScript configuration
 before treating a check failure as application behavior or red state.

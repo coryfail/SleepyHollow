@@ -134,6 +134,15 @@ export async function requirements(
       ),
     );
   }
+  files.push(
+    ...await collect(
+      `${project.projectRoot}/models`,
+      "models",
+      undefined,
+      "model",
+      options,
+    ),
+  );
   const uniqueFiles = [...new Map(
     files.map((file) => [file.absolutePath, file]),
   ).values()];

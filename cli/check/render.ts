@@ -3,6 +3,7 @@ import type { CheckLocation, CheckResult } from "./types.ts";
 function location(value: CheckLocation): string {
   return [
     value.path,
+    value.line ? `line ${value.line}` : undefined,
     value.route,
     value.requirementId,
     value.criterionId,

@@ -15,10 +15,14 @@ import {
   MANDATORY_CONSTRAINTS,
   SkillError,
   validateAuthenticationPlan,
+  validateCodeQualityVerification,
+  validatePersistencePlan,
 } from "./mod.ts";
 import type {
   AuthenticationPlan,
+  CodeQualityVerification,
   EndpointWorkRequest,
+  PersistencePlan,
   ProjectInspection,
 } from "./types.ts";
 
@@ -100,6 +104,27 @@ function authenticationPlan(
     csrf: "not applicable to bearer tokens",
     unauthenticatedBehavior: "401 with RFC 9457 problem details",
     unauthorizedBehavior: "403 with RFC 9457 problem details",
+    ...overrides,
+  };
+}
+
+function persistencePlan(
+  overrides: Partial<PersistencePlan> = {},
+): PersistencePlan {
+  return {
+    durableData: true,
+    orm: "drizzle",
+    adapter: "postgres",
+    ...overrides,
+  };
+}
+
+function codeQuality(
+  overrides: Partial<CodeQualityVerification> = {},
+): CodeQualityVerification {
+  return {
+    formatter: "passed",
+    linter: "passed",
     ...overrides,
   };
 }
@@ -223,16 +248,84 @@ test("AC-F009-007 · bounded repair rejects approved-behavior change", () => {
 });
 
 test("AC-F009-008 · verification requires passing independent check evidence", () => {
-  assert.equal(concludeVerification(checkResult(true)), "verified");
+  assert.equal(
+    concludeVerification(checkResult(true), codeQuality()),
+    "verified",
+  );
   assert.throws(
-    () => concludeVerification(undefined),
+    () => concludeVerification(undefined, codeQuality()),
     (error: unknown) =>
       codes(error).includes("SH_SKILL_CHECK_EVIDENCE_REQUIRED"),
   );
   assert.throws(
-    () => concludeVerification(checkResult(false)),
+    () => concludeVerification(checkResult(false), codeQuality()),
     (error: unknown) => codes(error).includes("SH_SKILL_CHECK_FAILED"),
   );
+});
+
+test("AC-F009-013 · durable persistence defaults to Drizzle", () => {
+  validatePersistencePlan(persistencePlan());
+  validatePersistencePlan(persistencePlan({
+    durableData: false,
+    orm: "none",
+    adapter: undefined,
+  }));
+  assert.throws(
+    () => validatePersistencePlan(persistencePlan({ orm: "alternative" })),
+    (error: unknown) =>
+      codes(error).includes("SH_SKILL_DRIZZLE_REQUIRED"),
+  );
+  assert.throws(
+    () =>
+      validatePersistencePlan(persistencePlan({
+        orm: "alternative",
+        humanApprovedAlternative: true,
+      })),
+    (error: unknown) =>
+      codes(error).includes("SH_SKILL_PERSISTENCE_APPROVAL_SOURCE_REQUIRED"),
+  );
+  validatePersistencePlan(persistencePlan({
+    orm: "alternative",
+    humanApprovedAlternative: true,
+    approvalSource: "Owner explicitly approved Prisma for this application.",
+  }));
+});
+
+test("AC-F009-014 · verification requires formatter and linter evidence", () => {
+  validateCodeQualityVerification(codeQuality());
+  assert.throws(
+    () => validateCodeQualityVerification(codeQuality({ formatter: "not-run" })),
+    (error: unknown) =>
+      codes(error).includes("SH_SKILL_FORMAT_CHECK_REQUIRED"),
+  );
+  assert.throws(
+    () => concludeVerification(checkResult(true), codeQuality({ linter: "failed" })),
+    (error: unknown) => codes(error).includes("SH_SKILL_LINT_FAILED"),
+  );
+});
+
+test("AC-F009-015 AC-F009-016 AC-F009-017 · model ownership standards are primary", () => {
+  assert.ok(MANDATORY_CONSTRAINTS.includes(
+    "Put every model in `models/<model>/` with its own governed `<model>.req.md`, `schema.ts`, `repository.ts`, and `types.ts`.",
+  ));
+  assert.ok(MANDATORY_CONSTRAINTS.includes(
+    "Keep database access inside model repositories and out of route handlers.",
+  ));
+});
+
+test("AC-F009-018 · AI and human application code share one engineering standard", async () => {
+  assert.ok(MANDATORY_CONSTRAINTS.includes(
+    "Apply the same application engineering standard to AI-generated and human-authored code.",
+  ));
+  const standard = await platform.readTextFile(
+    new URL("./references/code-quality.md", import.meta.url),
+  );
+  assert.match(standard, /canonical code standard/);
+  assert.match(standard, /no more than four parameters/);
+  assert.match(standard, /no more\s+than 40 executable lines/);
+  assert.match(standard, /cyclomatic complexity no greater than 10/);
+  assert.match(standard, /control\s+flow nested no deeper than three levels/);
+  assert.match(standard, /structured logger rather than `console`/);
 });
 
 test("AC-F009-009 · authentication planning records every mandatory element", () => {
@@ -333,6 +426,9 @@ test("AC-F009-012 · mandatory constraints stay in the primary skill instruction
   const referencePaths = [
     "planning.md",
     "requirement-format.md",
+    "persistence.md",
+    "models.md",
+    "code-quality.md",
     "tdd.md",
     "security.md",
     "service-design.md",
@@ -348,7 +444,7 @@ test("AC-F009-012 · mandatory constraints stay in the primary skill instruction
   );
   const audit = auditSkillInstructions(primary, references);
   assert.deepEqual(audit.mandatoryConstraints, MANDATORY_CONSTRAINTS);
-  assert.equal(audit.referencePaths.length, referencePaths.length);
+  assert.deepEqual(audit.referencePaths, references.map((reference) => reference.path));
 
   const moved = {
     path: "skills/sleepy-hollow/SKILL.md",

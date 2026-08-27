@@ -12,6 +12,12 @@ export const MANDATORY_CONSTRAINTS: readonly string[] = [
   "Repair implementation only; return behavioral change to requirement review.",
   "Declare verification only from independent `hollow check` evidence.",
   "Confirm the first external deployment or a materially risky change.",
+  "Use Drizzle for durable relational persistence unless the human explicitly approves a recorded alternative.",
+  "Put every model in `models/<model>/` with its own governed `<model>.req.md`, `schema.ts`, `repository.ts`, and `types.ts`.",
+  "Keep database access inside model repositories and out of route handlers.",
+  "Apply the same application engineering standard to AI-generated and human-authored code.",
+  "Document every application-owned function and format implementation code as readable multi-line blocks.",
+  "Require passing formatter and linter results before verification.",
 ];
 
 export function instructions(

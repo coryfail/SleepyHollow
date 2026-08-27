@@ -1,6 +1,7 @@
 export { EvidenceError } from "./evidence_error.ts";
 import { locations } from "./project.ts";
 import { requirements } from "./requirements.ts";
+import { standards } from "./standards.ts";
 import {
   checkLoader,
   inventory,
@@ -12,6 +13,7 @@ import type {
   EvidenceVerificationInventory,
   ProjectLocations,
   RequirementInventory,
+  CodeStandardsEvidence,
 } from "./types.ts";
 
 export * from "./types.ts";
@@ -27,6 +29,13 @@ export function loadRequirementEvidence(
   options: EvidenceLoadOptions,
 ): Promise<RequirementInventory> {
   return requirements(project, options);
+}
+
+/** Loads independent source evidence for the enforced project standards. */
+export function loadCodeStandards(
+  project: ProjectLocations,
+): Promise<CodeStandardsEvidence> {
+  return standards(project);
 }
 
 export function loadVerificationInventory(

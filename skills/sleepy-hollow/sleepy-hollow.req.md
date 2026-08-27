@@ -35,6 +35,8 @@ independent verification, and deployment.
 - Bounded repair based on framework diagnostics.
 - Contract, client, and deployment orchestration.
 - Progressive-disclosure references and portable agent guidance.
+- Governed model decomposition, Drizzle repository ownership, and readable
+  source standards.
 
 ## Requirements
 
@@ -54,6 +56,19 @@ implementation failures without changing approved behavior, and rely on
 planning, requirement formats, TDD, security, relational databases, service design, and
 deployment. Portable `AGENTS.md`, `CLAUDE.md`, or Copilot guidance may summarize
 conventions but shall not replace the official workflow.
+
+For durable relational data, the skill shall plan and implement Drizzle by
+default with a supported SQLite or PostgreSQL profile. It shall permit another
+persistence approach only after a human explicitly names and confirms the
+exception, with its technical reason and decision source recorded in the
+application requirement. An application with no durable data shall record that
+decision explicitly.
+
+The skill shall require readable, normally maintained source: a useful TSDoc
+comment for every application-owned function; readable multi-line implementation
+blocks rather than compressed one-line code; and the project's formatter and
+linter before independent verification. The formatter or linter cannot be
+skipped or reported as advisory when declaring a change verified.
 
 ## Acceptance criteria
 
@@ -84,6 +99,26 @@ conventions but shall not replace the official workflow.
   risks relevant to the selected work.
 - AC-F009-012: Detailed guidance is loaded progressively from referenced files
   while mandatory workflow constraints remain in the primary skill instructions.
+- AC-F009-013: For durable relational data, the skill selects Drizzle and a
+  supported database profile by default; a different persistence approach is
+  rejected unless a human's explicit confirmation and decision source are
+  recorded.
+- AC-F009-014: The skill requires TSDoc for every application-owned function,
+  readable multi-line implementation blocks, and passing formatter and linter
+  checks before declaring independent verification.
+- AC-F009-015: Every proposed model is decomposed into
+  `models/<model>/<model>.req.md`, `schema.ts`, `repository.ts`, and `types.ts`,
+  with the requirement approved before its source is implemented.
+- AC-F009-016: The skill keeps Drizzle and database-driver access inside model
+  repositories and prohibits direct database access from route handlers.
+- AC-F009-017: Model requirements govern fields, relationships, constraints,
+  indexes, bounded access, retention, security, migrations, and repository tests;
+  dependent endpoints cite the model requirement IDs they use.
+- AC-F009-018: The skill applies one canonical application engineering standard
+  to AI-generated and human-authored code, keeps human contributor guidance
+  aligned with it, and covers formatting, documentation, naming, function
+  limits, type safety, validation, errors, async work, architecture, persistence,
+  security, structured logging, dependencies, tests, and governed exceptions.
 
 ## Out of scope
 
@@ -147,7 +182,10 @@ other digest normalization is permitted.
 - AC-F009-010 -> `skill_test.ts` first and risky deployment confirmation test.
 - AC-F009-011 -> `skill_test.ts` completion-report coverage and evidence test.
 - AC-F009-012 -> `skill_test.ts` mandatory-constraint placement test against the
-  shipped `SKILL.md` and seven references.
+  shipped `SKILL.md` and eight references.
+- AC-F009-013 -> `skill_test.ts` default-Drizzle and human-approved-exception
+  test.
+- AC-F009-014 -> `skill_test.ts` formatter and linter verification-gate test.
 
 ### Red-state evidence
 
@@ -222,3 +260,60 @@ other digest normalization is permitted.
   `sha256:066e40e039176f056367fe5be646b4c28424143d0e09c522b36eff8b6c70b707`.
 - Decision source: owner direct response `approve it all`, immediately after
   review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Approval, persistence and code-quality amendment
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T14:04:40Z.
+- Approved criteria: AC-F009-001, AC-F009-002, AC-F009-003, AC-F009-004,
+  AC-F009-005, AC-F009-006, AC-F009-007, AC-F009-008, AC-F009-009,
+  AC-F009-010, AC-F009-011, AC-F009-012, AC-F009-013, AC-F009-014.
+- Governed-content digest:
+  `sha256:67183fb12a6da6f3f1a0052e5b70c4257d2ebe96069c5b962f9dbc2641a99d07`.
+- Decision source: owner request in the current workspace conversation to make
+  Drizzle the default unless a human confirms an exception and to enforce
+  documented, readable code through verification.
+
+### Approval, governed model architecture
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T17:49:55Z.
+- Approved criteria: AC-F009-001, AC-F009-002, AC-F009-003, AC-F009-004,
+  AC-F009-005, AC-F009-006, AC-F009-007, AC-F009-008, AC-F009-009,
+  AC-F009-010, AC-F009-011, AC-F009-012, AC-F009-013, AC-F009-014,
+  AC-F009-015, AC-F009-016, AC-F009-017.
+- Governed-content digest:
+  `sha256:b94938a613593495cb9111534e82e45dc60d72c2ee9f05d94098024011fd1ee6`.
+- Decision source: owner direct response `Do it` after approving the proposed
+  Drizzle, model ownership, repository boundary, and code-quality standards.
+
+### Criterion mapping, governed model architecture
+
+- AC-F009-015 -> `skills/sleepy-hollow/skill_test.ts` model-layout mandatory
+  constraint test and `cli/evidence/standards_test.ts` layout checks.
+- AC-F009-016 -> `skills/sleepy-hollow/skill_test.ts` repository-boundary
+  mandatory constraint test and `cli/evidence/standards_test.ts` route check.
+- AC-F009-017 -> `skills/sleepy-hollow/references/models.md` source review plus
+  the model and check suites mapped by AC-F006-011, AC-F008-016, and AC-F018-016.
+
+### Approval, shared application engineering standard
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T18:23:59Z.
+- Approved criteria: AC-F009-001, AC-F009-002, AC-F009-003, AC-F009-004,
+  AC-F009-005, AC-F009-006, AC-F009-007, AC-F009-008, AC-F009-009,
+  AC-F009-010, AC-F009-011, AC-F009-012, AC-F009-013, AC-F009-014,
+  AC-F009-015, AC-F009-016, AC-F009-017, AC-F009-018.
+- Governed-content digest:
+  `sha256:046c4edbaa174f705f9864d1d24a802158fad51108638816f7c62a4ee888967a`.
+- Decision source: owner direct response `Let's do it` after specifying that the
+  proposed code standards are the baseline for AI-generated and human-authored
+  applications built with the framework and skill.
+
+### Criterion mapping, shared application engineering standard
+
+- AC-F009-018 -> `skills/sleepy-hollow/skill_test.ts` shared-standard invariant
+  and canonical `references/code-quality.md` baseline assertions.

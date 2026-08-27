@@ -41,6 +41,8 @@ claim of completion.
 - Route, method, schema, security, index, query-bound, and concurrency checks.
 - OpenAPI, documentation, generated-client, and manifest consistency.
 - Pending data decisions and supported breaking-contract change checks.
+- Governed model layout, Drizzle adoption, route/repository boundaries, and
+  readable-source checks.
 - Human-readable and versioned structured results from one normalized outcome.
 
 ## Requirements
@@ -100,23 +102,27 @@ allow project metadata to disable, replace, reorder, or mark them successful:
    digests, bounded approved criteria, dependency resolution, credible red-state
    evidence, and status honesty;
 2. type-check runner and pinned criterion-test runner health;
-3. bidirectional SH-F007 traceability, unchanged governed test mappings, and all
+3. source quality, requiring documented multi-line functions and bounded line
+   length across application, model, and test TypeScript;
+4. bidirectional SH-F007 traceability, unchanged governed test mappings, and all
    selected mapped test results;
-4. approved endpoint path/method inventory against SH-F002 discovery, with no
+5. approved endpoint path/method inventory against SH-F002 discovery, with no
    requirements-only or implementation-only operation;
-5. SH-F003 request-location, response-status, media-type, and normalized schema
+6. SH-F003 request-location, response-status, media-type, and normalized schema
    coverage for every operation;
-6. SH-F005 authentication, authorization-requirement ID, rate-limit, CORS, and
+7. SH-F005 authentication, authorization-requirement ID, rate-limit, CORS, and
    production-safety consistency with approved endpoint/application decisions;
-7. SH-F004 data-operation metadata, requiring a declared compatible index and
+8. SH-F004 data-operation metadata plus model architecture, requiring a
+   colocated governed model requirement, Drizzle schema, repository and public
+   types, no direct database access from routes, a declared compatible index and
    positive bound for collection access, versionstamp/atomic semantics for
    read-modify-write, approved justification for raw access, and no SH-F014
    foreign-service KV capability;
-8. SH-F012 configuration and operational metadata without resolving or exposing
+9. SH-F012 configuration and operational metadata without resolving or exposing
    secret values;
-9. SH-F010 regeneration in no-write check mode plus supported breaking-change
+10. SH-F010 regeneration in no-write check mode plus supported breaking-change
    analysis against the last reviewed OpenAPI contract; and
-10. pending data/contract decisions and verification-eligibility synthesis.
+11. pending data/contract decisions and verification-eligibility synthesis.
 
 A phase may consume only normalized metadata exposed by its owning verified
 component or explicitly versioned evidence defined here. It shall not infer a
@@ -228,6 +234,13 @@ verification rather than being treated as an absence of findings.
   passes, and the justification appears in the verification result.
 - AC-F008-015: A missing, stale, or unreadable capture artifact fails
   verification rather than reporting no findings.
+- AC-F008-016: A persistent model without its colocated governed requirement,
+  Drizzle schema, repository, public types, Drizzle dependency, or migration
+  configuration fails verification, as does direct database access from a route.
+- AC-F008-017: An undocumented, compressed, overlong, over-parameterized,
+  over-complex, or deeply nested function fails verification with its file and
+  line, as does a breakable line over 100 columns, an unsafe type escape,
+  unchecked suppression, console use, or empty catch block.
 
 ## Out of scope
 
@@ -389,3 +402,44 @@ other digest normalization is permitted.
   `sha256:bcd51a36d292d71b0b51c632550929d8b9bf29c8879365285c42a9cb6b5b4b0d`.
 - Decision source: owner direct response `approve it all`, immediately after
   review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Approval, model and source standards
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T17:49:55Z.
+- Approved criteria: AC-F008-001, AC-F008-002, AC-F008-003, AC-F008-004,
+  AC-F008-005, AC-F008-006, AC-F008-007, AC-F008-008, AC-F008-009,
+  AC-F008-010, AC-F008-011, AC-F008-012, AC-F008-013, AC-F008-014,
+  AC-F008-015, AC-F008-016, AC-F008-017.
+- Governed-content digest:
+  `sha256:c1fceb1d6ba6c5c4d1f43c34903aeb9f1f6315d7dd8559de83f06ca06203b7cd`.
+- Decision source: owner direct response `Do it` after approving the proposed
+  Drizzle, model ownership, repository boundary, and code-quality standards.
+
+### Criterion mapping, model and source standards
+
+- AC-F008-016 -> `cli/check/check_test.ts` model-architecture failure test and
+  `cli/evidence/standards_test.ts` filesystem evidence tests.
+- AC-F008-017 -> `cli/check/check_test.ts` source-quality failure test and
+  `cli/evidence/standards_test.ts` filesystem evidence tests.
+
+### Approval, expanded application source standards
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T18:23:59Z.
+- Approved criteria: AC-F008-001, AC-F008-002, AC-F008-003, AC-F008-004,
+  AC-F008-005, AC-F008-006, AC-F008-007, AC-F008-008, AC-F008-009,
+  AC-F008-010, AC-F008-011, AC-F008-012, AC-F008-013, AC-F008-014,
+  AC-F008-015, AC-F008-016, AC-F008-017.
+- Governed-content digest:
+  `sha256:c5773ec1c2b9cc93b1aef91c0d4898b58116170fb7c14d7dccc160e05122a1ee`.
+- Decision source: owner direct response `Let's do it` after specifying that the
+  proposed code standards are the baseline for AI-generated and human-authored
+  applications built with the framework and skill.
+
+### Criterion mapping, expanded application source standards
+
+- AC-F008-017 -> `cli/check/check_test.ts` quality-diagnostic propagation and
+  `cli/evidence/standards_test.ts` expanded unsafe-source fixture.

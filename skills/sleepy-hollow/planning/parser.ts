@@ -383,6 +383,8 @@ export function parseRequirementDocument(
   const diagnostics: PlanningDiagnostic[] = [];
   const requiredStrings = kind === "application"
     ? ["id", "title", "status", "risk"]
+    : kind === "model"
+    ? ["id", "model", "status"]
     : ["id", "path", "status", "service"];
   for (const field of requiredStrings) {
     if (typeof metadata[field] !== "string" || metadata[field].trim() === "") {
@@ -444,6 +446,18 @@ export function parseRequirementDocument(
         1,
         "Application requirements must use schema sgad-application/v0.2.",
         "Set schema: sgad-application/v0.2.",
+      ));
+    }
+    stringList(metadata.owners, "owners", path, diagnostics, false);
+  } else if (kind === "model") {
+    if (metadata.schema !== "sgad-model/v0.1") {
+      diagnostics.push(diagnostic(
+        "SH_PLANNING_SCHEMA_INVALID",
+        path,
+        2,
+        1,
+        "Model requirements must use schema sgad-model/v0.1.",
+        "Set schema: sgad-model/v0.1.",
       ));
     }
     stringList(metadata.owners, "owners", path, diagnostics, false);
@@ -535,6 +549,29 @@ export function parseRequirementDocument(
         1,
         "Endpoint security must state authentication and authorization decisions.",
         "Add explicit Authentication: and Authorization: entries, including none when applicable.",
+      ));
+    }
+  }
+  if (kind === "model") {
+    for (const title of [
+      "Purpose",
+      "Fields",
+      "Relationships",
+      "Constraints and indexes",
+      "Data access",
+      "Retention and deletion",
+      "Security",
+      "Migration strategy",
+      "Acceptance criteria",
+    ]) {
+      if (sections.has(title)) continue;
+      diagnostics.push(diagnostic(
+        "SH_PLANNING_MODEL_SECTION_MISSING",
+        path,
+        1,
+        1,
+        `Model requirement is missing ${title}.`,
+        `Add a Markdown heading named ${title} with explicit behavior.`,
       ));
     }
   }

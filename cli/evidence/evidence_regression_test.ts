@@ -153,12 +153,17 @@ async function projectFixture(): Promise<string> {
     `${root}/api/music/releases/route.ts`,
     `import { defineRoute } from ${JSON.stringify(routing)};
 
+/** Returns the bounded release collection for the public route. */
+function getMusicReleases(): Response {
+  return Response.json({ releases: [] });
+}
+
 export default defineRoute({
   GET: {
     schemas: { responses: { 200: { contract: { type: "object" } } } },
     security: { authentication: { mode: "none" } },
     contract: { operationId: "getMusicReleases" },
-    handler: () => Response.json({ releases: [] }),
+    handler: getMusicReleases,
   },
 });
 `,
@@ -242,12 +247,55 @@ test("AC-F018-012 · hollow test smoke persists evidence consumed by check", asy
     `import { criterionTest } from ${JSON.stringify(testing)};
 
 const requirements = [
-  { id: "cory-fail-api-application", status: "approved", governedContentDigest: "fixture", criteria: [{ id: "AC-APP-001" }], approval: { valid: true, digest: "fixture", criteria: ["AC-APP-001"] } },
-  { id: "EP-MUSIC-RELEASES", status: "approved", governedContentDigest: "fixture", criteria: [{ id: "AC-EP-RELEASES-001" }], approval: { valid: true, digest: "fixture", criteria: ["AC-EP-RELEASES-001"] } },
+  {
+    id: "cory-fail-api-application",
+    status: "approved",
+    governedContentDigest: "fixture",
+    criteria: [{ id: "AC-APP-001" }],
+    approval: {
+      valid: true,
+      digest: "fixture",
+      criteria: ["AC-APP-001"],
+    },
+  },
+  {
+    id: "EP-MUSIC-RELEASES",
+    status: "approved",
+    governedContentDigest: "fixture",
+    criteria: [{ id: "AC-EP-RELEASES-001" }],
+    approval: {
+      valid: true,
+      digest: "fixture",
+      criteria: ["AC-EP-RELEASES-001"],
+    },
+  },
 ];
 
-criterionTest({ id: "T-APP-001", requirementId: "cory-fail-api-application", criteria: ["AC-APP-001"], name: "application contract", sourcePath: "tests/music_releases_test.ts", fn: async () => {} }, { requirements });
-criterionTest({ id: "T-MUSIC-RELEASES-001", requirementId: "EP-MUSIC-RELEASES", criteria: ["AC-EP-RELEASES-001"], name: "returns releases", sourcePath: "tests/music_releases_test.ts", fn: async () => {} }, { requirements });
+/** Verifies the application-wide bounded response contract. */
+async function verifyApplicationContract(): Promise<void> {
+}
+
+/** Verifies the release endpoint returns its approved collection. */
+async function verifyReleaseCollection(): Promise<void> {
+}
+
+criterionTest({
+  id: "T-APP-001",
+  requirementId: "cory-fail-api-application",
+  criteria: ["AC-APP-001"],
+  name: "application contract",
+  sourcePath: "tests/music_releases_test.ts",
+  fn: verifyApplicationContract,
+}, { requirements });
+
+criterionTest({
+  id: "T-MUSIC-RELEASES-001",
+  requirementId: "EP-MUSIC-RELEASES",
+  criteria: ["AC-EP-RELEASES-001"],
+  name: "returns releases",
+  sourcePath: "tests/music_releases_test.ts",
+  fn: verifyReleaseCollection,
+}, { requirements });
 `,
   );
   const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));

@@ -12,7 +12,7 @@ Ask about a topic only when the answer changes behavior or architecture.
 | Topic                | Ask when unresolved                                          | Why it is material                            |
 | -------------------- | ------------------------------------------------------------ | --------------------------------------------- |
 | Resources            | What does the application own, and what identifies one?      | Determines routes, keys, and contracts        |
-| Persistence          | What outlives a request, and for how long?                   | Determines the storage and retention model    |
+| Persistence          | What outlives a request, and for how long?                   | Defaults durable relational data to Drizzle   |
 | Authentication       | Who calls this, and how do they prove identity?              | Changes every protected route                 |
 | Authorization        | Who may act on data they do not own?                         | Changes handler and data-access behavior      |
 | Consumers            | Which clients consume this, and do they need a typed client? | Changes generated contracts and compatibility |
@@ -33,6 +33,27 @@ When an answer is genuinely unknown, record it as an open question with a stable
 identifier, the decision it blocks, and what would resolve it. Never substitute
 an invented answer for a missing one. An application requirement with three
 honest open questions is more useful than one with three fabricated decisions.
+
+## Persistence planning
+
+Do not ask a developer to choose an ORM for ordinary durable application data.
+Use Drizzle by default and record the selected SQLite or PostgreSQL profile,
+tables, relationships, indexes, migration ownership, retention, and backup or
+recovery expectations in the application requirement. This is a deliberate
+default, not an agent preference.
+
+There are only two alternatives:
+
+- When the application has no data that must survive a request or restart,
+  record `no persistence` explicitly.
+- A different persistence approach is allowed only when a human explicitly
+  names it and confirms the exception. Record the selected approach, the
+  technical reason, the approver, and the conversation or review that carries
+  the confirmation. Existing code, a framework limitation, or an agent's
+  inference is not human confirmation.
+
+Read [persistence.md](persistence.md) before detailing the data model or
+implementing an approved data-access requirement.
 
 ## Authentication planning
 
