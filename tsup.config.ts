@@ -14,6 +14,7 @@ export default defineConfig({
   },
   clean: true,
   dts: true,
+  external: ["typescript"],
   format: ["esm"],
   platform: "node",
   sourcemap: true,

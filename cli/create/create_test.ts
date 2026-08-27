@@ -37,7 +37,14 @@ test("AC-F001-002 · a new project passes its documented verifier", () =>
   temporary(async (directory) => {
     const result = await createProject({ name: "verified-app", directory });
     const manifest = JSON.parse(await platform.readTextFile(join(result.projectPath, "package.json")));
-    assert.match(manifest.scripts.verify, /^npm run check && npm run test/);
+    assert.match(
+      manifest.scripts.verify,
+      /^npm run format:check && npm run lint && npm run check && npm run test/,
+    );
+    assert.equal(manifest.scripts["format:check"], "prettier --check .");
+    assert.equal(manifest.scripts.lint, "eslint .");
+    assert.equal(manifest.dependencies["drizzle-orm"], "^0.45.2");
+    assert.equal(manifest.devDependencies["drizzle-kit"], "^0.31.10");
   }));
 
 test("AC-F001-003 · scaffold exposes typed config and canonical locations", () =>
@@ -50,6 +57,10 @@ test("AC-F001-003 · scaffold exposes typed config and canonical locations", () 
         "requirements/application.req.md",
         "generated/.gitkeep",
         "models/.gitkeep",
+        "CONTRIBUTING.md",
+        ".prettierignore",
+        "eslint.config.js",
+        "prettier.config.js",
         "tests/scaffold_test.ts",
       ]
     ) assert.equal(await exists(join(result.projectPath, path)), true, path);
@@ -162,10 +173,10 @@ test("AC-F001-010 · generated projects include capture-aware test setup", () =>
     assert.equal(config.scripts.test, "vitest run");
   }));
 
-test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.6", () =>
+test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.4.0", () =>
   temporary(async (directory) => {
     const result = await createProject({ name: "named-app", directory });
-    assert.equal(result.version, "0.3.6");
+    assert.equal(result.version, "0.4.0");
     assert.ok(result.createdFiles.includes("requirements/application.req.md"));
     assert.ok(!result.createdFiles.includes("requirements/application.md"));
     assert.ok(
@@ -178,7 +189,7 @@ test("AC-NRF-007 AC-NRF-012 · scaffold uses named requirements and version 0.3.
     );
     assert.match(config, /requirements\/application\.req\.md/);
     const manifest = JSON.parse(await platform.readTextFile(join(result.projectPath, "package.json")));
-    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.3.6");
+    assert.equal(manifest.dependencies["@sleepy-hollow/framework"], "^0.4.0");
     assert.equal(manifest.scripts.check, "tsc --noEmit");
     assert.equal(manifest.devDependencies["@types/node"], "26.2.0");
     assert.ok(result.createdFiles.includes("tsconfig.json"));
@@ -199,6 +210,61 @@ test("AC-F001-011 · the generated test task produces a capture artifact", () =>
     const root = join(directory, "captured");
     const manifest = JSON.parse(await platform.readTextFile(join(root, "package.json")));
     assert.equal(manifest.scripts.test, "vitest run");
+  }));
+
+test("AC-F001-014 · scaffold includes standard tooling and readable TypeScript", () =>
+  temporary(async (directory) => {
+    const result = await createProject({ name: "readable", directory });
+    for (const path of [
+      ".sleepyhollow/verify.ts",
+      "tests/capture.ts",
+      "tests/capture_test.ts",
+      "tests/scaffold_test.ts",
+    ]) {
+      const source = await platform.readTextFile(join(result.projectPath, path));
+      assert.match(source, /\/\*\*/);
+      assert.doesNotMatch(source, /=>\s*\{[^\n}]+\}/);
+    }
+    const manifest = JSON.parse(
+      await platform.readTextFile(join(result.projectPath, "package.json")),
+    );
+    assert.equal(manifest.scripts["format:check"], "prettier --check .");
+    assert.equal(manifest.scripts.lint, "eslint .");
+    assert.equal(manifest.dependencies["drizzle-orm"], "^0.45.2");
+    assert.equal(manifest.devDependencies["drizzle-kit"], "^0.31.10");
+  }));
+
+test("AC-F001-015 · AI and human contributors receive the same strict standard", () =>
+  temporary(async (directory) => {
+    const result = await createProject({ name: "shared-standard", directory });
+    const contributing = await platform.readTextFile(
+      join(result.projectPath, "CONTRIBUTING.md"),
+    );
+    const eslint = await platform.readTextFile(
+      join(result.projectPath, "eslint.config.js"),
+    );
+    const compiler = JSON.parse(await platform.readTextFile(
+      join(result.projectPath, "tsconfig.json"),
+    ));
+
+    assert.match(contributing, /AI-generated and\s+human-authored code/);
+    assert.match(contributing, /at most four parameters/);
+    assert.match(contributing, /at most 40\s+executable lines/);
+    assert.match(contributing, /complexity at most 10/);
+    assert.match(contributing, /nesting at most three levels/);
+    assert.match(eslint, /recommendedTypeChecked/);
+    assert.match(eslint, /no-floating-promises/);
+    assert.match(eslint, /no-explicit-any/);
+    assert.match(eslint, /max-lines-per-function/);
+    assert.match(eslint, /no-console/);
+    const manifest = JSON.parse(await platform.readTextFile(
+      join(result.projectPath, "package.json"),
+    ));
+    assert.equal(manifest.devDependencies["@eslint/js"], "^10.0.0");
+    assert.equal(manifest.devDependencies.eslint, "^10.0.0");
+    assert.equal(compiler.compilerOptions.exactOptionalPropertyTypes, true);
+    assert.equal(compiler.compilerOptions.noImplicitReturns, true);
+    assert.equal(compiler.compilerOptions.noUncheckedIndexedAccess, true);
   }));
 
 test("AC-F001-012 · the typed configuration accepts an optional security module", () =>

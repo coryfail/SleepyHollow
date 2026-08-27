@@ -105,4 +105,19 @@ export interface EvidenceVerificationInventory {
     readonly atomic?: boolean;
     readonly rawJustification?: string;
   }[];
+  readonly codeStandards: CodeStandardsEvidence;
+}
+
+export interface CodeStandardsViolation {
+  readonly code: string;
+  readonly phase: "data" | "routes" | "quality";
+  readonly path: string;
+  readonly line: number;
+  readonly summary: string;
+  readonly correction: string;
+}
+
+export interface CodeStandardsEvidence {
+  readonly hasDurableModels: boolean;
+  readonly violations: readonly CodeStandardsViolation[];
 }

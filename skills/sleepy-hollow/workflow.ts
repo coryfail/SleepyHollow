@@ -1,7 +1,9 @@
 import type { CheckResult } from "../../cli/check/mod.ts";
 import type { RedStateResult } from "../../core/testing/mod.ts";
+import { codeQuality } from "./quality.ts";
 import { SkillError } from "./skill_error.ts";
 import type {
+  CodeQualityVerification,
   DeploymentIntent,
   EndpointWorkRequest,
   RepairRequest,
@@ -136,7 +138,10 @@ export function repair(request: RepairRequest): void {
   if (diagnostics.length > 0) throw new SkillError(diagnostics);
 }
 
-export function verification(check: CheckResult | undefined): "verified" {
+export function verification(
+  check: CheckResult | undefined,
+  quality: CodeQualityVerification | undefined,
+): "verified" {
   if (!check) {
     throw new SkillError([diagnostic(
       "SH_SKILL_CHECK_EVIDENCE_REQUIRED",
@@ -153,6 +158,7 @@ export function verification(check: CheckResult | undefined): "verified" {
       "Resolve every reported diagnostic and rerun hollow check.",
     )]);
   }
+  codeQuality(quality);
   return "verified";
 }
 

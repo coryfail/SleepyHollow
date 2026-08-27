@@ -9,6 +9,7 @@ import type { ContractChange, GenerationResult } from "../generate/mod.ts";
 export type CheckPhase =
   | "governance"
   | "runner"
+  | "quality"
   | "traceability"
   | "routes"
   | "schemas"
@@ -26,6 +27,7 @@ export type RequestedCheckScope =
 
 export interface CheckLocation {
   readonly path?: string;
+  readonly line?: number;
   readonly route?: string;
   readonly requirementId?: string;
   readonly criterionId?: string;
@@ -131,6 +133,17 @@ export interface VerificationInventory {
   readonly testRunner: {
     readonly status: "passed" | "failed";
     readonly evidence: string;
+  };
+  readonly codeStandards: {
+    readonly hasDurableModels: boolean;
+    readonly violations: readonly {
+      readonly code: string;
+      readonly phase: "data" | "routes" | "quality";
+      readonly path: string;
+      readonly line: number;
+      readonly summary: string;
+      readonly correction: string;
+    }[];
   };
   readonly configurationDiagnostics: readonly {
     readonly code: string;

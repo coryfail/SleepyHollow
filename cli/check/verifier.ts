@@ -14,6 +14,7 @@ import type {
 const phaseOrder: readonly CheckPhase[] = [
   "governance",
   "runner",
+  "quality",
   "traceability",
   "routes",
   "schemas",
@@ -28,6 +29,7 @@ const phaseOrder: readonly CheckPhase[] = [
 const checkDefinitions: readonly [string, CheckPhase][] = [
   ["SH_CHECK_GOVERNANCE", "governance"],
   ["SH_CHECK_RUNNERS", "runner"],
+  ["SH_CHECK_QUALITY", "quality"],
   ["SH_CHECK_TRACEABILITY", "traceability"],
   ["SH_CHECK_ROUTES", "routes"],
   ["SH_CHECK_SCHEMAS", "schemas"],
@@ -184,6 +186,17 @@ export function verify(inventory: VerificationInventory): CheckResult {
         result: safeRunnerEvidence(inventory.testRunner.evidence),
       },
       "Correct the runner or test failure without weakening governed tests.",
+    ));
+  }
+
+  for (const item of inventory.codeStandards.violations) {
+    diagnostics.push(diagnostic(
+      item.code,
+      item.phase,
+      item.summary,
+      { path: item.path, line: item.line },
+      { line: item.line },
+      item.correction,
     ));
   }
 

@@ -45,6 +45,11 @@ configuration, API routes, models, tests, and generated artifacts evident. It
 shall include concise guidance for activating or installing the official skill
 in supported agent environments.
 
+The scaffold shall install Drizzle ORM and Drizzle Kit as the default relational
+persistence toolchain without choosing a database profile before planning. It
+shall configure Prettier and ESLint, expose format and lint scripts, and run both
+before type checking and tests in the documented verification command.
+
 ### Capture-aware test setup
 
 A generated project shall include test setup that enables SH-F019 runtime
@@ -124,6 +129,13 @@ that.
   formatter would rewrap, the project's own verifier reports no formatting
   failure, and running the project's formatter leaves that requirement's bytes
   unchanged while still formatting the project's other files.
+- AC-F001-014: A generated project includes Drizzle ORM and Drizzle Kit plus
+  version-controlled Prettier and ESLint configuration, and its verification
+  command runs format and lint checks before type checking and tests.
+- AC-F001-015: A generated project includes a human-facing contributor standard
+  that explicitly applies the same rules to AI-generated and human-authored
+  application code, plus typed ESLint and strict TypeScript configuration for
+  unsafe types, promises, console use, and the approved function limits.
 
 ## Out of scope
 
@@ -416,3 +428,41 @@ readability; no other digest normalization is permitted.
   `sha256:fd6a5d549c13ecf4243ff0e0de080464e94ebb3419998b4a49f2694121e1eddf`.
 - Decision source: owner direct response `approve it all`, immediately after
   review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Approval, default development standards
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T17:49:55Z.
+- Approved criteria: AC-F001-001, AC-F001-002, AC-F001-003, AC-F001-004,
+  AC-F001-005, AC-F001-006, AC-F001-007, AC-F001-008, AC-F001-009,
+  AC-F001-010, AC-F001-011, AC-F001-012, AC-F001-013, AC-F001-014.
+- Governed-content digest:
+  `sha256:58547091a2bb2ea98d7b9ec48a62e010b05e2a5016a9f7bf346fcf3d66eb8990`.
+- Decision source: owner direct response `Do it` after approving the proposed
+  Drizzle, model ownership, repository boundary, and code-quality standards.
+
+### Criterion mapping, default development standards
+
+- AC-F001-014 -> `cli/create/create_test.ts` standard-tooling and readable
+  TypeScript scaffold test.
+
+### Approval, shared application engineering standard
+
+- Status: approved.
+- Approver: human-project-owner.
+- Approved at: 2026-08-27T18:23:59Z.
+- Approved criteria: AC-F001-001, AC-F001-002, AC-F001-003, AC-F001-004,
+  AC-F001-005, AC-F001-006, AC-F001-007, AC-F001-008, AC-F001-009,
+  AC-F001-010, AC-F001-011, AC-F001-012, AC-F001-013, AC-F001-014,
+  AC-F001-015.
+- Governed-content digest:
+  `sha256:50f5b7afff166be5b8a659ba82ffb368557faab70e8684ee8ee6b89a6b98da85`.
+- Decision source: owner direct response `Let's do it` after specifying that the
+  proposed code standards are the baseline for AI-generated and human-authored
+  applications built with the framework and skill.
+
+### Criterion mapping, shared application engineering standard
+
+- AC-F001-015 -> `cli/create/create_test.ts` generated contributor guide, typed
+  ESLint rules, strict TypeScript options, and shared-standard assertions.

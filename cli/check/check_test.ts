@@ -124,6 +124,7 @@ function inventory(): VerificationInventory {
     }],
     typecheck: { status: "passed", evidence: "TypeScript check passed" },
     testRunner: { status: "passed", evidence: "Vitest passed" },
+    codeStandards: { hasDurableModels: false, violations: [] },
     configurationDiagnostics: [],
     generation: {
       ok: true,
@@ -439,4 +440,36 @@ test("AC-F008-015 · a missing or stale capture artifact fails verification", ()
       ),
     );
   }
+});
+
+test("AC-F008-016 AC-F008-017 · model and source standard violations fail verification", () => {
+  const result = verifyProject({
+    ...inventory(),
+    codeStandards: {
+      hasDurableModels: true,
+      violations: [{
+        code: "SH_CHECK_MODEL_REQUIREMENT_MISSING",
+        phase: "data",
+        path: "models/bookmark/bookmark.req.md",
+        line: 1,
+        summary: "Model bookmark has no colocated governed requirement.",
+        correction: "Create the model requirement.",
+      }, {
+        code: "SH_CHECK_FUNCTION_DOCUMENTATION_MISSING",
+        phase: "quality",
+        path: "models/bookmark/repository.ts",
+        line: 8,
+        summary: "A function has no TSDoc comment.",
+        correction: "Document the function.",
+      }],
+    },
+  });
+
+  assert.equal(result.ok, false);
+  assert.ok(codes(result).includes("SH_CHECK_MODEL_REQUIREMENT_MISSING"));
+  assert.ok(codes(result).includes("SH_CHECK_FUNCTION_DOCUMENTATION_MISSING"));
+  assert.equal(
+    result.checks.find((item) => item.id === "SH_CHECK_QUALITY")?.status,
+    "failed",
+  );
 });
