@@ -3,6 +3,7 @@
 website/node_modules/
 website/dist/
 website/docs/
+website/problems/
 website/generated/
 website/coverage/
 website/playwright-report/

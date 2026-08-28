@@ -2,6 +2,15 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.4.1 - 2026-08-28
+
+### Added: stable problem-type documentation and canonical URI correction
+
+Framework problem responses now consistently use the `sleepyhollow.io` problem
+URI, including internal server failures. The documentation site publishes a
+linked RFC 9457 catalogue at `/problems/` with a dedicated page for every
+framework-emitted problem type and complete no-JavaScript fallbacks.
+
 ## 0.4.0 - 2026-08-27
 
 ### Added: governed persistence architecture and shared engineering standards

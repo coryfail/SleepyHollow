@@ -129,3 +129,7 @@ against a route that would reject the identical request when served.
 
 Those remain your application's requirements, specified and tested with your own
 authentication design.
+
+The framework's authentication, authorization, and rate-limit failures are
+listed in the [problem details reference](/problems/), including their status
+codes and response headers.

@@ -31,6 +31,11 @@ const generatedGuides = async () => {
   return module.guides;
 };
 
+const generatedProblems = async () => {
+  const module = await import(new URL("../generated/problems-content.js", import.meta.url).href);
+  return module.problems;
+};
+
 test("AC-SITE-001 AC-SITE-003 · build defines independent root and SGAD entries", () => {
   assert.ok(existsSync(resolve(website, "sgad/index.html")), "missing sgad/index.html");
   assert.match(read("vite.config.ts"), /rollupOptions/);
@@ -93,6 +98,7 @@ test("AC-SITE-010 · Pages workflow verifies branches and only deploys main", ()
     /group:\s*pages-\$\{\{\s*github\.event_name\s*\}\}-\$\{\{\s*github\.ref\s*\}\}/,
   );
   assert.match(workflow, /docs\/framework\/\*\*/, "guide sources must trigger a website build");
+  assert.match(workflow, /docs\/problems\/\*\*/, "problem sources must trigger a website build");
 });
 
 test("LICENSE · public license copy matches the repository license", () => {
@@ -330,11 +336,13 @@ test("AC-SITE-014 · no generated documentation output is tracked in version con
     .split("\0").filter(Boolean);
   for (const path of tracked) {
     assert.doesNotMatch(path, /^website\/docs\//, `${path} is generated output`);
+    assert.doesNotMatch(path, /^website\/problems\//, `${path} is generated output`);
     assert.doesNotMatch(path, /^website\/generated\//, `${path} is generated output`);
     assert.doesNotMatch(path, /^website\/dist\//, `${path} is build output`);
   }
   const ignored = readFileSync(resolve(repository, ".gitignore"), "utf8");
   assert.match(ignored, /website\/docs\//);
+  assert.match(ignored, /website\/problems\//);
   assert.match(ignored, /website\/generated\//);
 });
 
@@ -413,7 +421,7 @@ test("AC-DOCS-006 · guide links resolve to site routes or the canonical reposit
     for (const link of guide.html.matchAll(/href="([^"]+)"/g)) {
       const target = link[1];
       if (target.startsWith("#") || target.startsWith("https://")) continue;
-      assert.match(target, /^\/(?:docs|sgad|api)\/|^\/$/, `${guide.route} has unresolved link ${target}`);
+      assert.match(target, /^\/(?:docs|sgad|api|problems)\/|^\/$/, `${guide.route} has unresolved link ${target}`);
     }
   }
 
@@ -421,6 +429,40 @@ test("AC-DOCS-006 · guide links resolve to site routes or the canonical reposit
   if (skillLink) {
     assert.match(skillLink.html, /https:\/\/github\.com\/coryfail\/SleepyHollow[^"]*skills\/sgad-workflow/);
   }
+});
+
+test("problem references · every emitted problem type has a generated page and stable links", async () => {
+  const problems = await generatedProblems();
+  assert.equal(problems.length, 8);
+  for (const problem of problems) {
+    assert.match(problem.route, /^\/problems\/[a-z0-9-]+\/$/);
+    assert.equal(problem.status >= 400 && problem.status < 600, true);
+    assert.ok(problem.summary.length > 10, `${problem.route} has no description`);
+    assert.ok(existsSync(resolve(website, `problems${problem.route.replace(/^\/problems/, "")}index.html`)), `${problem.route} has no entry document`);
+    assert.match(problem.html, /<h2[\s>]/, `${problem.route} has no semantic sections`);
+    const entry = read(`problems${problem.route.replace(/^\/problems/, "")}index.html`);
+    assert.match(entry, new RegExp("https://sleepyhollow\\.io/problems/" + problem.slug));
+  }
+  assert.ok(existsSync(resolve(website, "problems/index.html")), "missing the problem reference index entry");
+});
+
+test("problem references · generated pages retain complete no-JavaScript content", async () => {
+  const problems = await generatedProblems();
+  for (const problem of problems) {
+    const entry = read(`problems${problem.route.replace(/^\/problems/, "")}index.html`);
+    assert.match(entry, /<noscript>/, `${problem.route} has no no-JavaScript fallback`);
+    const fallback = entry.split("<noscript>")[1].split("</noscript>")[0];
+    assert.match(fallback, /<h1[\s>]/, `${problem.route} fallback has no heading`);
+    assert.ok(fallback.length > 500, `${problem.route} fallback is not the whole problem reference`);
+    assert.match(fallback, /<a /, `${problem.route} fallback has no navigation`);
+  }
+});
+
+test("problem references · the documentation fallback links the catalogue", () => {
+  const index = read("docs/index.html");
+  const fallback = index.split("<noscript>")[1].split("</noscript>")[0];
+  assert.match(fallback, /<h2>Problem details<\/h2>/);
+  assert.match(fallback, /href="\/problems\/"/);
 });
 
 test("AC-DOCS-007 · every generated guide document carries its prose without JavaScript", async () => {

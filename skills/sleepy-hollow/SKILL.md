@@ -70,7 +70,7 @@ and non-empty `owners`. The parser rejects the legacy
 migrating an existing scaffold.
 
 For the root application requirement, use `depends_on: []` unless a reviewed
-dependency is intentional. Because framework 0.4.0 includes this application
+dependency is intentional. Because framework 0.4.1 includes this application
 requirement in verification scope, map every approved application criterion to
 one or more governed `criterionTest(...)` tests as well as mapping endpoint
 criteria.
@@ -132,7 +132,7 @@ capabilities.
 ### 5. Verify independently
 
 Run `hollow check` and treat its result as the only source of verification. Do
-not declare an endpoint verified from passing tests alone. In framework 0.4.0,
+not declare an endpoint verified from passing tests alone. In framework 0.4.1,
 run these commands in order:
 
 ```bash

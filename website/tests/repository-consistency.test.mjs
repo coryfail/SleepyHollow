@@ -330,6 +330,15 @@ test("AC-REPO-006 · docs, skill, templates, links, and metadata stay aligned", 
     for (const match of document.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
       const target = match[1];
       if (/^(?:https?:|mailto:|#)/.test(target)) continue;
+      if (target.startsWith("/")) {
+        assert.match(
+          target,
+          /^\/(?:docs|sgad|api|problems)(?:\/|$)/,
+          `${path} has an unknown site route ${target}`,
+        );
+        links += 1;
+        continue;
+      }
       const local = decodeURIComponent(target.split("#")[0]);
       assert.equal(
         existsSync(resolve(repository, dirname(path), local)),
@@ -465,18 +474,18 @@ test("AC-NRF-002 AC-NRF-009 · every current governed artifact has a named requi
   assert.ok(requirementPaths().includes("named-requirement-files.req.md"));
 });
 
-test("AC-NRF-012 · framework release surfaces report 0.4.0", () => {
-  assert.equal(JSON.parse(read("package.json")).version, "0.4.0");
+test("AC-NRF-012 · framework release surfaces report 0.4.1", () => {
+  assert.equal(JSON.parse(read("package.json")).version, "0.4.1");
   assert.equal(JSON.parse(read("website/package.json")).version, "0.2.0");
-  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.4\.0"/);
-  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.4\.0"/);
+  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.4\.1"/);
+  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.4\.1"/);
   assert.match(
     read("cli/generate/artifacts.ts"),
-    /generatorVersion: "0\.4\.0"/,
+    /generatorVersion: "0\.4\.1"/,
   );
   assert.match(
     read("cli/generate/inventory.ts"),
-    /options\.version \?\? "0\.4\.0"/,
+    /options\.version \?\? "0\.4\.1"/,
   );
   assert.match(
     read("docs/sgad/README.md"),

@@ -293,7 +293,7 @@ test("AC-F007-007 · typed requests, fixtures, seeding, and Problem Details comp
       fetch: async (request) => {
         if (new URL(request.url).pathname === "/problem") {
           return Response.json({
-            type: "https://sleepyhollow.dev/problems/invalid",
+            type: "https://sleepyhollow.io/problems/invalid",
             title: "Invalid request",
             status: 400,
             field: "url",
@@ -322,7 +322,7 @@ test("AC-F007-007 · typed requests, fixtures, seeding, and Problem Details comp
     await context.fetch("/problem"),
     {
       status: 400,
-      type: "https://sleepyhollow.dev/problems/invalid",
+      type: "https://sleepyhollow.io/problems/invalid",
       title: "Invalid request",
       extensions: { field: "url" },
     },

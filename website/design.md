@@ -25,6 +25,10 @@ Halloween decoration (governed by AC-HOME-008).
   list in a 14–16rem column at ≥60rem, collapsing above the article below that.
   Bodies are generated from the canonical Markdown under `docs/`, so the
   selectors below are generic on purpose — nothing hand-authors that markup.
+- Problem reference (`/problems/`, `/problems/…`): Status ledger. The index
+  leads with the stable-address idea and a scannable HTTP-status catalogue;
+  detail pages pair a compact status/type-URI identity with generated,
+  reading-focused guidance and a persistent problem list.
 - Generated reference (`/api/`): outside this system. Produced by TypeDoc; the
   Node toolchain owns its markup and theme. It is labeled as a
   generated reference wherever it is linked so its different appearance does

@@ -27,7 +27,7 @@ function problem(
   headers: HeadersInit = {},
 ): Response {
   return Response.json({
-    type: `https://sleepyhollow.dev/problems/${slug}`,
+    type: `https://sleepyhollow.io/problems/${slug}`,
     title,
     status,
     instance: new URL(request.url).pathname,

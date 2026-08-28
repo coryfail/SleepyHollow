@@ -1,6 +1,6 @@
 import type { ValidationDiagnostic, ValidationIssue } from "./types.ts";
 
-const problemType = "https://sleepyhollow.dev/problems";
+const problemType = "https://sleepyhollow.io/problems";
 
 export function safeSchemaIssueMessage(
   issue: Readonly<Record<string, unknown>>,

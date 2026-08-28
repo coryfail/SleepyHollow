@@ -73,6 +73,19 @@ function documentationEntries(): Record<string, string> {
   return entries;
 }
 
+/**
+ * Problem references are generated from the framework's emitted error slugs,
+ * but use their own reading-focused layout outside the guide index.
+ */
+function problemEntries(): Record<string, string> {
+  const entries: Record<string, string> = {};
+  for (const absolute of globSync(resolve(here, "problems/**/index.html"))) {
+    const name = relative(resolve(here, "problems"), dirname(absolute)).replaceAll(/[/\\]/g, "-");
+    entries[name === "" ? "problems" : `problems-${name}`] = absolute;
+  }
+  return entries;
+}
+
 export default defineConfig({
   base: "/",
   plugins: [react(), generatedApiReference()],
@@ -84,6 +97,7 @@ export default defineConfig({
         home: "./index.html",
         sgad: "./sgad/index.html",
         ...documentationEntries(),
+        ...problemEntries(),
       },
     },
   },

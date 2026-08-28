@@ -1,10 +1,11 @@
 /**
  * Renders the repository's canonical guides into the website build.
  *
- * Guide prose has one source of truth: the Markdown files under `docs/`. This
- * script reads those exact files and emits, per guide, a static entry document
- * and a rendered HTML fragment. Nothing under `website/src/` holds a copy, so a
- * published page cannot drift from the file it documents (AC-DOCS-003).
+ * Guide and problem-reference prose has one source of truth: the Markdown
+ * files under `docs/`. This script reads those exact files and emits, per
+ * entry, a static document and a rendered HTML fragment. Nothing under
+ * `website/src/` holds a copy, so a published page cannot drift from the file
+ * it documents (AC-DOCS-003).
  *
  * Run through `npm run docs:build`, which every other website script depends on.
  */
@@ -46,6 +47,18 @@ const READING_ORDER = {
   ],
 };
 
+/** Stable order for the RFC 9457 problem type reference. */
+const PROBLEM_ORDER = [
+  "request-validation",
+  "content-too-large",
+  "unsupported-media-type",
+  "internal-server-error",
+  "rate-limit",
+  "rate-limit-unavailable",
+  "unauthorized",
+  "forbidden",
+];
+
 /**
  * One-line descriptions for the index. This is website framing copy, which the
  * approved requirement permits; guide bodies are never edited here.
@@ -68,6 +81,25 @@ const SUMMARIES = {
   "sgad/conformance": "The minimum bar for claiming SGAD conformance, plus optional capability profiles.",
   "sgad/adoption-guide": "Introducing SGAD to an existing project, one governed component at a time.",
   "sgad/sgad.req": "The methodology's own governed requirement — SGAD specified in its own terms.",
+  "problems/request-validation": "The request did not match a declared input schema.",
+  "problems/content-too-large": "The request body crossed the route's declared byte limit.",
+  "problems/unsupported-media-type": "The request body is not sent with a supported JSON media type.",
+  "problems/internal-server-error": "The server could not produce a response that satisfies its route contract.",
+  "problems/rate-limit": "The configured quota rejected the request for this rate-limit window.",
+  "problems/rate-limit-unavailable": "The rate-limit policy could not execute safely and failed closed.",
+  "problems/unauthorized": "A protected route did not receive a valid authenticated identity.",
+  "problems/forbidden": "An authorization guard denied an authenticated request.",
+};
+
+const PROBLEM_STATUSES = {
+  "request-validation": 400,
+  "content-too-large": 413,
+  "unsupported-media-type": 415,
+  "internal-server-error": 500,
+  "rate-limit": 429,
+  "rate-limit-unavailable": 503,
+  unauthorized: 401,
+  forbidden: 403,
 };
 
 /**
@@ -103,6 +135,7 @@ export const GROUPS = [
 ];
 
 const sourceDirectory = (group) => resolve(repository, group === "framework" ? "docs/framework" : "docs/sgad");
+const problemSourceDirectory = () => resolve(repository, "docs/problems");
 
 const routeFor = (group, slug) => {
   if (group === "framework") {
@@ -111,6 +144,8 @@ const routeFor = (group, slug) => {
   if (slug === "README") return "/docs/sgad/";
   return slug === "sgad.req" ? "/docs/sgad/requirements/" : `/docs/sgad/${slug}/`;
 };
+
+const problemRouteFor = (slug) => `/problems/${slug}/`;
 
 const slugify = (text) =>
   text.toLowerCase().trim()
@@ -170,9 +205,58 @@ export function planGuides(order = READING_ORDER) {
   return planned;
 }
 
+/** Plans every published RFC 9457 problem type and fails on a missing source. */
+export function planProblems(order = PROBLEM_ORDER) {
+  const directory = problemSourceDirectory();
+  const present = readdirSync(directory)
+    .filter((name) => name.endsWith(".md"))
+    .map((name) => name.replace(/\.md$/, ""));
+
+  for (const slug of order) {
+    if (!present.includes(slug)) {
+      throw new Error(
+        `docs/problems/${slug}.md is listed in the problem order but does not exist. ` +
+          "Update PROBLEM_ORDER in scripts/generate-docs.mjs, or restore the file.",
+      );
+    }
+  }
+
+  const extras = present.filter((slug) => !order.includes(slug)).sort();
+  const planned = [...order, ...extras].map((slug) => ({
+    group: "problems",
+    slug,
+    sourcePath: posix.join("docs/problems", `${slug}.md`),
+    route: problemRouteFor(slug),
+    typeUri: `https://sleepyhollow.io/problems/${slug}`,
+    summary: SUMMARIES[`problems/${slug}`] ?? "",
+    navTitle: null,
+    status: PROBLEM_STATUSES[slug] ?? null,
+  }));
+
+  for (const problem of planned) {
+    if (problem.status === null) {
+      throw new Error(
+        `docs/problems/${problem.slug}.md has no declared HTTP status. Add it to PROBLEM_STATUSES.`,
+      );
+    }
+    if (!problem.summary) {
+      throw new Error(
+        `docs/problems/${problem.slug}.md has no index summary. Add it to SUMMARIES.`,
+      );
+    }
+  }
+
+  const routes = new Set();
+  for (const problem of planned) {
+    if (routes.has(problem.route)) throw new Error(`two problem types claim the route ${problem.route}`);
+    routes.add(problem.route);
+  }
+  return planned;
+}
+
 /** Resolves a Markdown link to a site route, or to the file on the repository host. */
 function resolveLink(href, guide, routesBySource) {
-  if (/^(?:https?:|mailto:|#)/.test(href)) return href;
+  if (/^(?:https?:|mailto:|#|\/)/.test(href)) return href;
 
   const [target, anchor] = href.split("#");
   if (!target) return href;
@@ -280,7 +364,85 @@ const documentFor = (guide, guides) => {
 `;
 };
 
-const indexDocument = (guides) => {
+const problemDocument = (problem, problems) => {
+  const navigation = problems
+    .map((entry) =>
+      `<li><a href="${entry.route}"${entry.route === problem.route ? ' aria-current="page"' : ""}>${
+        escapeHtml(entry.title)
+      }</a></li>`
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="${escapeHtml(problem.summary || `${problem.title} — Sleepy Hollow problem details.`)}" />
+    <meta property="og:title" content="${escapeHtml(problem.title)} · Sleepy Hollow problem details" />
+    <meta property="og:description" content="${escapeHtml(problem.summary || `${problem.title} — Sleepy Hollow problem details.`)}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://sleepyhollow.io${problem.route}" />
+    <link rel="canonical" href="https://sleepyhollow.io${problem.route}" />
+    <title>${escapeHtml(problem.title)} · Sleepy Hollow problem details</title>
+  </head>
+  <body data-page="problems" data-problem="${problem.route}">
+    <div id="root"></div>
+    <noscript>
+      <nav aria-label="Problem details"><ul>${navigation}</ul></nav>
+      <main>
+        <p><a href="/docs/">Documentation</a> · Problem details</p>
+        <h1>${escapeHtml(problem.title)}</h1>
+        <p>HTTP ${problem.status} · <code>${problem.typeUri}</code></p>
+        ${problem.html}
+        <a href="/problems/">All problem details</a>
+        <a href="/">Sleepy Hollow</a>
+      </main>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`;
+};
+
+const problemIndexDocument = (problems) => {
+  const items = problems
+    .map((problem) =>
+      `<li><a href="${problem.route}">${escapeHtml(problem.title)}</a> <span>HTTP ${problem.status}</span> · <code>${escapeHtml(problem.typeUri)}</code> — ${escapeHtml(problem.summary)}</li>`,
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="The stable RFC 9457 problem types emitted by Sleepy Hollow." />
+    <meta property="og:title" content="Problem details · Sleepy Hollow" />
+    <meta property="og:description" content="The stable RFC 9457 problem types emitted by Sleepy Hollow." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sleepyhollow.io/problems/" />
+    <link rel="canonical" href="https://sleepyhollow.io/problems/" />
+    <title>Problem details · Sleepy Hollow</title>
+  </head>
+  <body data-page="problems" data-problem="/problems/">
+    <div id="root"></div>
+    <noscript>
+      <main>
+        <h1>Every failure has a stable address.</h1>
+        <p>Stable RFC 9457 problem types emitted by Sleepy Hollow.</p>
+        <ul>${items}</ul>
+        <a href="/docs/">Documentation</a>
+        <a href="/">Sleepy Hollow</a>
+      </main>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`;
+};
+
+const indexDocument = (guides, problems) => {
   const groups = GROUPS.map((group) => {
     const items = guides
       .filter((guide) => guide.group === group.id)
@@ -288,6 +450,9 @@ const indexDocument = (guides) => {
       .join("");
     return `<section><h2>${escapeHtml(group.title)}</h2><p>${escapeHtml(group.description)}</p><ul>${items}</ul></section>`;
   }).join("");
+  const problemItems = problems
+    .map((problem) => `<li><a href="${problem.route}">${escapeHtml(problem.title)}</a> — HTTP ${problem.status} · ${escapeHtml(problem.summary)}</li>`)
+    .join("");
 
   return `<!doctype html>
 <html lang="en">
@@ -311,6 +476,7 @@ const indexDocument = (guides) => {
       <main>
         <h1>Documentation</h1>
         ${groups}
+        <section><h2>Problem details</h2><p>Stable RFC 9457 type URIs for the failures emitted by Sleepy Hollow.</p><ul>${problemItems}</ul><a href="/problems/">Browse all problem details</a></section>
         <a href="/api/">API reference</a>
         <a href="/">Sleepy Hollow</a>
       </main>
@@ -340,6 +506,24 @@ const contentModule = (guides) => {
     `export const guides = ${JSON.stringify(payload, null, 2)};\n`;
 };
 
+const problemsContentModule = (problems) => {
+  const payload = problems.map((problem) => ({
+    slug: problem.slug,
+    route: problem.route,
+    sourcePath: problem.sourcePath,
+    title: problem.title,
+    typeUri: problem.typeUri,
+    summary: problem.summary,
+    status: problem.status,
+    headings: problem.headings,
+    html: problem.html,
+    next: problem.next,
+  }));
+
+  return `// Generated by scripts/generate-docs.mjs. Do not edit; edit the Markdown under docs/problems/.\n` +
+    `export const problems = ${JSON.stringify(payload, null, 2)};\n`;
+};
+
 const typeDeclaration = () =>
   `// Generated by scripts/generate-docs.mjs.
 export interface DocsGroup {
@@ -366,41 +550,99 @@ export interface Guide {
   readonly next: { readonly route: string; readonly title: string } | null;
 }
 
+export interface ProblemType {
+  readonly slug: string;
+  readonly route: string;
+  readonly typeUri: string;
+  readonly sourcePath: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly status: number;
+  readonly headings: readonly DocsHeading[];
+  readonly html: string;
+  readonly next: { readonly route: string; readonly title: string } | null;
+}
+
 export declare const groups: readonly DocsGroup[];
 export declare const guides: readonly Guide[];
 `;
 
+const problemsTypeDeclaration = () =>
+  `// Generated by scripts/generate-docs.mjs.
+export interface ProblemHeading {
+  readonly id: string;
+  readonly text: string;
+}
+
+export interface ProblemType {
+  readonly slug: string;
+  readonly route: string;
+  readonly typeUri: string;
+  readonly sourcePath: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly status: number;
+  readonly headings: readonly ProblemHeading[];
+  readonly html: string;
+  readonly next: { readonly route: string; readonly title: string } | null;
+}
+
+export declare const problems: readonly ProblemType[];
+`;
+
 export function build() {
   const planned = planGuides();
+  const plannedProblems = planProblems();
   const routesBySource = new Map(planned.map((guide) => [guide.sourcePath, guide.route]));
-  const rendered = planned.map((guide) => renderGuide(guide, routesBySource));
+  const problemRoutes = new Map(plannedProblems.map((problem) => [problem.sourcePath, problem.route]));
+  const allRoutes = new Map([...routesBySource, ...problemRoutes]);
+  const rendered = planned.map((guide) => renderGuide(guide, allRoutes));
+  const renderedProblems = plannedProblems.map((problem) => renderGuide(problem, allRoutes));
 
   for (const [index, guide] of rendered.entries()) {
     const following = rendered[index + 1];
     guide.next = following ? { route: following.route, title: following.title } : null;
   }
 
+  for (const [index, problem] of renderedProblems.entries()) {
+    const following = renderedProblems[index + 1];
+    problem.next = following ? { route: following.route, title: following.title } : null;
+    problem.status = plannedProblems[index].status;
+  }
+
   const entriesRoot = resolve(website, "docs");
+  const problemsRoot = resolve(website, "problems");
   const generatedRoot = resolve(website, "generated");
   rmSync(entriesRoot, { recursive: true, force: true });
+  rmSync(problemsRoot, { recursive: true, force: true });
   mkdirSync(entriesRoot, { recursive: true });
+  mkdirSync(problemsRoot, { recursive: true });
   mkdirSync(generatedRoot, { recursive: true });
 
-  writeFileSync(join(entriesRoot, "index.html"), indexDocument(rendered), "utf8");
+  writeFileSync(join(entriesRoot, "index.html"), indexDocument(rendered, renderedProblems), "utf8");
   for (const guide of rendered) {
     const directory = resolve(website, `docs${guide.route.replace(/^\/docs/, "")}`);
     mkdirSync(directory, { recursive: true });
     writeFileSync(join(directory, "index.html"), documentFor(guide, rendered), "utf8");
   }
 
+  writeFileSync(join(problemsRoot, "index.html"), problemIndexDocument(renderedProblems), "utf8");
+  for (const problem of renderedProblems) {
+    const directory = resolve(website, `problems${problem.route.replace(/^\/problems/, "")}`);
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(join(directory, "index.html"), problemDocument(problem, renderedProblems), "utf8");
+  }
+
   writeFileSync(join(generatedRoot, "docs-content.js"), contentModule(rendered), "utf8");
   writeFileSync(join(generatedRoot, "docs-content.d.ts"), typeDeclaration(), "utf8");
+  writeFileSync(join(generatedRoot, "problems-content.js"), problemsContentModule(renderedProblems), "utf8");
+  writeFileSync(join(generatedRoot, "problems-content.d.ts"), problemsTypeDeclaration(), "utf8");
 
-  return rendered;
+  return { guides: rendered, problems: renderedProblems };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
-  const guides = build();
-  const entries = guides.length + 1;
-  console.log(`Generated ${guides.length} guide(s) and ${entries} entry document(s) from docs/.`);
+  const { guides, problems } = build();
+  const entries = guides.length + problems.length + 2;
+  console.log(`Generated ${guides.length} guide(s), ${problems.length} problem reference(s), and ${entries} entry document(s).`);
 }

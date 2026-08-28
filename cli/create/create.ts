@@ -7,7 +7,7 @@ import {
   type CreationResult,
 } from "./types.ts";
 
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 const NAME = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
 function files(name: string): Readonly<Record<string, string>> {
@@ -339,7 +339,7 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-export const FRAMEWORK_VERSION = "0.4.0";
+export const FRAMEWORK_VERSION = "0.4.1";
 
 export async function createProject(
   options: CreateProjectOptions,

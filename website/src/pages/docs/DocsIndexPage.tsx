@@ -1,5 +1,6 @@
 import { groups, guidesInGroup } from "../../docs";
 import { frameworkInstallCommand, sitePaths } from "../../site";
+import { problems } from "../../problems";
 
 export default function DocsIndexPage() {
   return (
@@ -51,6 +52,26 @@ export default function DocsIndexPage() {
               Generated from the source documentation comments of every published
               entry point. Opens the generated reference, which uses its own
               layout.
+            </span>
+          </li>
+        </ul>
+      </section>
+
+      <section className="docs-index__group" aria-labelledby="group-problems">
+        <div className="docs-index__group-head">
+          <h2 id="group-problems">Problem details</h2>
+          <p>
+            Stable RFC 9457 type URIs for the failures the framework emits.
+            Each page explains when the response appears and what a client can
+            safely do next.
+          </p>
+        </div>
+        <ul className="docs-index__list">
+          <li>
+            <a href={sitePaths.problems}>Browse all problem details</a>
+            <span>
+              {problems.length} published types, including request validation,
+              authentication, rate limiting, and safe internal failures.
             </span>
           </li>
         </ul>

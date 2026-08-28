@@ -85,7 +85,7 @@ human-approved exception uses `persistence: alternative` and records a
 `approver`, and `decision_source` values. Because this mapping is governed
 content, the model requirement's exact-content approval binds the exception.
 
-The framework 0.4.0 `hollow create` scaffold now emits a matching `tsconfig.json`
+The framework 0.4.1 `hollow create` scaffold now emits a matching `tsconfig.json`
 alongside its `tsc --noEmit` check script. A project created by an older CLI may
 have the script without that file; add or migrate the TypeScript configuration
 before treating a check failure as application behavior or red state.

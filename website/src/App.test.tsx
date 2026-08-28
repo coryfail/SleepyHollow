@@ -94,8 +94,37 @@ describe("approved site behavior", () => {
     expect(container.querySelector(".docs-next")).toBeInTheDocument();
   });
 
+  test("problem references · the catalogue links every emitted problem type", () => {
+    const { container } = render(<App page="problems" route="/problems/" />);
+    expect(screen.getByRole("heading", { level: 1, name: /every failure/i })).toBeVisible();
+    for (const slug of [
+      "request-validation",
+      "content-too-large",
+      "unsupported-media-type",
+      "internal-server-error",
+      "rate-limit",
+      "rate-limit-unavailable",
+      "unauthorized",
+      "forbidden",
+    ]) {
+      expect(container.querySelector(`a[href="/problems/${slug}/"]`)).toBeInTheDocument();
+    }
+  });
+
+  test("problem references · a detail page exposes its type URI and related navigation", () => {
+    const { container } = render(
+      <App page="problems" route="/problems/internal-server-error/" />,
+    );
+    expect(screen.getByRole("heading", { level: 1, name: "Internal server error" })).toBeVisible();
+    expect(screen.getByRole("link", { name: /https:\/\/sleepyhollow\.io\/problems\/internal-server-error/i })).toHaveAttribute(
+      "href", "/problems/internal-server-error/",
+    );
+    expect(container.querySelector(".problem-nav__link[aria-current='page']")).toHaveTextContent("Internal server error");
+    expect(container.querySelector(".problem-body .doc-article")).toBeInTheDocument();
+  });
+
   test("AC-SITE-006 · every route exposes one h1 and semantic landmarks", () => {
-    for (const [page, route] of [["sleepy-hollow", undefined], ["sgad", undefined], ["docs", "/docs/"], ["docs", "/docs/routing/"]] as const) {
+    for (const [page, route] of [["sleepy-hollow", undefined], ["sgad", undefined], ["docs", "/docs/"], ["docs", "/docs/routing/"], ["problems", "/problems/"], ["problems", "/problems/internal-server-error/"]] as const) {
       const { container, unmount } = render(<App page={page} route={route} />);
       expect(within(container).getAllByRole("heading", { level: 1 })).toHaveLength(1);
       expect(container.querySelector("header, nav, main, footer")).toBeInTheDocument();
@@ -111,7 +140,7 @@ describe("approved site behavior", () => {
   });
 
   test("AC-SITE-009 AC-DOCS-010 · no route contains a data-entry surface", () => {
-    for (const [page, route] of [["sleepy-hollow", undefined], ["sgad", undefined], ["docs", "/docs/"], ["docs", "/docs/routing/"]] as const) {
+    for (const [page, route] of [["sleepy-hollow", undefined], ["sgad", undefined], ["docs", "/docs/"], ["docs", "/docs/routing/"], ["problems", "/problems/"], ["problems", "/problems/internal-server-error/"]] as const) {
       const { container, unmount } = render(<App page={page} route={route} />);
       expect(container.querySelector("form, input, textarea, select")).not.toBeInTheDocument();
       unmount();

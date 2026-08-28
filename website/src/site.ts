@@ -11,6 +11,7 @@ export const cliInstallCommand = "npm install -g @sleepy-hollow/framework";
 export const sitePaths = {
   home: import.meta.env.BASE_URL,
   docs: `${import.meta.env.BASE_URL}docs/`,
+  problems: `${import.meta.env.BASE_URL}problems/`,
   sgad: `${import.meta.env.BASE_URL}sgad/`,
   api: `${import.meta.env.BASE_URL}api/`,
 } as const;

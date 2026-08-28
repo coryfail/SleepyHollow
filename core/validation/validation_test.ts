@@ -141,7 +141,7 @@ test("AC-F003-002 · invalid input returns field-specific Problem Details before
   assert.equal(handled, 0);
   assert.equal(
     problem.type,
-    "https://sleepyhollow.dev/problems/request-validation",
+    "https://sleepyhollow.io/problems/request-validation",
   );
   assert.equal(problem.title, "Request validation failed");
   assert.deepEqual(problem.errors, [{
@@ -253,6 +253,10 @@ test("AC-F003-005 · invalid handler responses become internal failures", async 
   const response = await app.fetch(validRequest());
   const problem = await json(response);
   assert.equal(response.status, 500);
+  assert.equal(
+    problem.type,
+    "https://sleepyhollow.io/problems/internal-server-error",
+  );
   assert.equal(problem.title, "Internal Server Error");
   assert.doesNotMatch(JSON.stringify(problem), /accepted|wrong/);
   assert.equal(diagnostics[0]?.code, "SH_RESPONSE_SCHEMA_INVALID");

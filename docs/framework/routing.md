@@ -125,15 +125,17 @@ Return a standard `Response`. Failures use RFC 9457 problem details:
 
 ```json
 {
-  "type": "https://sleepyhollow.io/problems/validation",
-  "title": "Unprocessable Entity",
-  "status": 422,
-  "detail": "body.url must be a valid URL"
+  "type": "https://sleepyhollow.io/problems/request-validation",
+  "title": "Request validation failed",
+  "status": 400,
+  "instance": "/bookmarks"
 }
 ```
 
 Validation failures produce this shape automatically. Declare the status in
-`responses` so it appears in the generated contract.
+the response contract so it appears in the generated contract. See the
+[complete problem details reference](/problems/) for every stable type URI and
+its response behavior.
 
 ## Escape hatch
 

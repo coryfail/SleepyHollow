@@ -195,6 +195,10 @@ test("AC-F005-003 · missing identity returns declared 401 and challenge", async
     'Bearer realm="project"',
   );
   assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(
+    body.type,
+    "https://sleepyhollow.io/problems/unauthorized",
+  );
   assert.equal(body.title, "Unauthorized");
   assert.equal(handled, 0);
   assert.doesNotMatch(JSON.stringify(body), /missing/);

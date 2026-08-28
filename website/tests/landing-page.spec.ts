@@ -6,6 +6,8 @@ const routes = [
   { name: "SGAD", path: "/sgad/" },
   { name: "Documentation index", path: "/docs/" },
   { name: "Routing guide", path: "/docs/routing/" },
+  { name: "Problem details index", path: "/problems/" },
+  { name: "Internal server error problem", path: "/problems/internal-server-error/" },
 ] as const;
 
 const requiredViewports = [
@@ -139,6 +141,15 @@ test("AC-DOCS-008 · guide code blocks scroll inside their own region at 320px",
     viewport: document.documentElement.clientWidth,
   }));
   expect(dimensions.body).toBeLessThanOrEqual(dimensions.viewport);
+});
+
+test("problem references · the index links to a stable type page", async ({ page }) => {
+  await page.goto("/problems/");
+  await expect(page.getByRole("heading", { level: 1, name: /every failure/i })).toBeVisible();
+  await page.getByRole("link", { name: /internal server error/i }).first().click();
+  await expect(page).toHaveURL(/\/problems\/internal-server-error\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Internal server error" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /https:\/\/sleepyhollow\.io\/problems\/internal-server-error/i })).toBeVisible();
 });
 
 test("AC-WEB-SGAD-001 AC-WEB-SGAD-003 AC-WEB-SGAD-006 AC-WEB-SGAD-012 · SGAD is a complete independent methodology page", async ({ page }) => {
@@ -372,5 +383,17 @@ test("AC-SITE-004 AC-DOCS-007 · core content remains available without JavaScri
     .toBeVisible();
   await expect(page.getByRole("link", { name: "Data", exact: true }).first())
     .toBeVisible();
+
+  await page.goto("/problems/");
+  await expect(page.getByRole("heading", { level: 1, name: /every failure/i }))
+    .toBeVisible();
+  await expect(page.getByRole("link", { name: /internal server error/i }).first())
+    .toBeVisible();
+
+  await page.goto("/problems/internal-server-error/");
+  await expect(page.getByRole("heading", { level: 1, name: "Internal server error" }))
+    .toBeVisible();
+  await expect(page.locator("main > p code").first())
+    .toContainText("https://sleepyhollow.io/problems/internal-server-error");
   await context.close();
 });
