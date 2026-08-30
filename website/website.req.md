@@ -634,3 +634,17 @@ otherwise healthy runner.
   `sha256:5636854fe3dd65285040439d9e9210d3266069ab2dacf3cc0f6f5ab6b9e64350`.
 - Decision source: owner direct response `approve it all`, immediately after
   review of manifest `sha256:efa3ea4203288b8ddf06e598787a4bcfea3125b77952381dd98fa34a8a75e710`.
+
+### Delivery, 0.4.2 engineering standards
+
+- Status: delivered successfully.
+- Source: `ae9bf830e4d2fc7d059cdca53d24dd50e7eae704` on `main`.
+- Target: `https://sleepyhollow.io` through GitHub Pages.
+- Workflow evidence:
+  `https://github.com/coryfail/SleepyHollow/actions/runs/33287656006`
+  completed verification and deployment successfully at
+  2026-08-30T02:22:24Z.
+- Production smoke: headless Chromium loaded the custom domain, found “One
+  application standard, for agents and humans,” navigated to the published
+  Application standards guide, and found the SGAD Core 0.3.0 status plus “One
+  engineering standard, whoever writes the code.”

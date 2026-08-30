@@ -236,3 +236,14 @@ entries to make stale evidence appear current.
 
 - Status: not applicable until delivery is authorized and attempted.
 - Verified source, target, result, and time: pending when applicable.
+
+### Delivery, 0.4.2
+
+- Status: delivered successfully.
+- Source: `ae9bf830e4d2fc7d059cdca53d24dd50e7eae704`.
+- Targets: the versioned repository sources and
+  `https://sleepyhollow.io/docs/sgad/engineering-quality/`.
+- Result: GitHub Pages workflow
+  `https://github.com/coryfail/SleepyHollow/actions/runs/33287656006`
+  completed successfully at 2026-08-30T02:22:24Z. SGAD remains identified as
+  a public draft of Core 0.3.0 rather than a finalized standard.

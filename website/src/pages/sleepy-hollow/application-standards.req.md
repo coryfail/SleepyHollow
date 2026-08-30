@@ -181,3 +181,12 @@ entries to make stale evidence appear current.
 
 - Status: not applicable until delivery is authorized and attempted.
 - Verified source, target, result, and time: pending when applicable.
+
+### Delivery, 0.4.2
+
+- Status: delivered successfully.
+- Source: `ae9bf830e4d2fc7d059cdca53d24dd50e7eae704`.
+- Target: `https://sleepyhollow.io/`.
+- Result: the Pages workflow completed successfully at
+  2026-08-30T02:22:24Z. Headless Chromium found the application-standards
+  section and navigated its descriptive action to the canonical guide.

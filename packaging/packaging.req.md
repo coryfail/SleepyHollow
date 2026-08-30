@@ -443,3 +443,22 @@ readability; no other digest normalization is permitted.
   through a temporary symlink and asserts a version response.
 - Verification: `npm run verify` passed Node and Bun suites (220 passed, 3
   skipped each) and the 5-test baseline, including the symlinked executable.
+
+### Delivery, 0.4.2
+
+- Status: delivered successfully.
+- Source: `ae9bf830e4d2fc7d059cdca53d24dd50e7eae704`, tag `v0.4.2`.
+- Target: `@sleepy-hollow/framework@0.4.2` on npm.
+- Publisher evidence:
+  `https://github.com/coryfail/SleepyHollow/actions/runs/33287655965`
+  completed successfully at 2026-08-30T02:19:10Z after re-running framework
+  verification, pack inspection, tag matching, and unused-version refusal.
+- Registry evidence: npm reports `latest: 0.4.2`, tarball
+  `https://registry.npmjs.org/@sleepy-hollow/framework/-/framework-0.4.2.tgz`,
+  integrity
+  `sha512-AG520siSEBNx9v3aWBsVkwaeulh7FnneC4nZ815G3etBTd5GM18ea2v1e5NP9FPeWU52Kq4pseX5o2BQUAQEGg==`,
+  shasum `1f8b003f71ea2d4858b9b16332252beefc6fe1cf`, and `gitHead` equal to the
+  delivered source.
+- Post-publication smoke: a clean temporary project installed the exact version
+  with zero audit vulnerabilities; the CLI reported `hollow 0.4.2` and the main
+  package export loaded.

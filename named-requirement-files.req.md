@@ -411,3 +411,24 @@ It does not authorize release delivery.
 - Residuals: npm publication and GitHub Pages deployment still depend on the
   repository workflows and their configured secrets. Four existing TypeDoc
   inclusion warnings remain non-blocking; TypeDoc reported zero errors.
+
+### Delivery result, 0.4.2
+
+- Status: delivered successfully.
+- Delivered source: commit
+  `ae9bf830e4d2fc7d059cdca53d24dd50e7eae704`, atomically pushed to `main`
+  and annotated tag `v0.4.2`.
+- npm target: `@sleepy-hollow/framework@0.4.2`; publish workflow
+  `https://github.com/coryfail/SleepyHollow/actions/runs/33287655965`
+  completed successfully at 2026-08-30T02:19:10Z. npm reports `latest` as
+  `0.4.2` and binds `gitHead` to the delivered commit.
+- Website target: `https://sleepyhollow.io`; website workflow
+  `https://github.com/coryfail/SleepyHollow/actions/runs/33287656006`
+  verified and deployed the delivered commit successfully at
+  2026-08-30T02:22:24Z.
+- Consumer smoke: a clean temporary npm project installed 0.4.2 with no audit
+  vulnerabilities, `hollow --version` returned `0.4.2`, and the package's main
+  `defineRoute` export loaded successfully.
+- Production smoke: headless Chromium found the Sleepy Hollow application-
+  standards section and guide plus the SGAD Core 0.3.0 status and engineering-
+  quality section on the custom domain.
