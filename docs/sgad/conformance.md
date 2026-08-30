@@ -8,7 +8,7 @@ document.
 
 ## SGAD Core
 
-A project claiming **SGAD Core 0.2.0** must satisfy every requirement below.
+A project claiming **SGAD Core 0.3.0** must satisfy every requirement below.
 
 ### Intent
 
@@ -54,12 +54,42 @@ A project claiming **SGAD Core 0.2.0** must satisfy every requirement below.
     revision, policy, checks, outcome, and residual exceptions.
 18. Material changes to governed inputs must invalidate affected verification.
 
+### Engineering quality
+
+19. The project must declare a repository-visible engineering standard, its
+    applicability, and deterministic enforcement controls. The same standard
+    must apply to human-authored, agent-authored, and mixed-author changes.
+20. Authored source must satisfy the [SGAD engineering-quality baseline](engineering-quality.md):
+    readable source layout, intentional naming and structure, cohesive
+    responsibilities, governed complexity and duplication, meaningful contract
+    and decision documentation, explicit error handling, and trust-boundary
+    validation.
+21. Delivery-ready authored source must not contain exposed secrets, accidental
+    debugging residue, dead code, or unresolved implementation placeholders.
+    Generated and vendored source must be distinguishable from authored source
+    and retain a canonical origin or regeneration path when applicable.
+22. Independent verification must identify the applicable engineering policy
+    revision, run or validate every required quality control, record results and
+    residual exceptions, and fail closed when a required control is missing,
+    stale, bypassed, malformed, or failing.
+23. An engineering-quality exception must identify its unmet rule, bounded
+    scope, authority, rationale, duration or review condition, residual risk,
+    compensating controls, and removal condition. An active exception requires a
+    qualified conformance claim.
+
 ### Delivery
 
-19. A governed delivery path must require the verification evidence selected by
+24. A governed delivery path must require the verification evidence selected by
     project risk policy.
-20. The delivered revision must be traceable to the verified implementation
+25. The delivered revision must be traceable to the verified implementation
     revision.
+
+## Version compatibility
+
+SGAD Core 0.2.0 retains its original meaning and requirements. The engineering-
+quality rules above are introduced by 0.3.0; they do not retroactively change an
+existing 0.2.0 claim. A 0.2.0 assessment uses the immutable 0.2.0 methodology
+revision, while adoption of these rules is reported as SGAD Core 0.3.0.
 
 ## Optional capability profiles
 
@@ -67,7 +97,7 @@ Projects may append these capability claims after satisfying SGAD Core.
 
 ### Content-addressed
 
-Claim: `SGAD Core 0.2.0 + Content-Addressed`
+Claim: `SGAD Core 0.3.0 + Content-Addressed`
 
 The project:
 
@@ -79,7 +109,7 @@ The project:
 
 ### Bidirectionally traceable
 
-Claim: `SGAD Core 0.2.0 + Bidirectional-Traceability`
+Claim: `SGAD Core 0.3.0 + Bidirectional-Traceability`
 
 The project:
 
@@ -89,7 +119,7 @@ The project:
 
 ### Adversarially tested
 
-Claim: `SGAD Core 0.2.0 + Adversarial-Testing`
+Claim: `SGAD Core 0.3.0 + Adversarial-Testing`
 
 The project selects risk-appropriate independent assurance such as mutation
 testing, property-based testing, fuzzing, protected regression tests, security
@@ -97,7 +127,7 @@ analysis, or independently produced test cases and records the results.
 
 ### Risk-governed
 
-Claim: `SGAD Core 0.2.0 + Risk-Governed`
+Claim: `SGAD Core 0.3.0 + Risk-Governed`
 
 The project:
 
@@ -108,7 +138,7 @@ The project:
 
 ### Delivery-gated
 
-Claim: `SGAD Core 0.2.0 + Delivery-Gated`
+Claim: `SGAD Core 0.3.0 + Delivery-Gated`
 
 The project:
 
@@ -120,7 +150,7 @@ The project:
 
 ### AI-system evaluated
 
-Claim: `SGAD Core 0.2.0 + AI-System-Evaluated`
+Claim: `SGAD Core 0.3.0 + AI-System-Evaluated`
 
 For nondeterministic AI behavior, the project:
 
@@ -153,7 +183,7 @@ An exception does not silently preserve full conformance. It must identify:
 - The residual risk and compensating controls.
 - The condition for removal.
 
-A project with an active exception states `SGAD Core 0.2.0 with exceptions` and
+A project with an active exception states `SGAD Core 0.3.0 with exceptions` and
 links the exception record.
 
 ## Non-conforming claims

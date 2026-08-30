@@ -125,3 +125,13 @@ governs.
 Projects advocating SGAD should apply SGAD to changes in their own methodology,
 templates, verifiers, and policies. A change to the rules is itself governed
 behavior with requirements, review, evidence, and compatibility impact.
+
+## 15. Engineering quality is explicit and shared
+
+Humans, agents, and mixed teams follow the same repository-visible engineering
+standard. Behavioral correctness does not excuse unreadable, unmaintainable, or
+policy-violating implementation.
+
+SGAD defines a small technology-neutral baseline and requires independently
+checkable enforcement. Each project retains authority over its exact conventions,
+thresholds, tools, and justified exceptions.

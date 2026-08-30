@@ -474,24 +474,124 @@ test("AC-NRF-002 AC-NRF-009 · every current governed artifact has a named requi
   assert.ok(requirementPaths().includes("named-requirement-files.req.md"));
 });
 
-test("AC-NRF-012 · framework release surfaces report 0.4.1", () => {
-  assert.equal(JSON.parse(read("package.json")).version, "0.4.1");
+test("AC-NRF-012 · framework release surfaces report 0.4.2", () => {
+  assert.equal(JSON.parse(read("package.json")).version, "0.4.2");
   assert.equal(JSON.parse(read("website/package.json")).version, "0.2.0");
-  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.4\.1"/);
-  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.4\.1"/);
+  assert.match(read("cli/dispatcher.ts"), /CLI_VERSION = "0\.4\.2"/);
+  assert.match(read("cli/create/create.ts"), /FRAMEWORK_VERSION = "0\.4\.2"/);
   assert.match(
     read("cli/generate/artifacts.ts"),
-    /generatorVersion: "0\.4\.1"/,
+    /generatorVersion: "0\.4\.2"/,
   );
   assert.match(
     read("cli/generate/inventory.ts"),
-    /options\.version \?\? "0\.4\.1"/,
+    /options\.version \?\? "0\.4\.2"/,
   );
   assert.match(
     read("docs/sgad/README.md"),
-    /Draft methodology, version 0\.2\.0/,
+    /Draft methodology, version 0\.3\.0/,
   );
-  assert.match(read("docs/sgad/conformance.md"), /SGAD Core 0\.2\.0/);
+  assert.match(read("docs/sgad/conformance.md"), /SGAD Core 0\.3\.0/);
+});
+
+test("AC-SGAD-EQ-001 AC-SGAD-EQ-002 AC-SGAD-EQ-003 AC-SGAD-EQ-004 AC-SGAD-EQ-005 AC-SGAD-EQ-006 · SGAD defines a portable engineering-quality baseline", () => {
+  const methodologyPath = "docs/sgad/engineering-quality.md";
+  const skillReferencePath =
+    "skills/sgad-workflow/references/engineering-quality.md";
+  assert.equal(
+    existsSync(resolve(repository, methodologyPath)),
+    true,
+    "the canonical SGAD engineering-quality baseline must exist",
+  );
+  assert.equal(
+    existsSync(resolve(repository, skillReferencePath)),
+    true,
+    "the portable SGAD skill must package engineering-quality guidance",
+  );
+
+  const methodology = read(methodologyPath);
+  const skillReference = read(skillReferencePath);
+  const combined = `${methodology}\n${skillReference}`;
+  assert.match(
+    combined,
+    /(?:humans?|human-authored)[\s\S]{0,160}(?:agents?|agent-authored)[\s\S]{0,160}(?:same|equally|shared)/i,
+  );
+  assert.match(combined, /repository-visible[\s\S]{0,100}(?:standard|policy)/i);
+  assert.match(combined, /authored source[\s\S]{0,100}readable/i);
+  assert.match(combined, /cohesive[\s\S]{0,160}(?:functions?|modules?|responsibilit)/i);
+  assert.match(combined, /public contracts?[\s\S]{0,180}non-obvious/i);
+  assert.match(combined, /explicit[\s\S]{0,100}errors?/i);
+  assert.match(combined, /trust boundar(?:y|ies)[\s\S]{0,100}validat/i);
+  assert.match(
+    combined,
+    /secrets?[\s\S]{0,180}debugging[\s\S]{0,180}dead code[\s\S]{0,180}(?:placeholder|incomplete)/i,
+  );
+  assert.match(combined, /generated[\s\S]{0,120}vendored[\s\S]{0,180}(?:origin|regenerat)/i);
+  assert.match(
+    combined,
+    /project(?:'s)? (?:policy|standard)[\s\S]{0,200}(?:owns?|defines?)[\s\S]{0,200}(?:format|naming|organization)/i,
+  );
+  assert.match(combined, /does not require[\s\S]{0,100}(?:every function|function-by-function)/i);
+  assert.doesNotMatch(
+    combined,
+    /Sleepy Hollow|Drizzle|TypeScript|JavaScript|Python|Ruby|\bORM\b/i,
+    "SGAD's portable quality baseline must remain technology-independent",
+  );
+});
+
+test("AC-SGAD-EQ-007 AC-SGAD-EQ-008 · SGAD verifies declared controls and bounded exceptions", () => {
+  const methodologyPath = "docs/sgad/engineering-quality.md";
+  const skillReferencePath =
+    "skills/sgad-workflow/references/engineering-quality.md";
+  assert.equal(
+    existsSync(resolve(repository, methodologyPath)),
+    true,
+    "quality verification requires the canonical engineering policy",
+  );
+  assert.equal(
+    existsSync(resolve(repository, skillReferencePath)),
+    true,
+    "quality verification requires the portable skill policy",
+  );
+  const canonical = [
+    read(methodologyPath),
+    read("docs/sgad/verification-model.md"),
+    read("docs/sgad/conformance.md"),
+  ].join("\n");
+  const packaged = [
+    read("skills/sgad-workflow/SKILL.md"),
+    read(skillReferencePath),
+    read("skills/sgad-workflow/references/verification-and-conformance.md"),
+  ].join("\n");
+
+  for (const guidance of [canonical, packaged]) {
+    assert.match(
+      guidance,
+      /policy revision[\s\S]{0,180}(?:commands?|controls?)[\s\S]{0,180}(?:results?|outcomes?)/i,
+    );
+    assert.match(
+      guidance,
+      /(?:missing|stale|bypassed|malformed|failing)[\s\S]{0,220}(?:prevent|fail|nonzero|not verified)/i,
+    );
+    assert.match(
+      guidance,
+      /exception[\s\S]{0,220}bounded scope[\s\S]{0,220}(?:removal condition|review condition)/i,
+    );
+  }
+});
+
+test("AC-SGAD-EQ-009 · engineering quality evolves SGAD without redefining Core 0.2.0", () => {
+  assert.match(read("docs/sgad/README.md"), /Draft methodology, version 0\.3\.0/);
+  const conformance = read("docs/sgad/conformance.md");
+  assert.match(conformance, /SGAD Core 0\.3\.0/);
+  assert.match(
+    conformance,
+    /SGAD Core 0\.2\.0[\s\S]{0,300}(?:retains|continues|original)[\s\S]{0,300}(?:meaning|requirements)/i,
+  );
+  assert.match(
+    read("skills/sgad-workflow/references/verification-and-conformance.md"),
+    /SGAD Core 0\.3\.0/,
+  );
 });
 
 test("AC-NRF-013 · contribution workflow uses main without a development branch", () => {

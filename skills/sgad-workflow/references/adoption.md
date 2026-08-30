@@ -18,6 +18,8 @@ Define:
 - The governed named `*.req.md` files that will contain complete governance
   histories.
 - Criterion-mapping convention.
+- Repository-visible engineering standards, applicability rules, deterministic
+  controls, and active exceptions.
 - One stable verifier command or CI entry point.
 - Evidence retention, invalidation, and delivery rules.
 
@@ -26,6 +28,11 @@ Define:
 Write the system specification, decompose independently reviewable components,
 approve exact intent, create mapped tests, retain red evidence, implement, verify,
 and only then deliver.
+
+Before implementation, adopt or confirm an engineering policy that applies
+equally to human and agent changes. Read
+[engineering-quality.md](engineering-quality.md) for the portable baseline and
+the boundary between SGAD obligations and project-owned conventions.
 
 ## Brownfield adoption
 
@@ -38,7 +45,8 @@ approval and red evidence for new governed behavior.
 
 1. Visible intent: specifications, stable criteria, and auditable approval.
 2. Traceable tests: bidirectional mapping and credible red evidence.
-3. Independent verification: one fail-closed verifier bound to revisions.
+3. Independent verification: one fail-closed verifier bound to revisions and the
+   applicable engineering policy.
 4. Governed delivery: risk-scaled gates and retained operational evidence.
 
 ## Repository layout example

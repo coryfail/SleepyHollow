@@ -404,6 +404,7 @@ main,
 }
 
 .methodology-prose,
+.methodology-quality,
 .methodology-workflow,
 .methodology-adoption,
 .methodology-caution {
@@ -435,6 +436,7 @@ main,
 }
 
 .methodology-workflow,
+.methodology-quality,
 .methodology-adoption,
 .methodology-caution,
 .methodology-close {
@@ -444,6 +446,14 @@ main,
 .methodology-section-head {
   display: grid;
   gap: var(--space-md);
+}
+
+.methodology-quality {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.methodology-quality__action {
+  justify-self: start;
 }
 
 .methodology-adoption .adoption__steps {
@@ -553,6 +563,14 @@ main,
   gap: var(--space-xl);
   padding-block: var(--space-3xl);
   padding-inline: clamp(var(--space-md), 4vw, var(--space-2xl));
+}
+
+.home-standards {
+  display: grid;
+  gap: var(--space-2xl);
+  padding-block: var(--space-3xl);
+  padding-inline: clamp(var(--space-md), 4vw, var(--space-2xl));
+  border-block-start: var(--rule-hair) solid var(--color-rule);
 }
 
 .home-capabilities .section-intro {
@@ -1705,6 +1723,7 @@ main,
   .home-problem,
   .home-method,
   .home-code,
+  .home-standards,
   .home-check,
   .home-install {
     grid-template-columns: minmax(19rem, 0.8fr) minmax(0, 1.2fr);
@@ -1716,6 +1735,7 @@ main,
   .home-problem,
   .home-method,
   .home-code,
+  .home-standards,
   .home-check,
   .home-install {
     align-items: start;
@@ -1740,6 +1760,7 @@ main,
   }
 
   .methodology-prose,
+  .methodology-quality,
   .methodology-caution,
   .methodology-practice {
     grid-template-columns: minmax(15rem, 0.75fr) minmax(0, 1.25fr);

@@ -26,6 +26,8 @@ governed software lifecycle transitions.
 - Place application, component, and repository-wide requirements according to
   the behavior they own.
 - Define how SGAD extends to nondeterministic AI systems.
+- Define a framework-independent engineering-quality baseline through the
+  separately governed `sgad-engineering-quality` requirement.
 - Describe Sleepy Hollow as a reference implementation without making it a
   dependency of SGAD.
 
@@ -87,6 +89,9 @@ governed software lifecycle transitions.
   use meaningful colocated `*.req.md` files, multiple requirements may share a
   directory, and repository-wide behavior uses its own meaningful root-level
   `*.req.md` name.
+- AC-SGAD-019: The approved `sgad-engineering-quality` requirement is represented
+  in the methodology, adoption, verification, conformance, and portable skill
+  guidance without imposing a particular technology or project convention.
 
 ## Dependencies and assumptions
 
@@ -95,7 +100,7 @@ governed software lifecycle transitions.
 - Each adopting stack can provide a verifier appropriate to its behavior and
   risk.
 - Normative conformance language will receive compatibility review before SGAD
-  advances beyond version 0.2.0 draft.
+  advances beyond version 0.3.0 draft.
 
 ## Change impact
 
@@ -106,8 +111,9 @@ compatibility assessment.
 ## Approval scope
 
 Approval should cover the methodology purpose, all AC-SGAD criteria, SGAD Core
-normative requirements, optional capability profiles, and the version 0.2.0
-templates. Partial approval must list excluded criteria explicitly.
+normative requirements, optional capability profiles, and the version 0.3.0
+methodology with its current templates. Partial approval must list excluded
+criteria explicitly.
 
 ## Governance record
 

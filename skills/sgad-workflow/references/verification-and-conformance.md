@@ -15,12 +15,15 @@ Select layers according to component risk and policy:
 5. Functional: run mapped unit, integration, contract, system, and regression tests.
 6. Policy and security: run applicable static, authorization, dependency, secret,
    configuration, data, privacy, and abuse checks.
-7. Contract and compatibility: detect unapproved interface, schema, error, data,
+7. Engineering quality: resolve the repository-visible engineering policy, run
+   all declared applicable controls, and record the policy revision, commands or
+   controls, applicability decisions, results, and exceptions.
+8. Contract and compatibility: detect unapproved interface, schema, error, data,
    and compatibility changes.
-8. Generated artifacts: regenerate or compare canonical outputs.
-9. Non-functional: evaluate approved performance, reliability, accessibility,
+9. Generated artifacts: regenerate or compare canonical outputs.
+10. Non-functional: evaluate approved performance, reliability, accessibility,
    privacy, resource, and operational thresholds.
-10. Delivery: bind the verified revision to the target and post-delivery evidence.
+11. Delivery: bind the verified revision to the target and post-delivery evidence.
 
 Require the verifier to be independent, reproducible, fail-closed, structured,
 actionable, content-bound, and observable.
@@ -35,6 +38,9 @@ Require evidence that:
   behavioral change.
 - Tests map to approved intent, credible red evidence exists for new behavior,
   and the producer cannot weaken tests or expand scope silently.
+- A repository-visible engineering standard applies equally to human and agent
+  changes; required controls fail closed and active exceptions qualify the
+  conformance claim.
 - Verification is independent, identifies exact inputs and policy, and fails on
   missing, stale, malformed, or failing evidence.
 - Governed delivery requires valid evidence and traces the target revision to the
@@ -55,7 +61,7 @@ Assess optional profiles only after SGAD Core is satisfied:
 - Delivery-Gated
 - AI-System-Evaluated
 
-State `SGAD Core 0.2.0 with exceptions` when active exceptions remain. Identify the
+State `SGAD Core 0.3.0 with exceptions` when active exceptions remain. Identify the
 unmet rule, bounded scope and duration, authority, residual risk, compensating
 controls, and removal condition.
 

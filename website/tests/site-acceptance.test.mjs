@@ -306,6 +306,71 @@ test("AC-WEB-SGAD-013 AC-WEB-SGAD-014 · SGAD explains the change in concrete te
   assert.match(text, /sitePaths\.docs|docsPaths/, "the page must route to the on-site SGAD documentation");
 });
 
+test("AC-WEB-SGAD-EQ-001 through AC-WEB-SGAD-EQ-006 · SGAD publishes one portable engineering-quality boundary", () => {
+  const text = prose(sgad());
+  assert.match(text, /Public draft[^.]*Core 0\.3\.0/i);
+  assert.match(text, /human-authored[^.]+agent-authored[^.]+mixed-author/i);
+  for (const phrase of [
+    "formatting",
+    "naming",
+    "organization",
+    "documentation",
+    "coverage",
+    "complexity",
+    "architecture",
+    "dependency",
+    "tooling",
+    "readable",
+    "cohesive",
+    "trust-boundary",
+    "generated or vendored",
+  ]) {
+    assert.match(text, new RegExp(phrase, "i"));
+  }
+  assert.match(text, /independent verification[^.]+policy/i);
+  assert.match(text, /exception/i);
+  assert.match(sgad(), /docs}sgad\/engineering-quality\//);
+  const section = sgad().match(/className="methodology-quality"([\s\S]*?)<\/section>/)?.[1] ?? "";
+  assert.doesNotMatch(section, /Sleepy Hollow|Drizzle|SQLite|PostgreSQL|TSDoc|every[^.]+function/i);
+});
+
+test("AC-HOME-STDS-001 through AC-HOME-STDS-008 · home presents the Sleepy Hollow application standard before review", () => {
+  const sourceText = home();
+  const text = prose(sourceText);
+  assert.match(text, /Drizzle[^.]+SQLite[^.]+PostgreSQL/i);
+  assert.match(text, /human-approved|human approval/i);
+  for (const phrase of [
+    "models/<model>/",
+    "<model>.req.md",
+    "schema.ts",
+    "repository.ts",
+    "types.ts",
+    "AI-generated",
+    "human-authored",
+    "multi-line",
+    "every application-owned function",
+    "formatter",
+    "linter",
+    "type",
+    "test",
+    "evidence",
+    "hollow check",
+  ]) {
+    assert.match(text, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+  assert.match(text, /routes?[^.]+(?:do not|does not|must not)[^.]+database/i);
+  assert.match(sourceText, /docs}application-standards\//);
+  assert.ok(
+    sourceText.indexOf('className="home-capabilities"') < sourceText.indexOf('className="home-standards"'),
+    "the standards section must follow ordinary capabilities",
+  );
+  assert.ok(
+    sourceText.indexOf('className="home-standards"') < sourceText.indexOf('className="home-check"'),
+    "the standards section must precede independent review",
+  );
+  assert.doesNotMatch(text, /guarantees? (?:correct|secure|defect-free|senior-quality)|replaces? human review/i);
+});
+
 test("AC-SITE-012 AC-DOCS-003 · guide prose is generated, never copied into website source", () => {
   assert.ok(existsSync(resolve(website, "scripts/generate-docs.mjs")), "missing the documentation generator");
   const generator = read("scripts/generate-docs.mjs");

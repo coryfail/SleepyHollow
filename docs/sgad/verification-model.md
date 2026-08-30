@@ -91,22 +91,33 @@ required environments.
 Runs applicable static analysis, authorization, dependency, secret, configuration,
 data-access, threat-model, and abuse-resistance checks.
 
-### 7. Contract and compatibility verification
+### 7. Engineering-quality verification
+
+Resolves the repository-visible engineering policy and its applicability to the
+evaluated change. Runs every required deterministic control and records the
+policy revision, commands or controls, results, and active exceptions. Missing,
+stale, bypassed, malformed, or failing required checks prevent verification.
+
+This layer applies the same policy to human-authored and agent-authored source.
+It distinguishes authored source from generated and vendored artifacts when the
+project standard defines different controls.
+
+### 8. Contract and compatibility verification
 
 Compares interfaces, schemas, errors, data behavior, and compatibility policy.
 Breaking changes require explicit approval and delivery treatment.
 
-### 8. Generated-artifact verification
+### 9. Generated-artifact verification
 
 Regenerates or hashes derived artifacts and fails on drift or unapproved manual
 edits.
 
-### 9. Non-functional verification
+### 10. Non-functional verification
 
 Evaluates approved performance, reliability, accessibility, privacy, resource,
 or operational thresholds with methods appropriate to the requirement.
 
-### 10. Delivery verification
+### 11. Delivery verification
 
 Binds the verified revision to the target and records health, smoke, migration,
 or rollback-readiness evidence required by policy.

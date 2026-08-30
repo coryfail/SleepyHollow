@@ -215,3 +215,56 @@ test("AC-FWDOC-008 · writing requirements introduces identifiers before it depe
     "writing-requirements.md depends on a requirement ID before explaining acceptance criteria",
   );
 });
+
+test("AC-FW-STDS-001 AC-FW-STDS-002 AC-FW-STDS-003 AC-FW-STDS-004 · the application standard is published with its persistence and ownership boundaries", () => {
+  const guide = read("docs/framework/application-standards.md");
+  const generator = read("website/scripts/generate-docs.mjs");
+
+  assert.match(generator, /"application-standards"/);
+  assert.match(generator, /"framework\/application-standards":\s*"[^"]+"/);
+  assert.match(guide, /AI-generated[^.]+human-authored|human-authored[^.]+AI-generated/i);
+  assert.match(guide, /Drizzle[\s\S]+SQLite[\s\S]+PostgreSQL/i);
+  assert.match(guide, /alternative[\s\S]+human[\s\S]+approved as exact content/i);
+  assert.match(guide, /models\/<model>\//);
+  for (const file of ["<model>.req.md", "schema.ts", "repository.ts", "types.ts"]) {
+    assert.match(guide, new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(guide, /routes?[^.]+(?:shall not|must not|do not)[^.]+(?:database|Drizzle|driver|client)/i);
+});
+
+test("AC-FW-STDS-005 AC-FW-STDS-006 AC-FW-STDS-007 AC-FW-STDS-008 · the application standard is complete, connected, and bounded", () => {
+  const guide = read("docs/framework/application-standards.md");
+  const commands = [
+    "npm run format:check",
+    "npm run lint",
+    "npm run check",
+    "npm run test",
+    "npx hollow test",
+    "npx hollow check",
+  ];
+
+  for (const phrase of [
+    "multi-line",
+    "TSDoc",
+    "strict TypeScript",
+    "trust boundaries",
+    "typed errors",
+    "structured logging",
+    "dependenc(?:y|ies)",
+    "criterion-mapped tests",
+  ]) {
+    assert.match(guide, new RegExp(phrase, "i"));
+  }
+  let previous = -1;
+  for (const command of commands) {
+    const position = guide.indexOf(command);
+    assert.ok(position > previous, `${command} must appear in canonical gate order`);
+    previous = position;
+  }
+  assert.match(guide, /(?:skipped|failed)[^.]+(?:cannot|prevents?)[^.]+verification/i);
+  assert.match(guide, /\.\/data\.md/);
+  assert.match(guide, /\.\/verification\.md/);
+  assert.match(guide, /\.\/writing-requirements\.md/);
+  assert.match(guide, /\.\.\/sgad\/engineering-quality\.md/);
+  assert.match(guide, /(?:does not|do not)[^.]+guarantee[^.]+(?:complete|defect-free|human review)/i);
+});

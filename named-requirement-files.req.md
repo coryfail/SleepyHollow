@@ -343,3 +343,71 @@ It does not authorize release delivery.
 ### Delivery
 
 - Status: not applicable until delivery is separately authorized.
+
+### Red-state evidence, 0.4.2 release alignment
+
+- Status: failed as expected against the healthy 0.4.1 release baseline.
+- Observed at: 2026-08-30T02:14:42Z.
+- Baseline revision: `b2bd7c7632b0a3864016b57e86127eec41c038d5` plus
+  the approved documentation and standards changes and the updated 0.4.2
+  release assertions, before release-surface implementation.
+- Commands: `./node_modules/.bin/vitest run cli/create/create_test.ts` and
+  `node --test website/tests/repository-consistency.test.mjs`.
+- Result: the scaffold suite kept 16 tests green and failed only AC-NRF-012
+  because it returned `0.4.1`; the repository suite kept 14 checks green and
+  failed only AC-NRF-012 because `package.json` still declared `0.4.1`.
+- Test digests: create
+  `sha256:2b6ddfcb72e2ce137f973206567b2d35bf4ddf6c5f02889f8f11a794d24a0f8f`;
+  repository consistency
+  `sha256:419461188b681706d804f14daba8e47a4eca028d6dd2bfeb362b3d0903b655fe`.
+- Expected reason: the release identity had not yet been advanced to the
+  owner-authorized new patch version. The failures were not compilation,
+  dependency, or runner failures.
+
+### Delivery authorization, 0.4.2
+
+- Status: authorized, not yet attempted.
+- Authorized by: human project owner.
+- Authorized at: 2026-08-30T02:14:42Z.
+- Target: commit and push the verified release to `main`, create and push tag
+  `v0.4.2`, allow the repository publish workflow to publish
+  `@sleepy-hollow/framework@0.4.2` with provenance, and allow the website
+  workflow to deploy the same revision to GitHub Pages.
+- Decision source: direct owner instruction, “Alright let’s publish as a new
+  version.” The patch version was selected because the release changes
+  standards, skills, documentation, and presentation without a public runtime
+  API compatibility break.
+
+### Verification, 0.4.2 release alignment
+
+- Status: passed.
+- Verified at: 2026-08-30T02:16:52Z.
+- Framework result: `npm run verify` passed 240 Node and 240 Bun tests with 6
+  intentional skips in each runtime plus all 5 platform-baseline checks.
+- Package result: the rebuilt CLI reported `hollow 0.4.2`; `npm pack --dry-run
+  --json` produced `@sleepy-hollow/framework@0.4.2` with 52 files, package
+  shasum `ee4227f2fe3c16b46121e9fc41f51ac0b9f2503a`, and no bundled dependencies.
+- Website result: the complete `website/package.json#verify` gate passed 36
+  structural, 1 link, 15 repository-consistency, 10 framework-documentation,
+  17 component, all TypeScript, and 192 Playwright checks across Chromium,
+  Firefox, and WebKit.
+- Release-surface manifests: `package.json`
+  `sha256:428b0ebf7ed09e2289de810d3d2d05d44e02ff49efc705c1a5868a682bee8b80`;
+  `package-lock.json`
+  `sha256:d0b40d67c6d83d03c4523fca0deb167b65b55499d43c739c775b6a86647b6f14`;
+  `CHANGELOG.md`
+  `sha256:c3c61401770047f4a83663a28b8b1b6bc361ab9270be8f8cdb457265fc067d1c`;
+  CLI identity
+  `sha256:f9046e77210cc060562a706895efa90bc13c42810c052c838a138174453d1c21`;
+  scaffold
+  `sha256:41f9e7821fedec3f4bf8f3463f594fa4fd957c864ea1e21b66f39ea8c3448025`;
+  artifact generator
+  `sha256:d854d48ec8e2a25d2fb4688da198ec56ac1236dda7e9cb1fa93b03789b118cde`;
+  inventory generator
+  `sha256:eeacde316bb4b3d1cbff0472379ec70a3cce6ea094f4e233b7db91cd948b027d`.
+- Remote preflight: `origin/main` remained at the release baseline, no remote
+  `v0.4.2` tag existed, and npm returned `E404` for
+  `@sleepy-hollow/framework@0.4.2`, confirming the immutable version was unused.
+- Residuals: npm publication and GitHub Pages deployment still depend on the
+  repository workflows and their configured secrets. Four existing TypeDoc
+  inclusion warnings remain non-blocking; TypeDoc reported zero errors.

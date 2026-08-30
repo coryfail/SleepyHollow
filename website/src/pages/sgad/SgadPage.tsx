@@ -43,12 +43,31 @@ const adoptionSteps = [
   "Use an independent verification command, not the producing agent’s summary, to decide whether evidence passes.",
 ];
 
+const qualityPrinciples = [
+  [
+    "One contributor standard",
+    "Human-authored, agent-authored, and mixed-author implementation follow the same declared engineering standard.",
+  ],
+  [
+    "Projects own the specifics",
+    "SGAD supplies a technology-neutral baseline. Each project owns its formatting, naming, organization, documentation, coverage, complexity, architecture, dependency, and tooling decisions.",
+  ],
+  [
+    "Readable, reviewable source",
+    "The baseline calls for readable source, cohesive responsibilities, meaningful contract and decision documentation, explicit errors, trust-boundary validation, clean delivery-ready source, and clear treatment of generated or vendored artifacts.",
+  ],
+  [
+    "Independent controls",
+    "Independent verification records the applicable policy revision and fails closed when a required control is missing or failing. A bounded exception qualifies conformance until it expires or is resolved.",
+  ],
+] as const;
+
 export default function SgadPage() {
   return (
     <main id="main-content" className="sgad-page">
       <article className="methodology-document">
         <header className="methodology-hero">
-          <p className="status-line">An open methodology · Public draft</p>
+          <p className="status-line">An open methodology · Public draft · Core 0.3.0</p>
           <h1>Specification-Governed Agentic Development</h1>
           <p className="methodology-hero__lede">
             SGAD is a proposed open methodology for connecting human intent,
@@ -98,6 +117,33 @@ export default function SgadPage() {
             Humans approve the intent. Agents implement the specification.
             Independent evidence decides whether the work is complete.
           </blockquote>
+        </section>
+
+        <section className="methodology-quality" aria-labelledby="quality-title">
+          <div className="methodology-section-head">
+            <p>Engineering quality</p>
+            <h2 id="quality-title">One engineering standard, whoever writes the code.</h2>
+            <p>
+              SGAD governs how a project declares and verifies quality without
+              prescribing one technology stack. Passing style or tooling checks
+              is evidence about the declared policy, not proof that behavior is
+              correct.
+            </p>
+          </div>
+          <dl className="practice-ledger">
+            {qualityPrinciples.map(([term, description]) => (
+              <div key={term}>
+                <dt>{term}</dt>
+                <dd>{description}</dd>
+              </div>
+            ))}
+          </dl>
+          <a
+            className="text-action methodology-quality__action"
+            href={`${sitePaths.docs}sgad/engineering-quality/`}
+          >
+            Read the engineering-quality guide <span aria-hidden="true">→</span>
+          </a>
         </section>
 
         <section className="methodology-workflow" aria-labelledby="workflow-title">

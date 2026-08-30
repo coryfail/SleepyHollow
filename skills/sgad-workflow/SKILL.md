@@ -24,6 +24,8 @@ For artifact creation, approval design, or lifecycle questions, read
 [governance-and-artifacts.md](references/governance-and-artifacts.md). For
 verification, risk profiles, or conformance assessment, read
 [verification-and-conformance.md](references/verification-and-conformance.md).
+When adopting, implementing, reviewing, or verifying source-quality policy, read
+[engineering-quality.md](references/engineering-quality.md).
 
 ## Preserve the non-negotiable gates
 
@@ -36,10 +38,12 @@ verification, risk profiles, or conformance assessment, read
    red-state evidence for new behavior.
 7. Stop when the baseline is broken for an unrelated reason.
 8. Implement only approved scope; never weaken intent or tests to obtain success.
-9. Use an independent repository control for verification; producer prose is not
+9. Apply the repository's declared engineering standard equally to human and
+   agent work; do not invent technology-specific rules when policy is absent.
+10. Use an independent repository control for verification; producer prose is not
    verification.
-10. Invalidate affected authority and evidence after material changes.
-11. Gate delivery on the evidence required by project risk and policy.
+11. Invalidate affected authority and evidence after material changes.
+12. Gate delivery on the evidence required by project risk and policy.
 
 Treat `draft`, `approved`, and `verified` as lifecycle projections. Never accept
 an editable status field, an agent's assertion, or a second agent's agreement as
@@ -57,6 +61,8 @@ release controls, and evidence. Determine:
 - Who or what may approve exact intent.
 - The governed named `*.req.md` file that will contain the complete approval and
   evidence history.
+- The repository-visible engineering standard, applicability rules, required
+  deterministic controls, and active exceptions.
 - The independent verifier entry point and delivery gate.
 
 If these controls do not exist, propose the smallest explicit policy before
@@ -123,16 +129,18 @@ the absence of historical red evidence honestly.
 ### 5. Implement within authority
 
 Produce the smallest change that satisfies approved criteria and repository
-policy. Preserve test semantics and declared scope. Repair bounded implementation
-defects, but return to specification review if the required behavior changes or
-the approved scope is insufficient.
+policy, including the applicable engineering standard. Preserve test semantics
+and declared scope. Repair bounded implementation defects, but return to
+specification review if the required behavior changes or the approved scope is
+insufficient.
 
 ### 6. Verify independently
 
 Run the repository's verifier or CI control against current repository state.
 Require it to check applicable structure, authority, traceability, red evidence,
-tests, security and policy, contracts, generated artifacts, non-functional
-requirements, and delivery readiness.
+tests, engineering quality, security and policy, contracts, generated artifacts,
+non-functional requirements, and delivery readiness. Record the engineering
+policy revision, applicability decisions, controls, results, and exceptions.
 
 Append the verification result beneath the requirement's `Governance record` and
 link machine-readable runner output when useful. Report missing, stale,

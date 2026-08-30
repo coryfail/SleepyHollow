@@ -55,11 +55,34 @@ const method = [
 const capabilities = [
   ["Routing", "Routes are files. The directory is the path, so the URL surface cannot drift from the tree."],
   ["Validation", "Every request and response is checked against a Zod schema declared on the route itself."],
-  ["Data", "Embedded SQLite by default, with an optional PostgreSQL profile for managed SQL."],
+  ["Data", "Drizzle-backed SQLite by default, with a supported PostgreSQL profile for managed SQL."],
   ["Security", "Each route states its authentication mode. There is no implicit default to forget."],
   ["Contracts", "OpenAPI documents and typed clients are generated from the schemas already on your routes."],
   ["Deploy", "One command ships a verified revision to Fly.io, with room for additional providers."],
 ];
+
+const applicationStandards = [
+  [
+    "Persistence",
+    "Durable relational data uses Drizzle-backed SQLite or PostgreSQL by default. An alternative requires an explicit, recorded, human-approved decision in the governing requirement.",
+  ],
+  [
+    "Model ownership",
+    "Each models/<model>/ directory owns <model>.req.md, schema.ts, repository.ts, and types.ts. Routes do not own database access; repositories do.",
+  ],
+  [
+    "Source quality",
+    "Sleepy Hollow requires readable multi-line application code and TSDoc for every application-owned function, with bounded responsibilities and strict types.",
+  ],
+  [
+    "One contributor standard",
+    "AI-generated and human-authored application code follow the same Sleepy Hollow standard, review boundary, and evidence requirements.",
+  ],
+  [
+    "Complementary controls",
+    "Formatter, linter, type, test, evidence, and hollow check controls enforce different parts of the standard. Human review remains required; passing controls is not proof of correctness, security, or freedom from defects.",
+  ],
+] as const;
 
 export default function SleepyHollowPage() {
   return (
@@ -173,6 +196,29 @@ export default function SleepyHollowPage() {
 
         <dl className="framework__ledger framework__ledger--plain">
           {capabilities.map(([term, description]) => (
+            <div key={term}>
+              <dt>{term}</dt>
+              <dd>{description}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section className="home-standards" aria-labelledby="standards-title">
+        <div className="section-intro">
+          <p className="eyebrow">How applications are built</p>
+          <h2 id="standards-title">One application standard, for agents and humans.</h2>
+          <p>
+            The framework turns its engineering position into concrete rules for
+            persistence, ownership, readable source, and the checks required
+            before verification.
+          </p>
+          <a className="text-action" href={`${sitePaths.docs}application-standards/`}>
+            Read the application standards <span aria-hidden="true">→</span>
+          </a>
+        </div>
+        <dl className="framework__ledger framework__ledger--plain">
+          {applicationStandards.map(([term, description]) => (
             <div key={term}>
               <dt>{term}</dt>
               <dd>{description}</dd>

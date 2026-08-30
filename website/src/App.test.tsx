@@ -67,6 +67,32 @@ describe("approved site behavior", () => {
     expect(screen.getByText("npx skills add coryfail/SleepyHollow --skill sgad-workflow", { exact: true })).toBeVisible();
   });
 
+  test("AC-WEB-SGAD-EQ-001 through AC-WEB-SGAD-EQ-006 · SGAD renders its shared engineering-quality boundary", () => {
+    render(<App page="sgad" />);
+    expect(screen.getByText(/Public draft · Core 0\.3\.0/i)).toBeVisible();
+    expect(screen.getByRole("heading", { name: /one engineering standard/i })).toBeVisible();
+    expect(screen.getByText(/human-authored, agent-authored, and mixed-author/i)).toBeVisible();
+    expect(screen.getByRole("link", { name: /read the engineering-quality guide/i })).toHaveAttribute(
+      "href",
+      expect.stringMatching(/\/docs\/sgad\/engineering-quality\/$/),
+    );
+  });
+
+  test("AC-HOME-STDS-001 through AC-HOME-STDS-008 · home renders the governed application standard", () => {
+    const { container } = render(<App page="sleepy-hollow" />);
+    expect(screen.getByRole("heading", { name: /one application standard/i })).toBeVisible();
+    expect(screen.getAllByText(/Drizzle-backed SQLite/i)[0]).toBeVisible();
+    expect(screen.getByText(/models\/<model>\//i)).toBeVisible();
+    expect(screen.getByText(/every application-owned function/i)).toBeVisible();
+    expect(screen.getByRole("link", { name: /read the application standards/i })).toHaveAttribute(
+      "href",
+      expect.stringMatching(/\/docs\/application-standards\/$/),
+    );
+    const standards = container.querySelector(".home-standards");
+    expect(standards?.previousElementSibling).toHaveClass("home-capabilities");
+    expect(standards?.nextElementSibling).toHaveClass("home-check");
+  });
+
   test("AC-SITE-002 · navigation identifies the current page", () => {
     render(<App page="sgad" />);
     const navigation = screen.getByRole("navigation", { name: /primary/i });

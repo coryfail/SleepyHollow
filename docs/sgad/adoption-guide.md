@@ -17,7 +17,18 @@ Choose which work requires SGAD. A practical initial policy covers:
 Formatting, comments, disposable exploration, or clearly non-behavioral changes
 may use a lighter path when repository policy says so.
 
-## 2. Add a portable structure
+## 2. Declare the engineering standard
+
+Identify the repository-visible engineering policy that applies to the governed
+component. It applies equally to human and agent contributions and extends the
+[SGAD engineering-quality baseline](engineering-quality.md).
+
+Record the standard's scope, authority, deterministic commands or controls,
+rules for generated and vendored source, and active exceptions. Reuse the
+project's existing quality tools. Add missing controls only when policy and risk
+require them.
+
+## 3. Add a portable structure
 
 One possible minimal structure is:
 
@@ -55,7 +66,7 @@ supporting provenance, but the canonical record remains in the named
 requirement file.
 Do not accept an editable status as sole proof of approval or verification.
 
-## 3. Write the system specification
+## 4. Write the system specification
 
 Capture the system purpose, actors, scope, boundaries, shared models, security,
 operations, risks, open decisions, and cross-cutting acceptance criteria.
@@ -67,7 +78,7 @@ behavior and unknowns honestly.
 Use [the application template](templates/application-requirements.md) as a
 starting point.
 
-## 4. Decompose one component
+## 5. Decompose one component
 
 Select a component small enough to review and verify independently. Create its
 named `*.req.md` file before new tests or implementation. Give every criterion a
@@ -88,7 +99,7 @@ AC-RESET-004: Implement token validation.
 
 Use [the component template](templates/component-requirements.md).
 
-## 5. Record approval against exact content
+## 6. Record approval against exact content
 
 At minimum, review the specification through an authorized control, calculate
 the governed-content digest, and append the approval decision and its supporting
@@ -101,7 +112,7 @@ normalization.
 Do not allow an agent to establish approval by changing `status: draft` to
 `status: approved` without independently verifiable authorization.
 
-## 6. Add criterion mapping
+## 7. Add criterion mapping
 
 Choose one deterministic mapping mechanism:
 
@@ -112,7 +123,7 @@ Choose one deterministic mapping mechanism:
 
 Add a CI check for unmapped criteria and unapproved acceptance tests.
 
-## 7. Require the red phase
+## 8. Require the red phase
 
 Run new tests against the pre-implementation baseline. Retain enough information
 to reproduce and classify the expected failure. Stop if unrelated baseline checks
@@ -122,7 +133,7 @@ For an existing implementation being brought under SGAD, record a characterizati
 baseline instead. Do not fabricate historical red evidence; state that the
 behavior predates adoption.
 
-## 8. Establish an independent verifier
+## 9. Establish an independent verifier
 
 Create one stable command or CI entry point that:
 
@@ -131,6 +142,8 @@ Create one stable command or CI entry point that:
 - Checks criterion mappings.
 - Validates red evidence when required.
 - Runs relevant tests and existing quality gates.
+- Resolves the applicable engineering policy and runs every required quality
+  control for the evaluated change.
 - Detects changed or stale generated artifacts.
 - Appends a human-readable result and links any machine-readable runner output in
   the governed `*.req.md` file.
@@ -140,7 +153,7 @@ The first verifier may be a small script around existing tools. Independence
 comes from evidence and control boundaries, not from building an elaborate new
 platform.
 
-## 9. Bind CI and delivery
+## 10. Bind CI and delivery
 
 Protect governed branches or environments so delivery requires a valid verifier
 result for the exact revision. Record the result in the named `*.req.md` file and link
@@ -148,7 +161,7 @@ the supporting CI run or repository attestation.
 
 Add post-delivery evidence only after pre-delivery verification is reliable.
 
-## 10. Add impact invalidation
+## 11. Add impact invalidation
 
 Start conservatively: rerun all relevant evidence after governed changes. As the
 dependency model improves, narrow invalidation safely.
@@ -172,7 +185,8 @@ was needed. Ambiguity expands the required verification scope.
 
 ### Stage 3: Independent verification
 
-- One verifier command checks authority, traceability, tests, and project policy.
+- One verifier command checks authority, traceability, tests, engineering
+  quality, and project policy.
 - Results are structured and bound to repository revisions.
 - CI fails closed on missing evidence.
 

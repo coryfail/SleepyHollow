@@ -2,6 +2,21 @@
 
 All notable changes to Sleepy Hollow are documented in this file.
 
+## 0.4.2 - 2026-08-29
+
+### Added: shared engineering-quality standards and public guidance
+
+SGAD Core 0.3.0 now defines a framework-independent engineering-quality
+baseline for human-authored, agent-authored, and mixed-author changes while
+leaving concrete tools and thresholds to each adopting project.
+
+Sleepy Hollow now publishes its concrete application standard for Drizzle-first
+SQLite and PostgreSQL persistence, governed per-model requirements, repository-
+owned database access, readable multi-line source, documentation for every
+application-owned function, strict TypeScript, security boundaries, tests, and
+ordered quality gates. The official skills, canonical documentation, product
+site, methodology page, and verification checks share the same guidance.
+
 ## 0.4.1 - 2026-08-28
 
 ### Added: stable problem-type documentation and canonical URI correction

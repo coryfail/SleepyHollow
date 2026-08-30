@@ -206,13 +206,32 @@ test("AC-WEB-SGAD-001 AC-WEB-SGAD-003 AC-WEB-SGAD-006 AC-WEB-SGAD-012 · SGAD is
   ).toBeVisible();
 });
 
+test("AC-WEB-SGAD-EQ-001 through AC-WEB-SGAD-EQ-006 · SGAD engineering quality is accessible and reaches its canonical guide", async ({ page }) => {
+  await page.goto("/sgad/");
+  await expect(page.getByText(/Public draft · Core 0\.3\.0/i)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /one engineering standard/i })).toBeVisible();
+  await page.getByRole("link", { name: /read the engineering-quality guide/i }).click();
+  await expect(page).toHaveURL(/\/docs\/sgad\/engineering-quality\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: /engineering quality/i })).toBeVisible();
+});
+
+test("AC-HOME-STDS-001 through AC-HOME-STDS-008 · application standards are ordered, usable, and linked", async ({ page }) => {
+  await page.goto("/");
+  const standards = page.locator(".home-standards");
+  await expect(standards.getByRole("heading", { name: /one application standard/i })).toBeVisible();
+  await expect(standards.getByText(/models\/<model>\//i)).toBeVisible();
+  await standards.getByRole("link", { name: /read the application standards/i }).click();
+  await expect(page).toHaveURL(/\/docs\/application-standards\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: /application standards/i })).toBeVisible();
+});
+
 test("AC-WEB-SGAD-001 · SGAD introduction follows the shared navigation without an excessive empty band", async ({ page }) => {
   await page.setViewportSize({ width: 889, height: 936 });
   await page.goto("/sgad/");
 
   const navigation = await page.locator(".nav-bar").boundingBox();
   const introduction = await page.getByText(
-    "An open methodology · Public draft",
+    "An open methodology · Public draft · Core 0.3.0",
     { exact: true },
   ).boundingBox();
 

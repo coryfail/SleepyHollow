@@ -2,7 +2,7 @@
 
 **Abbreviation:** SGAD
 
-**Status:** Draft methodology, version 0.2.0
+**Status:** Draft methodology, version 0.3.0
 
 > Intent authorizes. Agents implement. Evidence verifies.
 
@@ -61,6 +61,8 @@ A conforming SGAD workflow preserves these invariants:
    agent's assertion.
 7. Behavioral changes invalidate affected approval and verification evidence.
 8. Delivery is permitted only by the evidence required for the change's risk.
+9. Humans and agents follow the same repository-visible engineering standard,
+   and independent verification runs every declared applicable quality control.
 
 ## Lifecycle
 
@@ -113,6 +115,8 @@ See [workflow.md](workflow.md) for phase entry and exit conditions.
   approval records, evidence, state, and invalidation.
 - [Verification model](verification-model.md) defines the trust boundary and
   required kinds of evidence.
+- [Engineering quality](engineering-quality.md) defines the portable minimum and
+  the standards each adopting project must own.
 - [Adoption guide](adoption-guide.md) shows how to introduce SGAD in any
   repository.
 - [Conformance](conformance.md) defines the minimum claim and optional capability
